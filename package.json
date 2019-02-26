@@ -1,0 +1,45 @@
+{
+  "name": "@alicloud/credentials",
+  "version": "0.0.1",
+  "description": "alibaba cloud node.js sdk credentials",
+  "main": "lib/credentials.js",
+  "scripts": {
+    "lint": "eslint --fix lib/*.js test/*.js",
+    "test": "mocha -R spec test/*.test.js  --timeout 15000",
+    "cov": "nyc --reporter=html --reporter=text --reporter=lcov mocha -R spec test/*.test.js  --timeout 15000",
+    "ci": "npm run lint && npm run cov && codecov",
+    "clean": "rm -rf coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aliyun/nodejs-credentials.git"
+  },
+  "keywords": [
+    "alibaba cloud",
+    "sdk",
+    "credentials"
+  ],
+  "author": "Alibaba Cloud SDK",
+  "license": "MIT",
+  "devDependencies": {
+    "muk": "^0.5.3",
+    "codecov": "^3.1.0",
+    "eslint": "^5.10.0",
+    "expect.js": "^0.3.1",
+    "mm": "^2.4.1",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0",
+    "rewire": "^4.0.1"
+  },
+  "dependencies": {
+    "@alicloud/sts-sdk": "^1.0.0",
+    "ini": "^1.3.5"
+  },
+  "bugs": {
+    "url": "https://github.com/aliyun/nodejs-credentials/issues"
+  },
+  "homepage": "https://github.com/aliyun/nodejs-credentials#readme",
+  "files": [
+    "lib"
+  ]
+}
