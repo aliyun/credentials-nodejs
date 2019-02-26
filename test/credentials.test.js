@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const expect = require('expect.js');
 const mm = require('mm');
@@ -80,6 +81,52 @@ describe('credentials should failed with profile disable', function () {
       error = e.message;
     }
     expect(error).to.be('Credentials [demo1] no longer use!');
+  });
+});
+
+describe('credentials should failed with credentials file has no read permission', function () {
+  before(function () {
+    mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', path.join(__dirname, './fixtures/credentials'));
+    mm(fs, 'accessSync', function () {
+      throw new Error('No permission');
+    });
+  });
+  after(function () {
+    mm.restore();
+  });
+
+  it('should failed', async function () {
+    let error = '';
+    try {
+      const cred = new Credentials();
+      await cred.getCredential();
+    } catch (e) {
+      error = e.message;
+    }
+    expect(error).to.be('Has no read permission to credentials file');
+  });
+});
+
+describe('credentials should failed with credentials file has no read permission', function () {
+  before(function () {
+    mm(process.env, 'HOME', path.join(__dirname, './fixtures'));
+    mm(fs, 'accessSync', function () {
+      throw new Error('No permission');
+    });
+  });
+  after(function () {
+    mm.restore();
+  });
+
+  it('should failed', async function () {
+    let error = '';
+    try {
+      const cred = new Credentials();
+      await cred.getCredential();
+    } catch (e) {
+      error = e.message;
+    }
+    expect(error).to.be('No credentials found');
   });
 });
 
