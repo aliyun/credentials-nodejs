@@ -6,6 +6,49 @@ const expect = require('expect.js');
 const mm = require('mm');
 const Credentials = require('../lib/credentials');
 
+describe('credentials should failed with user config credentialsFile not exists', function () {
+  it('should failed', async function () {
+    let error = '';
+    const notExistsFile = path.join(__dirname, 'fixtures/not_exist_file')
+    try {
+      const cred = new Credentials({
+        credentialsFile: notExistsFile,
+        profile: 'demo10'
+      });
+      await cred.getCredential();
+    } catch (e) {
+      error = e.message;
+    }
+    expect(error).to.be(`Credentials file ${notExistsFile} cannot be empty`);
+  });
+});
+
+describe('credentials should failed with user config credentialsFile has no read permission', function () {
+  before(function () {
+    mm(fs, 'accessSync', function () {
+      throw new Error('No permission');
+    });
+  });
+  after(function () {
+    mm.restore();
+  });
+
+  it('should failed', async function () {
+    let error = '';
+    const noPermissionFile = path.join(__dirname, 'fixtures/credentials')
+    try {
+      const cred = new Credentials({
+        credentialsFile: noPermissionFile,
+        profile: 'demo10'
+      });
+      await cred.getCredential();
+    } catch (e) {
+      error = e.message;
+    }
+    expect(error).to.be(`Has no read permission to credentials file ${noPermissionFile}`);
+  });
+});
+
 describe('credentials should not ok with ak config not exists', function () {
   before(function () {
     mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', path.join(__dirname, './fixtures/credentials1'));
@@ -127,6 +170,22 @@ describe('credentials should failed with credentials file has no read permission
       error = e.message;
     }
     expect(error).to.be('No credentials found');
+  });
+});
+
+describe('credentials should ok with user config credentialsFile exists', function () {
+  it('should success', async function () {
+    const cred = new Credentials({
+      credentialsFile: path.join(__dirname, 'fixtures/credentials'),
+      profile: 'demo6'
+    });
+    const data = await cred.getCredential();
+    expect(data.accessKeyId).to.be('access-key-id-06');
+    expect(data.accessKeySecret).to.be('access-key-secret-06');
+    // repeat
+    const data2 = await cred.getCredential({ profile: 'demo' });
+    expect(data2.accessKeyId).to.be('access-key-id-06');
+    expect(data2.accessKeySecret).to.be('access-key-secret-06');
   });
 });
 
