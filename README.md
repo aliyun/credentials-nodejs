@@ -16,7 +16,15 @@ npm install @alicloud/credentials
 
 ## Usage
 
-### I. Write credentials file
+### I. Use accessKeyId & accessKeySecret
+
+```bash
+ALIBABA_CLOUD_ACCESS_KEY_ID=<your access key id> ALIBABA_CLOUD_ACCESS_KEY_SECRET=<your access key secret> node app.js
+```
+
+### II. Use credentials file
+
+#### Write credentials file
 
 First you should write credentials file at your home dir: **~/.alibabacloud/credentials**.
 
@@ -39,7 +47,7 @@ role_arn = acs:ram::******:role/******
 role_session_name = ******
 ```
 
-### II. Write code
+#### Write code
 
 Then this module will automatically load credentials from the credentials file above.
 
