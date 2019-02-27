@@ -68,6 +68,20 @@ You can also use custom credential path like:
 ALIBABA_CLOUD_CREDENTIALS_FILE=/path/to/your/credential node app.js
 ```
 
+Similarly, we also support setting explicit credentials file path like:
+
+```js
+const KmsClient = require('@alicloud/kms-sdk');
+const Credentials = require('@alicloud/credentials');
+const client = new KmsClient({
+  endpoint: 'kms.cn-hangzhou.aliyuncs.com', // check this from kms console
+  credential: new Credentials({
+    credentialsFile: '/path/to/your/credential'
+    profile: 'kms-demo'
+  })
+});
+```
+
 ## Test & Coverage
 
 * run test
