@@ -1,6 +1,6 @@
 {
   "name": "@alicloud/credentials",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "alibaba cloud node.js sdk credentials",
   "main": "lib/credentials.js",
   "scripts": {
@@ -32,6 +32,9 @@
     "rewire": "^4.0.1"
   },
   "dependencies": {
+    "httpx": "^2.2.0",
+    "json-bigint": "^0.2.3",
+    "kitx": "^1.2.1",
     "@alicloud/sts-sdk": "^1.0.0",
     "ini": "^1.3.5"
   },
