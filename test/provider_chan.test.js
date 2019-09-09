@@ -1,6 +1,6 @@
 'use strict';
 
-const providerChan = require('../lib/provider/providerChan');
+const providerChan = require('../lib/provider/provider_chan');
 
 
 describe('ProviderChan', function () {

@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('expect.js');
-const InstanceRamRoleCredentialsProvider = require('../lib/provider/instanceRamRoleCredentialsProvider');
+const InstanceRamRoleCredentialsProvider = require('../lib/provider/instance_ram_role_credentials_provider');
 const mm = require('mm');
 describe('InstanceRamRoleCredentialsProvider with env ALIBABA_CLOUD_ECS_METADATA exists', function () {
   describe('when it is empty', function () {
