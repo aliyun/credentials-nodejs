@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('expect.js');
-const ProfileCredentialsProvider = require('../lib/provider/profileCredentialsProvider');
+const ProfileCredentialsProvider = require('../lib/provider/profile_credentials_provider');
 const mm = require('mm');
 const fs = require('fs');
 const utils = require('../lib/util/utils');

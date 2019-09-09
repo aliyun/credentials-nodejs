@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('expect.js');
-const EnvironmentVariableCredentialsProvider = require('../lib/provider/environmentVariableCredentialsProvider');
+const EnvironmentVariableCredentialsProvider = require('../lib/provider/environment_variable_credentials_provider');
 const mm = require('mm');
 describe('EnvironmentVariableCredentialsProvider with env variables', function () {
   before(function () {

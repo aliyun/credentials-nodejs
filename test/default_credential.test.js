@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('expect.js');
-const DefaultCredential = require('../lib/defaultCredential');
+const DefaultCredential = require('../lib/default_credential');
 
 describe('DefaultCredential get corret value', function () {
   it('should success', async function () {
