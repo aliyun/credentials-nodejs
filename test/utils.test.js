@@ -20,7 +20,7 @@ describe('parseFile error', function () {
     let content = await utils.parseFile('test', true);
     expect(content).to.be(null);
   });
-  it('should faild when ignoreErr=false', async function () {
+  it('should failed when ignoreErr=false', async function () {
     expect(function () {
       utils.parseFile('test', false);
     }).throwException(/Has no read permission to credentials file/);

@@ -3,16 +3,14 @@
 const expect = require('expect.js');
 const DefaultCredential = require('../lib/default_credential');
 
-describe('DefaultCredential get corret value', function () {
+describe('DefaultCredential get correct value', function () {
   it('should success', async function () {
     const cred = new DefaultCredential();
-    let id = cred.getAccessKeyId();
+    let id = await cred.getAccessKeyId();
     expect(id).to.be('');
-    let secret = cred.getAccessKeySecret();
+    let secret = await cred.getAccessKeySecret();
     expect(secret).to.be('');
-    let bearerToken = cred.getBearerToken();
-    expect(bearerToken).to.be('');
-    let securityToken = cred.getSecurityToken();
+    let securityToken = await cred.getSecurityToken();
     expect(securityToken).to.be('');
   });
 });

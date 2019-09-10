@@ -1,11 +1,11 @@
 'use strict';
 
 const expect = require('expect.js');
-const ProfileCredentialsProvider = require('../lib/provider/profile_credentials_provider');
+const profileCredentialsProvider = require('../lib/provider/profile_credentials_provider');
 const mm = require('mm');
 const fs = require('fs');
 const utils = require('../lib/util/utils');
-describe('ProfileCredentialsProvider with env file_path exists', function () {
+describe('profileCredentialsProvider with env file_path exists', function () {
   describe('when file_path is empty', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', '');
@@ -13,9 +13,9 @@ describe('ProfileCredentialsProvider with env file_path exists', function () {
     after(function () {
       mm.restore();
     });
-    it('should faild', async function () {
+    it('should failed', async function () {
       expect(function () {
-        new ProfileCredentialsProvider().getCredential();
+        profileCredentialsProvider.getCredential();
       }).throwError(/Environment variable credentialFile cannot be empty/);
     });
   });
@@ -29,9 +29,9 @@ describe('ProfileCredentialsProvider with env file_path exists', function () {
     after(function () {
       mm.restore();
     });
-    it('should faild', async function () {
+    it('should failed', async function () {
       expect(function () {
-        new ProfileCredentialsProvider().getCredential();
+        profileCredentialsProvider.getCredential();
       }).throwError(/credentialFile ALIBABA_CLOUD_CREDENTIALS_FILE cannot be empty/);
     });
   });
@@ -53,7 +53,7 @@ describe('ProfileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      new ProfileCredentialsProvider().getCredential();
+      profileCredentialsProvider.getCredential();
     });
   });
   describe('when type in file is bearer ', function () {
@@ -73,7 +73,7 @@ describe('ProfileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      new ProfileCredentialsProvider().getCredential();
+      profileCredentialsProvider.getCredential();
     });
   });
   describe('when type in file is ecs_ram_role ', function () {
@@ -93,7 +93,7 @@ describe('ProfileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      new ProfileCredentialsProvider().getCredential();
+      profileCredentialsProvider.getCredential();
     });
   });
   describe('when type in file is ram_role_arn ', function () {
@@ -115,7 +115,7 @@ describe('ProfileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      new ProfileCredentialsProvider().getCredential();
+      profileCredentialsProvider.getCredential();
     });
   });
   describe('when type in file is rsa_key_pair ', function () {
@@ -136,7 +136,7 @@ describe('ProfileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      new ProfileCredentialsProvider().getCredential();
+      profileCredentialsProvider.getCredential();
     });
   });
   describe('when type in file is sts ', function () {
@@ -158,7 +158,7 @@ describe('ProfileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      new ProfileCredentialsProvider().getCredential();
+      profileCredentialsProvider.getCredential();
     });
   });
   describe('when type in file is empty ', function () {
@@ -178,9 +178,9 @@ describe('ProfileCredentialsProvider with env file_path exists', function () {
     after(function () {
       mm.restore();
     });
-    it('should faild', async function () {
+    it('should failed', async function () {
       expect(function () {
-        new ProfileCredentialsProvider().getCredential();
+        profileCredentialsProvider.getCredential();
       }).throwError(/Missing required type option in credentialFile/);
     });
   });
@@ -201,14 +201,14 @@ describe('ProfileCredentialsProvider with env file_path exists', function () {
     after(function () {
       mm.restore();
     });
-    it('should faild', async function () {
+    it('should failed', async function () {
       expect(function () {
-        new ProfileCredentialsProvider().getCredential();
+        profileCredentialsProvider.getCredential();
       }).throwError(/Invalid type option, support: access_key, sts, ecs_ram_role, ram_role_arn, rsa_key_pair/);
     });
   });
 });
-describe('ProfileCredentialsProvider with no env file_path', function () {
+describe('profileCredentialsProvider with no env file_path', function () {
   describe('when defaultFile exists', function () {
     before(function () {
       delete process.env.ALIBABA_CLOUD_CREDENTIALS_FILE;
@@ -228,7 +228,7 @@ describe('ProfileCredentialsProvider with no env file_path', function () {
       mm.restore();
     });
     it('should success', async function () {
-      new ProfileCredentialsProvider().getCredential();
+      profileCredentialsProvider.getCredential();
     });
   });
   describe('when defaultFile is empty', function () {
@@ -245,13 +245,13 @@ describe('ProfileCredentialsProvider with no env file_path', function () {
       mm.restore();
     });
     it('should return null', async function () {
-      const cred = new ProfileCredentialsProvider().getCredential();
+      const cred = profileCredentialsProvider.getCredential();
       expect(cred).to.be(null);
     });
   });
 
 });
-describe('ProfileCredentialsProvider with no env file_path and no defaultFile content', function () {
+describe('profileCredentialsProvider with no env file_path and no defaultFile content', function () {
   before(function () {
     delete process.env.ALIBABA_CLOUD_CREDENTIALS_FILE;
     mm(fs, 'existsSync', function () {
@@ -265,7 +265,7 @@ describe('ProfileCredentialsProvider with no env file_path and no defaultFile co
     mm.restore();
   });
   it('should return null', async function () {
-    new ProfileCredentialsProvider().getCredential();
+    profileCredentialsProvider.getCredential();
   });
 
 });
