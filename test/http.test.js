@@ -4,6 +4,7 @@ const expect = require('expect.js');
 const http = require('../lib//util/http');
 const mm = require('mm');
 const httpx = require('httpx');
+const https = require('https');
 
 
 describe('http request', function () {
@@ -22,7 +23,7 @@ describe('http request', function () {
       action: 'action',
       DurationSeconds: 3600,
       roleSessionName: 'defaultSessionName',
-    }, {}, 'keaccessKeySecret');
+    }, {}, 'accessKeySecret');
     expect(result).to.be.ok();
   });
 });
@@ -34,6 +35,26 @@ describe('http request', function () {
   });
   after(function () {
     mm.restore();
+  });
+  it('should success with undefined params', async function () {
+    let result = await http.request('https://sts.aliyuncs.com', {
+      accessKeyId: 'accessKeyId',
+      roleArn: 'roleArn',
+      action: 'action',
+      DurationSeconds: 3600,
+      roleSessionName: 'defaultSessionName',
+      testParams: [
+        { testKey: 'testKey1' },
+        { testKey: 'testKey2' },
+        { testKey: 'testKey3' },
+        'testValue1', 'testValue2'
+      ]
+    }, undefined, 'accessKeySecret');
+    expect(result).to.be.ok();
+  });
+  it('should success with undefined option', async function () {
+    let result = await http.request('https://sts.aliyuncs.com', undefined, undefined, 'accessKeySecret');
+    expect(result).to.be.ok();
   });
   it('should success with POST method', async function () {
     let result = await http.request('https://sts.aliyuncs.com', {
@@ -50,19 +71,48 @@ describe('http request', function () {
       ]
     }, {
         method: 'POST',
-        formatParams: true,
+        formatParams: false,
+        headers: {
+          content_type: 'application/x-www-form-urlencoded'
+        },
+        agent: new https.Agent({
+          keepAlive: true,
+          keepAliveMsecs: 3000
+        })
+
       },
-      'keaccessKeySecret');
+      'accessKeySecret');
+    expect(result).to.be.ok();
+  });
+  it('should success with POST method and no headers', async function () {
+    let result = await http.request('https://sts.aliyuncs.com', {
+      accessKeyId: 'accessKeyId',
+      roleArn: 'roleArn',
+      action: 'action',
+      DurationSeconds: 3600,
+      roleSessionName: 'defaultSessionName',
+      testParams: [
+        { testKey: 'testKey1' },
+        { testKey: 'testKey2' },
+        { testKey: 'testKey3' },
+        'testValue1', 'testValue2'
+      ]
+    }, {
+        method: 'POST',
+        formatParams: false,
+        headers: undefined,
+        agent: new https.Agent({
+          keepAlive: true,
+          keepAliveMsecs: 3000
+        })
+
+      },
+      'accessKeySecret');
     expect(result).to.be.ok();
   });
 });
 describe('http request', function () {
-  before(function () {
-  });
-  after(function () {
-    mm.restore();
-  });
-  it('should faild with invalid accessKeyId', async function () {
+  it('should failed with invalid accessKeyId', async function () {
     let error = '';
     try {
       let accessKeySecret = 'accessKeySecret';

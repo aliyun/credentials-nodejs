@@ -1,19 +1,15 @@
 'use strict';
 
 const expect = require('expect.js');
-const Credentials = require('../lib/credentials');
+const EcsRamRoleCredential = require('../lib/ecs_ram_role_credential');
 const mm = require('mm');
 const utils = require('../lib/util/utils');
-const http = require('../lib/util/http');
-const defaultConfig = {
-  type: 'ecs_ram_role',
-  role_name: 'role_name'
-};
+const httpUtil = require('../lib/util/http');
 
 describe('EcsRamRoleCredential with correct config', function () {
-  const cred = new Credentials(defaultConfig);
+  const cred = new EcsRamRoleCredential('role_name');
   before(function () {
-    mm(http, 'request', function () {
+    mm(httpUtil, 'request', function () {
       return {
         RequestId: '76C9056D-0E40-4ED9-A82E-D69B30E733C8',
         Credentials: {
@@ -38,7 +34,7 @@ describe('EcsRamRoleCredential with correct config', function () {
     let type = cred.getType();
     expect(type).to.be('ecs_ram_role');
   });
-  it('should refresh credentials with  sessionCredential expired', async function () {
+  it('should refresh credentials with sessionCredential expired', async function () {
     cred.sessionCredential.Expiration = utils.timestamp(cred.sessionCredential.Expiration, -1100 * 3600);
     let needRefresh = cred.needUpdateCredential();
     expect(needRefresh).to.be(true);
@@ -56,16 +52,10 @@ describe('EcsRamRoleCredential with correct config', function () {
   });
 });
 describe('EcsRamRoleCredential should filed with invalid config ', function () {
-  it('should faild when config has no role_name', async function () {
-    let error = '';
-    try {
-      await new Credentials({
-        type: 'ecs_ram_role',
-      });
-    } catch (e) {
-      error = e.message;
-    }
-    expect(error).to.be('Missing required role_name option in config for ecs_ram_role');
+  it('should failed when config has no role_name', async function () {
+    expect(function () {
+      new EcsRamRoleCredential();
+    }).throwException(/Missing required role_name option in config for ecs_ram_role/);
   });
 });
 

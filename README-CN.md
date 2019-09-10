@@ -2,7 +2,7 @@
 
 # Alibaba Cloud Credentials for nodejs
 [![npm version](https://badge.fury.io/js/@alicloud%2fcredentials.svg)](https://badge.fury.io/js/@alicloud%2fcredentials.svg)
-[![Travis Build Status](https://api.travis-ci.org/aliyun/credentials-nodejs.png?branch=master)](https://travis-ci.org/aliyun/credentials-nodejs)
+[![Travis Build Status](https://api.travis-ci.org/aliyun/credentials-nodejs.svg?branch=master)](https://travis-ci.org/aliyun/credentials-nodejs)
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/m9wp3edgrt2c098a?svg=true)](https://ci.appveyor.com/project/aliyun/credentials-nodejs)
 [![codecov](https://codecov.io/gh/aliyun/credentials-nodejs/branch/master/graph/badge.svg)](https://codecov.io/gh/aliyun/credentials-nodejs)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
@@ -40,8 +40,8 @@ const config = {
 	access_key_secret:  "AccessKeySecret",  // AccessKeySecret
 }
 const cred = new Credentials(config);
-let accessKeyId = cred.getAccessKeyId();
-let accessKeySecret = cred.getAccessKeySecret();
+let accessKeyId = await cred.getAccessKeyId();
+let accessKeySecret = await cred.getAccessKeySecret();
 let type = cred.getType();
 
 ```
@@ -57,8 +57,8 @@ const config = {
 	security_token:         "SecurityToken",   // STS Token
 }
 const cred = new Credentials(config);
-let accessKeyId = cred.getAccessKeyId();
-let accessKeySecret = cred.getAccessKeySecret();
+let accessKeyId = await cred.getAccessKeyId();
+let accessKeySecret = await cred.getAccessKeySecret();
 let type = cred.getType();
 ```
 
@@ -80,7 +80,6 @@ let accessKeyId = await cred.getAccessKeyId();
 let accessKeySecret = await cred.getAccessKeySecret();
 let securityToken = await cred.getSecurityToken();
 let type = cred.getType();
-await cred.updateCreadential();
 
 ```
 
@@ -97,7 +96,6 @@ let accessKeyId = await cred.getAccessKeyId();
 let accessKeySecret = await cred.getAccessKeySecret();
 let securityToken = await cred.getSecurityToken();
 let type = cred.getType();
-await cred.updateCreadential();
 ```
 
 #### rsa_key_pair
@@ -115,7 +113,6 @@ let accessKeyId = await cred.getAccessKeyId();
 let accessKeySecret = await cred.getAccessKeySecret();
 let securityToken = await cred.getSecurityToken();
 let type = cred.getType();
-await cred.updateCreadential();
 ```
 
 #### bearer

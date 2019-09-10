@@ -1,16 +1,11 @@
 'use strict';
 
 const expect = require('expect.js');
-const Credentials = require('../lib/credentials');
+const RsaKeyPairCredential = require('../lib/rsa_key_pair_credential');
 const mm = require('mm');
 const fs = require('fs');
 const utils = require('../lib/util/utils');
-const http = require('../lib/util/http');
-const defaultConfig = {
-  type: 'rsa_key_pair',
-  public_key_id: 'public_key_id',
-  private_key_file: 'private_key_file'
-};
+const httpUtil = require('../lib/util/http');
 
 describe('RsaKeyPairCredential with correct config', function () {
   before(function () {
@@ -20,7 +15,7 @@ describe('RsaKeyPairCredential with correct config', function () {
     mm(utils, 'parseFile', function () {
       return true;
     });
-    mm(http, 'request', function () {
+    mm(httpUtil, 'request', function () {
       return {
         RequestId: '76C9056D-0E40-4ED9-A82E-D69B30E733C8',
         Credentials: {
@@ -36,7 +31,7 @@ describe('RsaKeyPairCredential with correct config', function () {
     mm.restore();
   });
   it('should success', async function () {
-    const cred = new Credentials(defaultConfig);
+    const cred = new RsaKeyPairCredential('public_key_id', 'private_key_file');
     let id = await cred.getAccessKeyId();
     expect(id).to.be('AccessKeyId');
     let secret = await cred.getAccessKeySecret();
@@ -47,7 +42,7 @@ describe('RsaKeyPairCredential with correct config', function () {
     expect(type).to.be('rsa_key_pair');
   });
   it('should refresh credentials with sessionCredential expired', async function () {
-    const cred = new Credentials(defaultConfig);
+    const cred = new RsaKeyPairCredential('public_key_id', 'private_key_file');
     let id = await cred.getAccessKeyId();
     expect(id).to.be('AccessKeyId');
     cred.sessionCredential.Expiration = utils.timestamp(cred.sessionCredential.Expiration, -1100 * 3600);
@@ -57,7 +52,7 @@ describe('RsaKeyPairCredential with correct config', function () {
     expect(token).to.be('SecurityToken');
   });
   it('should refresh credentials with no sessionCredential', async function () {
-    const cred = new Credentials(defaultConfig);
+    const cred = new RsaKeyPairCredential('public_key_id', 'private_key_file');
     cred.sessionCredential = null;
     let needRefresh = cred.needUpdateCredential();
     expect(needRefresh).to.be(true);
@@ -76,44 +71,22 @@ describe('RsaKeyPairCredential should filed with invalid config ', function () {
   after(function () {
     mm.restore();
   });
-  it('should faild when config has no public_key_id', async function () {
-    let error = '';
-    try {
-      await new Credentials({
-        type: 'rsa_key_pair',
-        private_key_file: 'private_key_file',
-      });
-    } catch (e) {
-      error = e.message;
-    }
-    expect(error).to.be('Missing required public_key_id option in config for rsa_key_pair');
+  it('should failed when config has no public_key_id', async function () {
+    expect(function () {
+      new RsaKeyPairCredential(undefined, 'private_key_file');
+    }).throwException(/Missing required public_key_id option in config for rsa_key_pair/);
   });
-  it('should faild when config has no private_key_file', async function () {
-    let error = '';
-    try {
-      await new Credentials({
-        type: 'rsa_key_pair',
-        public_key_id: 'public_key_id',
-      });
-    } catch (e) {
-      error = e.message;
-    }
-    expect(error).to.be('Missing required private_key_file option in config for rsa_key_pair');
+  it('should failed when config has no private_key_file', async function () {
+    expect(function () {
+      new RsaKeyPairCredential('public_key_id', undefined);
+    }).throwException(/Missing required private_key_file option in config for rsa_key_pair/);
   });
 });
 describe('RsaKeyPairCredential should filed with private_key_file not exists', function () {
-  it('should faild', async function () {
-    let error = '';
-    try {
-      await new Credentials({
-        type: 'rsa_key_pair',
-        public_key_id: 'public_key_id',
-        private_key_file: 'private_key_file',
-      });
-    } catch (e) {
-      error = e.message;
-    }
-    expect(error).to.be('private_key_file private_key_file cannot be empty');
+  it('should failed', async function () {
+    expect(function () {
+      new RsaKeyPairCredential('public_key_id', 'private_key_file');
+    }).throwException(/private_key_file private_key_file cannot be empty/);
   });
 });
 

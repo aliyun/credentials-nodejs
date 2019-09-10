@@ -1,10 +1,10 @@
 'use strict';
 
 const expect = require('expect.js');
-const Credentials = require('../lib/credentials');
+const RamRoleArnCredential = require('../lib/ram_role_arn_credential');
 const mm = require('mm');
 const utils = require('../lib/util/utils');
-const http = require('../lib/util/http');
+const httpUtil = require('../lib/util/http');
 const defaultConfig = {
   type: 'ram_role_arn',
   role_arn: 'role_arn',
@@ -13,9 +13,9 @@ const defaultConfig = {
 };
 
 describe('RamRoleArnCredential with correct config', function () {
-  const cred = new Credentials(defaultConfig);
+  const cred = new RamRoleArnCredential(defaultConfig);
   before(function () {
-    mm(http, 'request', function () {
+    mm(httpUtil, 'request', function () {
       return {
         RequestId: '76C9056D-0E40-4ED9-A82E-D69B30E733C8',
         Credentials: {
@@ -58,44 +58,32 @@ describe('RamRoleArnCredential with correct config', function () {
   });
 });
 describe('RamRoleArnCredential should filed with invalid config ', function () {
-  it('should faild when config has no access_key_id', async function () {
-    let error = '';
-    try {
-      await new Credentials({
+  it('should failed when config has no access_key_id', async function () {
+    expect(function () {
+      new RamRoleArnCredential({
         type: 'ram_role_arn',
         role_arn: 'role_arn',
         access_key_secret: 'access_key_secret',
       });
-    } catch (e) {
-      error = e.message;
-    }
-    expect(error).to.be('Missing required access_key_id option in config for ram_role_arn');
+    }).throwException(/Missing required access_key_id option in config for ram_role_arn/);
   });
-  it('should faild when config has no access_key_secret', async function () {
-    let error = '';
-    try {
-      await new Credentials({
+  it('should failed when config has no access_key_secret', async function () {
+    expect(function () {
+      new RamRoleArnCredential({
         type: 'ram_role_arn',
         role_arn: 'role_arn',
         access_key_id: 'access_key_id'
       });
-    } catch (e) {
-      error = e.message;
-    }
-    expect(error).to.be('Missing required access_key_secret option in config for ram_role_arn');
+    }).throwException(/Missing required access_key_secret option in config for ram_role_arn/);
   });
-  it('should faild when config has no role_arn', async function () {
-    let error = '';
-    try {
-      await new Credentials({
+  it('should failed when config has no role_arn', async function () {
+    expect(function () {
+      new RamRoleArnCredential({
         type: 'ram_role_arn',
         access_key_id: 'access_key_id',
         access_key_secret: 'access_key_secret'
       });
-    } catch (e) {
-      error = e.message;
-    }
-    expect(error).to.be('Missing required role_arn option in config for ram_role_arn');
+    }).throwException(/Missing required role_arn option in config for ram_role_arn/);
   });
 });
 
