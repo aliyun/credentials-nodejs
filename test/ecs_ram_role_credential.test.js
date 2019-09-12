@@ -7,7 +7,7 @@ const utils = require('../lib/util/utils');
 const httpUtil = require('../lib/util/http');
 
 describe('EcsRamRoleCredential with correct config', function () {
-  const cred = new EcsRamRoleCredential('role_name');
+  const cred = new EcsRamRoleCredential('roleName');
   before(function () {
     mm(httpUtil, 'request', function () {
       return {
@@ -52,10 +52,10 @@ describe('EcsRamRoleCredential with correct config', function () {
   });
 });
 describe('EcsRamRoleCredential should filed with invalid config ', function () {
-  it('should failed when config has no role_name', async function () {
+  it('should failed when config has no roleName', async function () {
     expect(function () {
       new EcsRamRoleCredential();
-    }).throwException(/Missing required role_name option in config for ecs_ram_role/);
+    }).throwException(/Missing required roleName option in config for ecs_ram_role/);
   });
 });
 

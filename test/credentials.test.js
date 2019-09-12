@@ -18,7 +18,7 @@ describe('Credentials with no config', function () {
   after(function () {
     mm.restore();
   });
-  it('it should return default providerChain credentials', async function () {
+  it('should return default providerChain credentials', async function () {
     let cred = new Credentials();
     let type = cred.getType();
     expect(type).to.be('default');
@@ -33,56 +33,56 @@ describe('Credentials with valid config', function () {
       return true;
     });
   });
-  it('it should return AssessKeyCredential when type is access_key', async function () {
+  it('should return AssessKeyCredential when type is access_key', async function () {
     let cred = new Credentials({
       type: 'access_key',
-      access_key_id: 'access_key_id',
-      access_key_secret: 'access_key_secret'
+      accessKeyId: 'accessKeyId',
+      accessKeySecret: 'accessKeySecret'
     });
     let type = cred.getType();
     expect(type).to.be('access_key');
   });
-  it('it should return BearerTokenCredential when type is bearer', async function () {
+  it('should return BearerTokenCredential when type is bearer', async function () {
     let cred = new Credentials({
       type: 'bearer',
-      bearer_token: 'bearer_token'
+      bearerToken: 'bearerToken'
     });
     let type = cred.getType();
     expect(type).to.be('bearer');
   });
-  it('it should return StsTokenCredential when type is sts', async function () {
+  it('should return StsTokenCredential when type is sts', async function () {
     let cred = new Credentials({
       type: 'sts',
-      access_key_id: 'access_key_id',
-      access_key_secret: 'access_key_secret',
-      security_token: 'security_token'
+      accessKeyId: 'accessKeyId',
+      accessKeySecret: 'accessKeySecret',
+      securityToken: 'securityToken'
     });
     let type = cred.getType();
     expect(type).to.be('sts');
   });
-  it('it should return EcsRamRoleCredential when type is ecs_ram_role', async function () {
+  it('should return EcsRamRoleCredential when type is ecs_ram_role', async function () {
     let cred = new Credentials({
       type: 'ecs_ram_role',
-      role_name: 'role_name'
+      roleName: 'roleName'
     });
     let type = cred.getType();
     expect(type).to.be('ecs_ram_role');
   });
-  it('it should return RamRoleArnCredential when type is ram_role_arn', async function () {
+  it('should return RamRoleArnCredential when type is ram_role_arn', async function () {
     let cred = new Credentials({
       type: 'ram_role_arn',
-      access_key_id: 'access_key_id',
-      access_key_secret: 'access_key_secret',
-      role_arn: 'role_arn'
+      accessKeyId: 'accessKeyId',
+      accessKeySecret: 'accessKeySecret',
+      roleArn: 'roleArn'
     });
     let type = cred.getType();
     expect(type).to.be('ram_role_arn');
   });
-  it('it should return RsaKeyPairCredential when type is rsa_key_pair', async function () {
+  it('should return RsaKeyPairCredential when type is rsa_key_pair', async function () {
     let cred = new Credentials({
       type: 'rsa_key_pair',
-      public_key_id: 'public_key_id',
-      private_key_file: 'private_key_file'
+      publicKeyId: 'publicKeyId',
+      privateKeyFile: 'privateKeyFile'
     });
     let type = cred.getType();
     expect(type).to.be('rsa_key_pair');

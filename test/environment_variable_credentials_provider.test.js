@@ -5,8 +5,8 @@ const environmentVariableCredentialsProvider = require('../lib/provider/environm
 const mm = require('mm');
 describe('environmentVariableCredentialsProvider with env variables', function () {
   before(function () {
-    mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_ID', 'access_key_id');
-    mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_SECRET', 'access_key_secret');
+    mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_ID', 'accessKeyId');
+    mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_SECRET', 'accessKeySecret');
   });
   after(function () {
     mm.restore();
@@ -15,9 +15,9 @@ describe('environmentVariableCredentialsProvider with env variables', function (
   it('should success', async function () {
     const cred = environmentVariableCredentialsProvider.getCredential();
     let id = await cred.getAccessKeyId();
-    expect(id).to.be('access_key_id');
+    expect(id).to.be('accessKeyId');
     let secret = await cred.getAccessKeySecret();
-    expect(secret).to.be('access_key_secret');
+    expect(secret).to.be('accessKeySecret');
     let type = await cred.getType();
     expect(type).to.be('access_key');
   });
@@ -38,7 +38,7 @@ describe('environmentVariableCredentialsProvider with no env variables ', functi
 describe('environmentVariableCredentialsProvider with empty ALIBABA_CLOUD_ACCESS_KEY_ID ', function () {
   before(function () {
     mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_ID', '');
-    mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_SECRET', 'access_key_secret');
+    mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_SECRET', 'accessKeySecret');
   });
   after(function () {
     mm.restore();
@@ -52,7 +52,7 @@ describe('environmentVariableCredentialsProvider with empty ALIBABA_CLOUD_ACCESS
 });
 describe('environmentVariableCredentialsProvider with empty ALIBABA_CLOUD_ACCESS_KEY_SECRET ', function () {
   before(function () {
-    mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_ID', 'access_key_id');
+    mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_ID', 'accessKeyId');
     mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_SECRET', '');
   });
   after(function () {

@@ -44,8 +44,8 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm(utils, 'parseFile', function () {
         return {
           type: 'access_key',
-          access_key_id: 'access_key_id',
-          access_key_secret: 'access_key_secret'
+          accessKeyId: 'accessKeyId',
+          accessKeySecret: 'accessKeySecret'
         };
       });
     });
@@ -65,7 +65,7 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm(utils, 'parseFile', function () {
         return {
           type: 'bearer',
-          bearer_token: 'bearer_token',
+          bearerToken: 'bearerToken',
         };
       });
     });
@@ -85,7 +85,7 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm(utils, 'parseFile', function () {
         return {
           type: 'ecs_ram_role',
-          role_name: 'role_name'
+          roleName: 'roleName'
         };
       });
     });
@@ -105,9 +105,9 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm(utils, 'parseFile', function () {
         return {
           type: 'ram_role_arn',
-          role_arn: 'role_arn',
-          access_key_id: 'access_key_id',
-          access_key_secret: 'access_key_secret'
+          roleArn: 'roleArn',
+          accessKeyId: 'accessKeyId',
+          accessKeySecret: 'accessKeySecret'
         };
       });
     });
@@ -127,8 +127,8 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm(utils, 'parseFile', function () {
         return {
           type: 'rsa_key_pair',
-          public_key_id: 'public_key_id',
-          private_key_file: 'private_key_file'
+          publicKeyId: 'publicKeyId',
+          privateKeyFile: 'privateKeyFile'
         };
       });
     });
@@ -148,9 +148,9 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm(utils, 'parseFile', function () {
         return {
           type: 'sts',
-          access_key_id: 'access_key_id',
-          access_key_secret: 'access_key_secret',
-          security_token: 'security_token'
+          accessKeyId: 'accessKeyId',
+          accessKeySecret: 'accessKeySecret',
+          securityToken: 'securityToken'
         };
       });
     });
@@ -169,9 +169,9 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       });
       mm(utils, 'parseFile', function () {
         return {
-          access_key_id: 'access_key_id',
-          access_key_secret: 'access_key_secret',
-          security_token: 'security_token'
+          accessKeyId: 'accessKeyId',
+          accessKeySecret: 'accessKeySecret',
+          securityToken: 'securityToken'
         };
       });
     });
@@ -193,8 +193,8 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm(utils, 'parseFile', function () {
         return {
           type: 'invalid_type',
-          access_key_secret: 'access_key_secret',
-          security_token: 'security_token'
+          accessKeySecret: 'accessKeySecret',
+          securityToken: 'securityToken'
         };
       });
     });
@@ -218,9 +218,9 @@ describe('profileCredentialsProvider with no env file_path', function () {
       mm(utils, 'parseFile', function () {
         return {
           type: 'sts',
-          access_key_id: 'access_key_id',
-          access_key_secret: 'access_key_secret',
-          security_token: 'security_token'
+          accessKeyId: 'accessKeyId',
+          accessKeySecret: 'accessKeySecret',
+          securityToken: 'securityToken'
         };
       });
     });
