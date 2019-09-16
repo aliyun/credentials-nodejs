@@ -3,4 +3,7 @@ language: node_js
 node_js:
   - "8"
   - "10"
-script: npm run ci
+script: 
+  - npm run ci
+  - test -z $SUB_ACCESS_KEY_ID -a -z $SUB_ACCESS_KEY_SECRET -a -z $ROLE_ARN || npm run test-integration
+
