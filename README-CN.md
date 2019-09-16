@@ -35,9 +35,9 @@ npm install @alicloud/credentials
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:               "access_key",       // 凭证类型
-	accessKeyId: 	    "accessKeyId",      // AccessKeyId
-	accessKeySecret:    "accessKeySecret",  // AccessKeySecret
+	type:               'access_key',       // 凭证类型
+	accessKeyId: 	    'accessKeyId',      // AccessKeyId
+	accessKeySecret:    'accessKeySecret',  // AccessKeySecret
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -51,10 +51,10 @@ let type = cred.getType();
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                   "sts",             // 凭证类型
-	accessKeyId:            "accessKeyId",     // AccessKeyId
-	accessKeySecret:        "accessKeySecret", // AccessKeySecret
-	securityToken:          "securityToken",   // STS Token
+	type:                   'sts',             // 凭证类型
+	accessKeyId:            'accessKeyId',     // AccessKeyId
+	accessKeySecret:        'accessKeySecret', // AccessKeySecret
+	securityToken:          'securityToken',   // STS Token
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -67,12 +67,12 @@ let type = cred.getType();
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                   "ram_role_arn",     // 凭证类型
-	accessKeyId:            "accessKeyId",      // AccessKeyId
-	accessKeySecret:        "accessKeySecret",  // AccessKeySecret
-	roleArn:                "roleArn",          // 格式: acs:ram::用户ID:role/角色名
-	roleSessionName:        "roleSessionName",  // 角色会话名称
-	policy:                 "policy",           // 可选, 限制 STS Token 的权限
+	type:                   'ram_role_arn',     // 凭证类型
+	accessKeyId:            'accessKeyId',      // AccessKeyId
+	accessKeySecret:        'accessKeySecret',  // AccessKeySecret
+	roleArn:                'roleArn',          // 格式: acs:ram::用户ID:role/角色名
+	roleSessionName:        'roleSessionName',  // 角色会话名称
+	policy:                 'policy',           // 可选, 限制 STS Token 的权限
 	roleSessionExpiration:   3600,              // 可选, 限制 STS Token 的有效时间
 }
 const cred = new Credentials(config);
@@ -88,8 +88,8 @@ let type = cred.getType();
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                 "ecs_ram_role",       // 凭证类型
-	roleName:             "roleName",           // 账户RoleName
+	type:                 'ecs_ram_role',       // 凭证类型
+	roleName:             'roleName',           // 账户RoleName
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -104,9 +104,9 @@ By specifying the public key ID and the private key file, the credential will be
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                    "rsa_key_pair",       // 凭证类型
-	privateKeyFile:          "privateKeyFile",     // PrivateKey文件路径
-	publicKeyId:             "publicKeyId",        // 账户PublicKeyId
+	type:                    'rsa_key_pair',       // 凭证类型
+	privateKeyFile:          'privateKeyFile',     // PrivateKey文件路径
+	publicKeyId:             'publicKeyId',        // 账户PublicKeyId
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -120,8 +120,8 @@ let type = cred.getType();
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                 "bearer",            // 凭证类型
-	bearerToken:          "bearerToken",       // BearerToken
+	type:                 'bearer',            // 凭证类型
+	bearerToken:          'bearerToken',       // BearerToken
 }
 const cred = new Credentials(config);
 let bearerToken = cred.getBearerToken();
