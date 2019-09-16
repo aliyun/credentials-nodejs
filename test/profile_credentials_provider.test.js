@@ -5,6 +5,8 @@ const profileCredentialsProvider = require('../lib/provider/profile_credentials_
 const mm = require('mm');
 const fs = require('fs');
 const utils = require('../lib/util/utils');
+const path = require('path');
+const ENV_CREDENTIALS_FILE = path.join(__dirname, '/fixtures/credentials');
 describe('profileCredentialsProvider with env file_path exists', function () {
   describe('when file_path is empty', function () {
     before(function () {
@@ -35,7 +37,28 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       }).throwError(/credentialFile ALIBABA_CLOUD_CREDENTIALS_FILE cannot be empty/);
     });
   });
-  describe('when type in file is access_key ', function () {
+  describe('when env credential file exist', function () {
+    before(function () {
+      mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', ENV_CREDENTIALS_FILE);
+    });
+    after(function () {
+      mm.restore();
+    });
+    it('should success with no credential_name', async function () {
+      let cred = profileCredentialsProvider.getCredential();
+      expect(cred.getType()).to.be('access_key');
+    });
+    it('should success with valid credential_name', async function () {
+      let cred = profileCredentialsProvider.getCredential('demo');
+      expect(cred.getType()).to.be('ram_role_arn');
+    });
+    it('should failed with invalid credential_name', async function () {
+      expect(function () {
+        profileCredentialsProvider.getCredential('invalid');
+      }).throwException(/Missing required type option in credentialFile/);
+    });
+  });
+  describe('when default type in file is access_key ', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
       mm(fs, 'existsSync', function () {
@@ -43,9 +66,11 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       });
       mm(utils, 'parseFile', function () {
         return {
-          type: 'access_key',
-          accessKeyId: 'accessKeyId',
-          accessKeySecret: 'accessKeySecret'
+          default: {
+            type: 'access_key',
+            access_key_id: 'access_key_id',
+            access_key_secret: 'access_key_secret'
+          }
         };
       });
     });
@@ -53,10 +78,11 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      profileCredentialsProvider.getCredential();
+      let cred = profileCredentialsProvider.getCredential();
+      expect(cred.getType()).to.be('access_key');
     });
   });
-  describe('when type in file is bearer ', function () {
+  describe('when default type in file is bearer ', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
       mm(fs, 'existsSync', function () {
@@ -64,8 +90,10 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       });
       mm(utils, 'parseFile', function () {
         return {
-          type: 'bearer',
-          bearerToken: 'bearerToken',
+          default: {
+            type: 'bearer',
+            bearer_token: 'bearerToken',
+          }
         };
       });
     });
@@ -73,10 +101,11 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      profileCredentialsProvider.getCredential();
+      let cred = profileCredentialsProvider.getCredential();
+      expect(cred.getType()).to.be('bearer');
     });
   });
-  describe('when type in file is ecs_ram_role ', function () {
+  describe('when default type in file is ecs_ram_role ', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
       mm(fs, 'existsSync', function () {
@@ -84,8 +113,10 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       });
       mm(utils, 'parseFile', function () {
         return {
-          type: 'ecs_ram_role',
-          roleName: 'roleName'
+          default: {
+            type: 'ecs_ram_role',
+            role_name: 'roleName'
+          }
         };
       });
     });
@@ -93,10 +124,11 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      profileCredentialsProvider.getCredential();
+      let cred = profileCredentialsProvider.getCredential();
+      expect(cred.getType()).to.be('ecs_ram_role');
     });
   });
-  describe('when type in file is ram_role_arn ', function () {
+  describe('when default type in file is ram_role_arn ', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
       mm(fs, 'existsSync', function () {
@@ -104,10 +136,12 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       });
       mm(utils, 'parseFile', function () {
         return {
-          type: 'ram_role_arn',
-          roleArn: 'roleArn',
-          accessKeyId: 'accessKeyId',
-          accessKeySecret: 'accessKeySecret'
+          default: {
+            type: 'ram_role_arn',
+            role_arn: 'role_arn',
+            access_key_id: 'access_key_id',
+            access_key_secret: 'access_key_secret'
+          }
         };
       });
     });
@@ -115,10 +149,11 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      profileCredentialsProvider.getCredential();
+      let cred = profileCredentialsProvider.getCredential();
+      expect(cred.getType()).to.be('ram_role_arn');
     });
   });
-  describe('when type in file is rsa_key_pair ', function () {
+  describe('when default type in file is rsa_key_pair ', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
       mm(fs, 'existsSync', function () {
@@ -126,9 +161,11 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       });
       mm(utils, 'parseFile', function () {
         return {
-          type: 'rsa_key_pair',
-          publicKeyId: 'publicKeyId',
-          privateKeyFile: 'privateKeyFile'
+          default: {
+            type: 'rsa_key_pair',
+            public_key_id: 'public_key_id',
+            private_key_file: 'private_key_file'
+          }
         };
       });
     });
@@ -136,10 +173,11 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      profileCredentialsProvider.getCredential();
+      let cred = profileCredentialsProvider.getCredential();
+      expect(cred.getType()).to.be('rsa_key_pair');
     });
   });
-  describe('when type in file is sts ', function () {
+  describe('when default type in file is sts ', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
       mm(fs, 'existsSync', function () {
@@ -147,10 +185,12 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       });
       mm(utils, 'parseFile', function () {
         return {
-          type: 'sts',
-          accessKeyId: 'accessKeyId',
-          accessKeySecret: 'accessKeySecret',
-          securityToken: 'securityToken'
+          default: {
+            type: 'sts',
+            access_key_id: 'access_key_id',
+            access_key_secret: 'access_key_secret',
+            security_token: 'security_token'
+          }
         };
       });
     });
@@ -158,10 +198,11 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       mm.restore();
     });
     it('should success', async function () {
-      profileCredentialsProvider.getCredential();
+      let cred = profileCredentialsProvider.getCredential();
+      expect(cred.getType()).to.be('sts');
     });
   });
-  describe('when type in file is empty ', function () {
+  describe('when default type in file is empty ', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
       mm(fs, 'existsSync', function () {
@@ -169,9 +210,11 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       });
       mm(utils, 'parseFile', function () {
         return {
-          accessKeyId: 'accessKeyId',
-          accessKeySecret: 'accessKeySecret',
-          securityToken: 'securityToken'
+          default: {
+            access_key_id: 'access_key_id',
+            access_key_secret: 'access_key_secret',
+            security_token: 'security_token'
+          }
         };
       });
     });
@@ -184,7 +227,7 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       }).throwError(/Missing required type option in credentialFile/);
     });
   });
-  describe('when type in file is invalid ', function () {
+  describe('when default type in file is invalid ', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
       mm(fs, 'existsSync', function () {
@@ -192,9 +235,11 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       });
       mm(utils, 'parseFile', function () {
         return {
-          type: 'invalid_type',
-          accessKeySecret: 'accessKeySecret',
-          securityToken: 'securityToken'
+          default: {
+            type: 'invalid_type',
+            access_key_secret: 'access_key_secret',
+            security_token: 'security_token'
+          }
         };
       });
     });
@@ -217,10 +262,12 @@ describe('profileCredentialsProvider with no env file_path', function () {
       });
       mm(utils, 'parseFile', function () {
         return {
-          type: 'sts',
-          accessKeyId: 'accessKeyId',
-          accessKeySecret: 'accessKeySecret',
-          securityToken: 'securityToken'
+          default: {
+            type: 'sts',
+            access_key_id: 'access_key_id',
+            access_key_secret: 'access_key_secret',
+            security_token: 'security_token'
+          }
         };
       });
     });

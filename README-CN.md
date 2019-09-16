@@ -140,8 +140,8 @@ let type = cred.getType();
 ```ini
 [default]                          # 默认凭证
 type = access_key                  # 认证方式为 access_key
-accessKeyId = foo                # access key id
-accessKeySecret = bar            # access key secret
+access_key_id = foo                # access key id
+access_key_secret = bar            # access key secret
 ```
 
 #### 3. 实例 RAM 角色
