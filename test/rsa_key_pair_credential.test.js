@@ -31,7 +31,7 @@ describe('RsaKeyPairCredential with correct config', function () {
     mm.restore();
   });
   it('should success', async function () {
-    const cred = new RsaKeyPairCredential('public_key_id', 'private_key_file');
+    const cred = new RsaKeyPairCredential('publicKeyId', 'privateKeyFile');
     let id = await cred.getAccessKeyId();
     expect(id).to.be('AccessKeyId');
     let secret = await cred.getAccessKeySecret();
@@ -42,7 +42,7 @@ describe('RsaKeyPairCredential with correct config', function () {
     expect(type).to.be('rsa_key_pair');
   });
   it('should refresh credentials with sessionCredential expired', async function () {
-    const cred = new RsaKeyPairCredential('public_key_id', 'private_key_file');
+    const cred = new RsaKeyPairCredential('publicKeyId', 'privateKeyFile');
     let id = await cred.getAccessKeyId();
     expect(id).to.be('AccessKeyId');
     cred.sessionCredential.Expiration = utils.timestamp(cred.sessionCredential.Expiration, -1100 * 3600);
@@ -52,7 +52,7 @@ describe('RsaKeyPairCredential with correct config', function () {
     expect(token).to.be('SecurityToken');
   });
   it('should refresh credentials with no sessionCredential', async function () {
-    const cred = new RsaKeyPairCredential('public_key_id', 'private_key_file');
+    const cred = new RsaKeyPairCredential('publicKeyId', 'privateKeyFile');
     cred.sessionCredential = null;
     let needRefresh = cred.needUpdateCredential();
     expect(needRefresh).to.be(true);
@@ -71,22 +71,22 @@ describe('RsaKeyPairCredential should filed with invalid config ', function () {
   after(function () {
     mm.restore();
   });
-  it('should failed when config has no public_key_id', async function () {
+  it('should failed when config has no publicKeyId', async function () {
     expect(function () {
-      new RsaKeyPairCredential(undefined, 'private_key_file');
-    }).throwException(/Missing required public_key_id option in config for rsa_key_pair/);
+      new RsaKeyPairCredential(undefined, 'privateKeyFile');
+    }).throwException(/Missing required publicKeyId option in config for rsa_key_pair/);
   });
-  it('should failed when config has no private_key_file', async function () {
+  it('should failed when config has no privateKeyFile', async function () {
     expect(function () {
-      new RsaKeyPairCredential('public_key_id', undefined);
-    }).throwException(/Missing required private_key_file option in config for rsa_key_pair/);
+      new RsaKeyPairCredential('publicKeyId', undefined);
+    }).throwException(/Missing required privateKeyFile option in config for rsa_key_pair/);
   });
 });
-describe('RsaKeyPairCredential should filed with private_key_file not exists', function () {
+describe('RsaKeyPairCredential should filed with privateKeyFile not exists', function () {
   it('should failed', async function () {
     expect(function () {
-      new RsaKeyPairCredential('public_key_id', 'private_key_file');
-    }).throwException(/private_key_file private_key_file cannot be empty/);
+      new RsaKeyPairCredential('publicKeyId', 'privateKeyFile');
+    }).throwException(/privateKeyFile privateKeyFile cannot be empty/);
   });
 });
 

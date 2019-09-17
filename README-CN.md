@@ -35,9 +35,9 @@ npm install @alicloud/credentials
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:               "access_key",       // 凭证类型
-	access_key_id: 	    "AccessKeyId",      // AccessKeyId
-	access_key_secret:  "AccessKeySecret",  // AccessKeySecret
+	type:               'access_key',       // 凭证类型
+	accessKeyId: 	    'accessKeyId',      // AccessKeyId
+	accessKeySecret:    'accessKeySecret',  // AccessKeySecret
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -51,10 +51,10 @@ let type = cred.getType();
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                   "sts",             // 凭证类型
-	access_key_id:          "AccessKeyId",     // AccessKeyId
-	access_key_secret:      "AccessKeySecret", // AccessKeySecret
-	security_token:         "SecurityToken",   // STS Token
+	type:                   'sts',             // 凭证类型
+	accessKeyId:            'accessKeyId',     // AccessKeyId
+	accessKeySecret:        'accessKeySecret', // AccessKeySecret
+	securityToken:          'securityToken',   // STS Token
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -67,13 +67,13 @@ let type = cred.getType();
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                   "ram_role_arn",     // 凭证类型
-	access_key_id:          "AccessKeyId",      // AccessKeyId
-	access_key_secret:      "AccessKeySecret",  // AccessKeySecret
-	role_arn:               "RoleArn",          // 格式: acs:ram::用户ID:role/角色名
-	role_session_name:      "RoleSessionName",  // 角色会话名称
-	policy:                 "Policy",           // 可选, 限制 STS Token 的权限
-	role_session_expiration: 3600,              // 可选, 限制 STS Token 的有效时间
+	type:                   'ram_role_arn',     // 凭证类型
+	accessKeyId:            'accessKeyId',      // AccessKeyId
+	accessKeySecret:        'accessKeySecret',  // AccessKeySecret
+	roleArn:                'roleArn',          // 格式: acs:ram::用户ID:role/角色名
+	roleSessionName:        'roleSessionName',  // 角色会话名称
+	policy:                 'policy',           // 可选, 限制 STS Token 的权限
+	roleSessionExpiration:   3600,              // 可选, 限制 STS Token 的有效时间
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -88,8 +88,8 @@ let type = cred.getType();
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                 "ecs_ram_role",       // 凭证类型
-	role_name:            "RoleName",           // 账户RoleName
+	type:                 'ecs_ram_role',       // 凭证类型
+	roleName:             'roleName',           // 账户RoleName
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -104,9 +104,9 @@ By specifying the public key ID and the private key file, the credential will be
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                     "rsa_key_pair",       // 凭证类型
-	private_key_file:         "PrivateKeyFile",     // PrivateKey文件路径
-	public_key_id:            "PublicKeyId",        // 账户PublicKeyId
+	type:                    'rsa_key_pair',       // 凭证类型
+	privateKeyFile:          'privateKeyFile',     // PrivateKey文件路径
+	publicKeyId:             'publicKeyId',        // 账户PublicKeyId
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -120,8 +120,8 @@ let type = cred.getType();
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                 "bearer",            // 凭证类型
-	bearer_token:         "BearerToken",    // BearerToken
+	type:                 'bearer',            // 凭证类型
+	bearerToken:          'bearerToken',       // BearerToken
 }
 const cred = new Credentials(config);
 let bearerToken = cred.getBearerToken();
@@ -129,13 +129,13 @@ let type = cred.getType();
 ```
 
 ### 凭证提供程序链
-如果你调用 `New Credential()` 时传入空， 将通过凭证提供链来为你获取凭证。
+如果你调用 `new Credential()` 时传入空， 将通过凭证提供链来为你获取凭证。
 
 #### 1. 环境凭证
 程序首先会在环境变量里寻找环境凭证，如果定义了 `ALICLOUD_ACCESS_KEY`  和 `ALICLOUD_SECRET_KEY` 环境变量且不为空，程序将使用他们创建凭证。如否则，程序会在配置文件中加载和寻找凭证。
 
 #### 2. 配置文件
-如果用户主目录存在默认文件 `~/.alibabacloud/credentials` （Windows 为 `C:\Users\USER_NAME\.alibabacloud\credentials`），程序会自动创建指定类型和名称的凭证。默认文件可以不存在，但解析错误会抛出异常。也可以手动加载指定文件： `AlibabaCloud::load('/data/credentials', 'vfs://AlibabaCloud/credentials', ...);` 不同的项目、工具之间可以共用这个配置文件，因为超出项目之外，也不会被意外提交到版本控制。Windows 上可以使用环境变量引用到主目录 %UserProfile%。类 Unix 的系统可以使用环境变量 $HOME 或 ~ (tilde)。 可以通过定义 `ALIBABA_CLOUD_CREDENTIALS_FILE` 环境变量修改默认文件的路径。
+如果用户主目录存在默认文件 `~/.alibabacloud/credentials` （Windows 为 `C:\Users\USER_NAME\.alibabacloud\credentials`），程序会自动创建指定类型和名称的凭证。默认文件可以不存在，但解析错误会抛出异常。不同的项目、工具之间可以共用这个配置文件，因为超出项目之外，也不会被意外提交到版本控制。Windows 上可以使用环境变量引用到主目录 %UserProfile%。类 Unix 的系统可以使用环境变量 $HOME 或 ~ (tilde)。 可以通过定义 `ALIBABA_CLOUD_CREDENTIALS_FILE` 环境变量修改默认文件的路径。
 
 ```ini
 [default]                          # 默认凭证
