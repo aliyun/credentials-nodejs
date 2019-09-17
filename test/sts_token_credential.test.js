@@ -5,32 +5,32 @@ const StsTokenCredential = require('../lib/sts_token_credential');
 
 describe('StsTokenCredential should get correct value ', function () {
   it('should success', async function () {
-    const cred = new StsTokenCredential('access_key_id', 'access_key_secret', 'security_token');
+    const cred = new StsTokenCredential('accessKeyId', 'accessKeySecret', 'securityToken');
     let id = await cred.getAccessKeyId();
-    expect(id).to.be('access_key_id');
+    expect(id).to.be('accessKeyId');
     let secret = await cred.getAccessKeySecret();
-    expect(secret).to.be('access_key_secret');
+    expect(secret).to.be('accessKeySecret');
     let token = await cred.getSecurityToken();
-    expect(token).to.be('security_token');
+    expect(token).to.be('securityToken');
     let type = await cred.getType();
     expect(type).to.be('sts');
   });
 });
 describe('StsTokenCredential should filed with invalid config ', function () {
-  it('should failed when config has no access_key_id', async function () {
+  it('should failed when config has no accessKeyId', async function () {
     expect(function () {
-      new StsTokenCredential(undefined, 'access_key_secret', 'security_token');
-    }).throwException(/Missing required access_key_id option in config for sts/);
+      new StsTokenCredential(undefined, 'accessKeySecret', 'securityToken');
+    }).throwException(/Missing required accessKeyId option in config for sts/);
   });
-  it('should failed when config has no access_key_secret', async function () {
+  it('should failed when config has no accessKeySecret', async function () {
     expect(function () {
-      new StsTokenCredential('access_key_id', undefined, 'security_token');
-    }).throwException(/Missing required access_key_secret option in config for sts/);
+      new StsTokenCredential('accessKeyId', undefined, 'securityToken');
+    }).throwException(/Missing required accessKeySecret option in config for sts/);
   });
-  it('should failed when config has no security_token', async function () {
+  it('should failed when config has no securityToken', async function () {
     expect(function () {
-      new StsTokenCredential('access_key_id', 'access_key_secret', undefined);
-    }).throwException(/Missing required security_token option in config for sts/);
+      new StsTokenCredential('accessKeyId', 'accessKeySecret', undefined);
+    }).throwException(/Missing required securityToken option in config for sts/);
   });
 });
 

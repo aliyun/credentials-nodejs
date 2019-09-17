@@ -26,9 +26,9 @@ Setup access_key credential through [User Information Management][ak], it have f
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:               "access_key",       // credential type
-	access_key_id: 	    "AccessKeyId",      // AccessKeyId of your account
-	access_key_secret:  "AccessKeySecret",  // AccessKeySecret of your account
+	type:               'access_key',       // credential type
+	accessKeyId: 	    'accessKeyId',      // AccessKeyId of your account
+	accessKeySecret:    'accessKeySecret',  // AccessKeySecret of your account
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -42,10 +42,10 @@ Create a temporary security credential by applying Temporary Security Credential
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                   "sts",             // credential type
-	access_key_id:          "AccessKeyId",     // AccessKeyId of your account
-	access_key_secret:      "AccessKeySecret", // AccessKeySecret of your account
-	security_token:         "SecurityToken",   // Temporary Security Token
+	type:                  'sts',             // credential type
+	accessKeyId:           'accessKeyId',     // AccessKeyId of your account
+	accessKeySecret:       'accessKeySecret', // AccessKeySecret of your account
+	securityToken:         'securityToken',   // Temporary Security Token
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -58,13 +58,13 @@ By specifying [RAM Role][RAM Role], the credential will be able to automatically
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                   "ram_role_arn",     // credential type
-	access_key_id:          "AccessKeyId",      // AccessKeyId of your account
-	access_key_secret:      "AccessKeySecret",  // AccessKeySecret of your account
-	role_arn:               "RoleArn",          // Format: acs:ram::USER_ID:role/ROLE_NAME
-	role_session_name:      "RoleSessionName",  // Role Session Name
-	policy:                 "Policy",           // Not required, limit the permissions of STS Token
-	role_session_expiration: 3600,              // Not required, limit the Valid time of STS Token
+	type:                 'ram_role_arn',     // credential type
+	accessKeyId:          'accessKeyId',      // AccessKeyId of your account
+	accessKeySecret:      'accessKeySecret',  // AccessKeySecret of your account
+	roleArn:              'roleArn',          // Format: acs:ram::USER_ID:role/ROLE_NAME
+	roleSessionName:      'roleSessionName',  // Role Session Name
+	policy:               'policy',           // Not required, limit the permissions of STS Token
+	roleSessionExpiration: 3600,              // Not required, limit the Valid time of STS Token
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -78,8 +78,8 @@ By specifying the role name, the credential will be able to automatically reques
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                 "ecs_ram_role",       // credential type
-	role_name:            "RoleName",           // RoleName of your account
+	type:                 'ecs_ram_role',       // credential type
+	roleName:             'roleName',           // RoleName of your account
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -93,9 +93,9 @@ By specifying the public key ID and the private key file, the credential will be
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                     "rsa_key_pair",       // credential type
-	private_key_file:         "PrivateKeyFile",     // The file path to store the PrivateKey
-	public_key_id:            "PublicKeyId",        // PublicKeyId of your account
+	type:                     'rsa_key_pair',       // credential type
+	privateKeyFile:           'privateKeyFile',     // The file path to store the PrivateKey
+	publicKeyId:              'publicKeyId',        // PublicKeyId of your account
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
@@ -109,8 +109,8 @@ If credential is required by the Cloud Call Centre (CCC), please apply for Beare
 ```js
 const Credentials = require('@alicloud/credentials');
 const config = {
-	type:                 "bearer",            // credential type
-	bearer_token:         "BearerToken",    // BearerToken of your account
+	type:                 'bearer',            // credential type
+	bearerToken:          'bearerToken',       // BearerToken of your account
 }
 const cred = new Credentials(config);
 let bearerToken = await cred.getBearerToken();

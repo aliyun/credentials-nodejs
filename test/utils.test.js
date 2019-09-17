@@ -35,7 +35,7 @@ describe('parseFile with valid filePath', function () {
   it('should success', async function () {
     let filePath = path.join(__dirname, './fixtures/credentials');
     let content = await utils.parseFile(filePath, true);
-    expect(content).to.be.ok();
+    expect(content).to.have.property('default');
   });
 });
 

@@ -17,7 +17,7 @@ describe('instanceRamRoleCredentialsProvider with env ALIBABA_CLOUD_ECS_METADATA
   });
   describe('when is not empty', function () {
     before(function () {
-      mm(process.env, 'ALIBABA_CLOUD_ECS_METADATA', 'role_name');
+      mm(process.env, 'ALIBABA_CLOUD_ECS_METADATA', 'roleName');
     });
     after(function () {
       mm.restore();
