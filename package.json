@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "alibaba cloud node.js sdk credentials",
   "main": "lib/credentials.js",
+  "types": "lib/credentials.d.ts",
   "scripts": {
     "lint": "eslint --fix lib/*.js test/*.js",
     "test": "mocha -R spec test/*.test.js  --timeout 15000",
