@@ -153,3 +153,9 @@ access_key_secret = bar            # access key secret
 [policy]: https://www.alibabacloud.com/help/doc-detail/28664.htm?spm=a2c63.p38356.a3.3.27a63b01khWgdh
 [permissions]: https://ram.console.aliyun.com/permissions
 [RAM Role]: https://ram.console.aliyun.com/#/role/list
+
+## License
+
+[MIT](LICENSE)
+
+Copyright (c) 2009-present, Alibaba Cloud All rights reserved.
