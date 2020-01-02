@@ -79,7 +79,7 @@ By specifying the role name, the credential will be able to automatically reques
 const Credentials = require('@alicloud/credentials');
 const config = {
 	type:                 'ecs_ram_role',       // credential type
-	roleName:             'roleName',           // RoleName of your account
+	roleName:             'roleName',           // `roleName` is optional. It will be retrieved automatically if not set. It is highly recommended to set it up to reduce requests.
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
