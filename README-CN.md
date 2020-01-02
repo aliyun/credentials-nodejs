@@ -89,7 +89,7 @@ let type = cred.getType();
 const Credentials = require('@alicloud/credentials');
 const config = {
 	type:                 'ecs_ram_role',       // 凭证类型
-	roleName:             'roleName',           // 账户RoleName
+	roleName:             'roleName',           // 账户RoleName，非必填，不填则自动获取，建议设置，可以减少请求
 }
 const cred = new Credentials(config);
 let accessKeyId = await cred.getAccessKeyId();
