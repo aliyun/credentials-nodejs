@@ -1,19 +1,20 @@
-'use strict';
 
-const expect = require('expect.js');
-const httpUtil = require('../lib//util/http');
-const mm = require('mm');
-const httpx = require('httpx');
-const https = require('https');
-const rewire = require('rewire');
+
+import expect from 'expect.js';
+import { request } from '../src/util/http';
+import mm from 'mm';
+import httpx from 'httpx';
+import rewire from 'rewire';
+import 'mocha';
+
 const mock = (response, body) => {
   before(function () {
-    mm(httpx, 'request', function (url, opts) {
-      return Promise.resolve(response);
+    mm(httpx, 'request', async function (url, opts) {
+      return response;
     });
 
-    mm(httpx, 'read', function (response, encoding) {
-      return Promise.resolve(body);
+    mm(httpx, 'read', async function (response, encoding) {
+      return body;
     });
   });
 
@@ -23,10 +24,10 @@ const mock = (response, body) => {
 };
 
 describe('http request', function () {
-  mock({
-  }, '{}');
+  mock({}, '{}');
+
   it('should success', async function () {
-    let result = await httpUtil.request('https://sts.aliyuncs.com', {
+    let result = await request('https://sts.aliyuncs.com', {
       accessKeyId: 'accessKeyId',
       roleArn: 'roleArn',
       action: 'action',
@@ -36,11 +37,13 @@ describe('http request', function () {
     expect(result).to.be.ok();
   });
 });
+
 describe('http request', function () {
   mock({
   }, '{}');
+
   it('should success with undefined params', async function () {
-    let result = await httpUtil.request('https://sts.aliyuncs.com', {
+    let result = await request('https://sts.aliyuncs.com', {
       accessKeyId: 'accessKeyId',
       roleArn: 'roleArn',
       action: 'action',
@@ -55,10 +58,12 @@ describe('http request', function () {
     }, undefined, 'accessKeySecret');
     expect(result).to.be.ok();
   });
+
   it('should success with undefined option', async function () {
-    let result = await httpUtil.request('https://sts.aliyuncs.com', undefined, undefined, 'accessKeySecret');
+    let result = await request('https://sts.aliyuncs.com', undefined, undefined, 'accessKeySecret');
     expect(result).to.be.ok();
   });
+
   it('should success with POST method', async function () {
     let host = 'https://sts.aliyuncs.com';
     let params = {
@@ -79,16 +84,13 @@ describe('http request', function () {
       formatParams: false,
       headers: {
         content_type: 'application/x-www-form-urlencoded'
-      },
-      agent: new https.Agent({
-        keepAlive: true,
-        keepAliveMsecs: 3000
-      })
+      }
     };
     let key = 'accessKeySecret';
-    let result = await httpUtil.request(host, params, options, key);
+    let result = await request(host, params, options, key);
     expect(result).to.be.ok();
   });
+
   it('should success with POST method and no headers', async function () {
     let host = 'https://sts.aliyuncs.com';
     let params = {
@@ -107,23 +109,20 @@ describe('http request', function () {
     let options = {
       method: 'POST',
       formatParams: false,
-      headers: undefined,
-      agent: new https.Agent({
-        keepAlive: true,
-        keepAliveMsecs: 3000
-      })
+      headers: undefined
     };
     let key = 'accessKeySecret';
-    let result = await httpUtil.request(host, params, options, key);
+    let result = await request(host, params, options, key);
     expect(result).to.be.ok();
   });
 });
+
 describe('http request', function () {
   it('should failed with invalid accessKeyId', async function () {
     let error = '';
     try {
       let accessKeySecret = 'accessKeySecret';
-      await httpUtil.request('https://sts.aliyuncs.com', {
+      await request('https://sts.aliyuncs.com', {
         accessKeyId: 'accessKeyId',
         roleArn: 'roleArn',
         action: 'AssumeRole',
@@ -136,8 +135,9 @@ describe('http request', function () {
     expect(error).to.be('InvalidAccessKeyId.NotFoundError');
   });
 });
+
 describe('http private methods', function () {
-  const http = rewire('../lib/util/http');
+  const http = rewire('../src/util/http');
 
   it('firstLetterUpper should ok', function () {
     const firstLetterUpper = http.__get__('firstLetterUpper');
@@ -249,7 +249,3 @@ describe('http private methods', function () {
     ])).to.be('a=value&b=value&c=value');
   });
 });
-
-
-
-

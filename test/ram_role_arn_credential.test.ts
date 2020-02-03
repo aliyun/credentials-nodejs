@@ -1,11 +1,14 @@
-'use strict';
 
-const expect = require('expect.js');
-const RamRoleArnCredential = require('../lib/ram_role_arn_credential');
-const mm = require('mm');
-const utils = require('../lib/util/utils');
-const httpUtil = require('../lib/util/http');
-const defaultConfig = {
+
+import expect from 'expect.js';
+import RamRoleArnCredential from '../src/ram_role_arn_credential';
+import mm from 'mm';
+import * as utils from '../src/util/utils';
+import * as httpUtil from '../src/util/http';
+import 'mocha';
+import { Config } from '../src/client';
+
+const defaultConfig: Config = {
   type: 'ram_role_arn',
   roleArn: 'roleArn',
   accessKeyId: 'accessKeyId',

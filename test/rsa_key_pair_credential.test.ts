@@ -1,11 +1,12 @@
-'use strict';
 
-const expect = require('expect.js');
-const RsaKeyPairCredential = require('../lib/rsa_key_pair_credential');
-const mm = require('mm');
-const fs = require('fs');
-const utils = require('../lib/util/utils');
-const httpUtil = require('../lib/util/http');
+
+import expect from 'expect.js';
+import RsaKeyPairCredential from '../src/rsa_key_pair_credential';
+import mm from 'mm';
+import fs from 'fs';
+import * as utils from '../src/util/utils';
+import * as httpUtil from '../src/util/http';
+import 'mocha';
 
 describe('RsaKeyPairCredential with correct config', function () {
   before(function () {

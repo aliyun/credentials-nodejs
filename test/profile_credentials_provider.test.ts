@@ -1,17 +1,21 @@
-'use strict';
 
-const expect = require('expect.js');
-const profileCredentialsProvider = require('../lib/provider/profile_credentials_provider');
-const mm = require('mm');
-const fs = require('fs');
-const utils = require('../lib/util/utils');
-const path = require('path');
+
+import expect from 'expect.js';
+import profileCredentialsProvider from '../src/provider/profile_credentials_provider';
+import mm from 'mm';
+import fs from 'fs';
+import * as utils from '../src/util/utils';
+import path from 'path';
+import 'mocha';
+
 const ENV_CREDENTIALS_FILE = path.join(__dirname, '/fixtures/credentials');
+
 describe('profileCredentialsProvider with env file_path exists', function () {
   describe('when file_path is empty', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', '');
     });
+
     after(function () {
       mm.restore();
     });
@@ -21,6 +25,7 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       }).throwError(/Environment variable credentialFile cannot be empty/);
     });
   });
+
   describe('when file content is empty', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
@@ -37,33 +42,41 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       }).throwError(/credentialFile ALIBABA_CLOUD_CREDENTIALS_FILE cannot be empty/);
     });
   });
+
   describe('when env credential file exist', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', ENV_CREDENTIALS_FILE);
     });
+
     after(function () {
       mm.restore();
     });
+
     it('should success with no credential_name', async function () {
       let cred = profileCredentialsProvider.getCredential();
       expect(cred.getType()).to.be('access_key');
     });
+
     it('should success with valid credential_name', async function () {
       let cred = profileCredentialsProvider.getCredential('demo');
       expect(cred.getType()).to.be('ram_role_arn');
     });
+
     it('should failed with invalid credential_name', async function () {
       expect(function () {
         profileCredentialsProvider.getCredential('invalid');
       }).throwException(/Missing required type option in credentialFile/);
     });
   });
+
   describe('when default type in file is access_key ', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
+
       mm(fs, 'existsSync', function () {
         return true;
       });
+
       mm(utils, 'parseFile', function () {
         return {
           default: {
@@ -82,6 +95,7 @@ describe('profileCredentialsProvider with env file_path exists', function () {
       expect(cred.getType()).to.be('access_key');
     });
   });
+
   describe('when default type in file is bearer ', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_CREDENTIALS_FILE', 'ALIBABA_CLOUD_CREDENTIALS_FILE');
@@ -253,6 +267,7 @@ describe('profileCredentialsProvider with env file_path exists', function () {
     });
   });
 });
+
 describe('profileCredentialsProvider with no env file_path', function () {
   describe('when defaultFile exists', function () {
     before(function () {
@@ -260,6 +275,7 @@ describe('profileCredentialsProvider with no env file_path', function () {
       mm(fs, 'existsSync', function () {
         return true;
       });
+
       mm(utils, 'parseFile', function () {
         return {
           default: {
@@ -271,33 +287,39 @@ describe('profileCredentialsProvider with no env file_path', function () {
         };
       });
     });
+
     after(function () {
       mm.restore();
     });
+
     it('should success', async function () {
       profileCredentialsProvider.getCredential();
     });
   });
+
   describe('when defaultFile is empty', function () {
     before(function () {
       delete process.env.ALIBABA_CLOUD_CREDENTIALS_FILE;
       mm(fs, 'existsSync', function () {
         return true;
       });
+
       mm(utils, 'parseFile', function () {
         return null;
       });
     });
+
     after(function () {
       mm.restore();
     });
+
     it('should return null', async function () {
       const cred = profileCredentialsProvider.getCredential();
       expect(cred).to.be(null);
     });
   });
-
 });
+
 describe('profileCredentialsProvider with no env file_path and no defaultFile content', function () {
   before(function () {
     delete process.env.ALIBABA_CLOUD_CREDENTIALS_FILE;
@@ -311,8 +333,10 @@ describe('profileCredentialsProvider with no env file_path and no defaultFile co
   after(function () {
     mm.restore();
   });
+
   it('should return null', async function () {
-    profileCredentialsProvider.getCredential();
+    const credential = profileCredentialsProvider.getCredential();
+    expect(credential).to.be.null;
   });
 
 });

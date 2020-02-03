@@ -4,11 +4,12 @@
   "description": "alibaba cloud node.js sdk credentials",
   "main": "dist/credentials.js",
   "scripts": {
-    "lint": "eslint --fix lib/*.js test/*.js",
-    "test": "mocha -R spec test/*.test.js  --timeout 15000",
-    "cov": "nyc --reporter=html --reporter=text --reporter=lcov mocha -R spec test/*.test.js  --timeout 15000",
-    "ci": "npm run lint && npm run cov && codecov",
-    "test-integration": "mocha -R spec test/*.integration.js",
+    "prepublishOnly": "tsc",
+    "build": "tsc",
+    "test": "mocha -b -r ts-node/register test/**/*.test.ts --timeout 15000",
+    "cov": "nyc -e .ts -r=html -r=text -r=lcov npm run test",
+    "ci": "npm run cov && codecov",
+    "test-integration": "mocha -b -r ts-node/register -R spec test/*.integration.ts",
     "clean": "rm -rf coverage"
   },
   "repository": {
@@ -23,6 +24,7 @@
   "author": "Alibaba Cloud SDK",
   "license": "MIT",
   "devDependencies": {
+    "@types/mocha": "^7.0.1",
     "codecov": "^3.1.0",
     "eslint": "^5.10.0",
     "expect.js": "^0.3.1",
@@ -31,13 +33,14 @@
     "muk": "^0.5.3",
     "nyc": "^13.1.0",
     "rewire": "^4.0.1",
+    "ts-node": "^8.6.2",
+    "tslint": "^6.0.0",
     "typescript": "^3.7.5"
   },
   "dependencies": {
     "httpx": "^2.2.0",
     "json-bigint": "^0.2.3",
-    "kitx": "^1.2.1",
-    "@alicloud/sts-sdk": "^1.0.0",
+    "kitx": "^2.0.0",
     "ini": "^1.3.5"
   },
   "bugs": {

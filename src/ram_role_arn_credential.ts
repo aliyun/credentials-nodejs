@@ -1,8 +1,6 @@
 import SessionCredential from './session_credential';
 import { Config } from './client';
-
-const httpUtil = require('./util/http');
-
+import { request } from './util/http';
 
 export default class RamRoleArnCredential extends SessionCredential {
   roleArn: string;
@@ -12,16 +10,19 @@ export default class RamRoleArnCredential extends SessionCredential {
   runtime: {[key: string]: any};
   host: string;
 
-  constructor(config: Config, runtime) {
+  constructor(config: Config, runtime: {[key: string]: any} = {}) {
     if (!config.accessKeyId) {
       throw new Error('Missing required accessKeyId option in config for ram_role_arn');
     }
+
     if (!config.accessKeySecret) {
       throw new Error('Missing required accessKeySecret option in config for ram_role_arn');
     }
+
     if (!config.roleArn) {
       throw new Error('Missing required roleArn option in config for ram_role_arn');
     }
+
     super({
       type: 'ram_role_arn',
       accessKeyId: config.accessKeyId,
@@ -36,7 +37,7 @@ export default class RamRoleArnCredential extends SessionCredential {
   }
 
   async updateCredential() {
-    let params: {[key: string]: any} = {
+    const params: {[key: string]: any} = {
       accessKeyId: this.accessKeyId,
       roleArn: this.roleArn,
       action: 'AssumeRole',
@@ -46,7 +47,7 @@ export default class RamRoleArnCredential extends SessionCredential {
     if (this.policy) {
       params.policy = this.policy;
     }
-    let json = await httpUtil.request(this.host, params, this.runtime, this.accessKeySecret);
+    const json = await request(this.host, params, this.runtime, this.accessKeySecret);
     this.sessionCredential = json.Credentials;
   }
 }

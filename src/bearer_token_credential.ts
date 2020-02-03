@@ -1,8 +1,10 @@
-'use strict';
-const DefaultCredential = require('./default_credential');
 
+import DefaultCredential from './default_credential';
+import ICredential from './icredential';
 
-class BearerTokenCredential extends DefaultCredential {
+export default class BearerTokenCredential extends DefaultCredential implements ICredential {
+  bearerToken: string;
+
   constructor(bearerToken) {
     if (!bearerToken) {
       throw new Error('Missing required bearerToken option in config for bearer');
@@ -13,9 +15,7 @@ class BearerTokenCredential extends DefaultCredential {
     this.bearerToken = bearerToken;
   }
 
-  getBearerToken() {
+  getBearerToken(): string {
     return this.bearerToken;
   }
 }
-
-module.exports = BearerTokenCredential;

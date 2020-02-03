@@ -1,7 +1,7 @@
-'use strict';
+import expect from 'expect.js';
+import 'mocha';
 
-const expect = require('expect.js');
-const AccessKeyCredential = require('../lib/access_key_credential');
+import AccessKeyCredential from '../src/access_key_credential';
 
 describe('AccessKeyCredential with valid config', function () {
   it('should success get correct value', async function () {
@@ -14,6 +14,7 @@ describe('AccessKeyCredential with valid config', function () {
     expect(type).to.be('access_key');
   });
 });
+
 describe('AccessKeyCredential with invalid config', function () {
   it('should failed when config has no accessKeyId', async function () {
     expect(function () {
@@ -26,4 +27,3 @@ describe('AccessKeyCredential with invalid config', function () {
     }).throwException(/Missing required accessKeySecret option in config for access_key/);
   });
 });
-

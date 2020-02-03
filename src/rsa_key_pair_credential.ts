@@ -1,22 +1,29 @@
-'use strict';
-const SessionCredential = require('./session_credential');
-const fs = require('fs');
-const utils = require('./util/utils');
-const httpUtil = require('./util/http');
+import fs from 'fs';
+import SessionCredential from './session_credential';
+import * as utils from './util/utils';
+import { request } from './util/http';
+import ICredential from './icredential';
+
 const SECURITY_CRED_URL = 'http://100.100.100.200/latest/meta-data/ram/security-credentials/';
 
+export default class RsaKeyPairCredential extends SessionCredential implements ICredential {
+  privateKey: string;
+  publicKeyId: string;
+  roleName: string;
 
-class RsaKeyPairCredential extends SessionCredential {
-  constructor(publicKeyId, privateKeyFile) {
+  constructor(publicKeyId: string, privateKeyFile: string) {
     if (!publicKeyId) {
       throw new Error('Missing required publicKeyId option in config for rsa_key_pair');
     }
+
     if (!privateKeyFile) {
       throw new Error('Missing required privateKeyFile option in config for rsa_key_pair');
     }
+
     if (!fs.existsSync(privateKeyFile)) {
       throw new Error(`privateKeyFile ${privateKeyFile} cannot be empty`);
     }
+
     super({
       type: 'rsa_key_pair'
     });
@@ -25,8 +32,8 @@ class RsaKeyPairCredential extends SessionCredential {
   }
 
   async updateCredential() {
-    let url = SECURITY_CRED_URL + this.roleName;
-    let json = httpUtil.request(url, {
+    const url = SECURITY_CRED_URL + this.roleName;
+    const json = await request(url, {
       accessKeyId: this.publicKeyId,
       action: 'GenerateSessionAccessKey',
       durationSeconds: 3600,
@@ -36,5 +43,3 @@ class RsaKeyPairCredential extends SessionCredential {
     this.sessionCredential = json.Credentials;
   }
 }
-
-module.exports = RsaKeyPairCredential;

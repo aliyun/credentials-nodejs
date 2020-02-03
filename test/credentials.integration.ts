@@ -1,7 +1,7 @@
-'use strict';
+import expect from 'expect.js';
+import RamRoleArnCredential from '../src/ram_role_arn_credential';
+import 'mocha';
 
-const expect = require('expect.js');
-const RamRoleArnCredential = require('../lib/ram_role_arn_credential');
 const defaultConfig = {
   type: 'ram_role_arn',
   roleArn: process.env.ROLE_ARN,
@@ -29,5 +29,3 @@ describe('RamRoleArnCredential with correct config', function () {
     expect(repeatToken).to.be(token);
   });
 });
-
-
