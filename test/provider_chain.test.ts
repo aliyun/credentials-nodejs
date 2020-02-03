@@ -1,29 +1,33 @@
-'use strict';
 
-const ProviderChain = require('../lib/provider/provider_chain');
-const environmentVariableCredentialsProvider = require('../lib/provider/environment_variable_credentials_provider');
-const profileCredentialsProvider = require('../lib/provider/profile_credentials_provider');
-const instanceRamRoleCredentialsProvider = require('../lib/provider/instance_ram_role_credentials_provider');
-const DefaultCredential = require('../lib/default_credential');
-const mm = require('mm');
-const expect = require('expect.js');
 
+import * as ProviderChain from '../src/provider/provider_chain';
+import environmentVariableCredentialsProvider from '../src/provider/environment_variable_credentials_provider';
+import profileCredentialsProvider from '../src/provider/profile_credentials_provider';
+import instanceRamRoleCredentialsProvider from '../src/provider/instance_ram_role_credentials_provider';
+import DefaultCredential from '../src/default_credential';
+import mm from 'mm';
+import expect from 'expect.js';
+import 'mocha';
 
 describe('ProviderChain', function () {
   before(function () {
     mm(environmentVariableCredentialsProvider, 'getCredential', function () {
       return new DefaultCredential({ type: 'environment' });
     });
+
     mm(profileCredentialsProvider, 'getCredential', function () {
       return new DefaultCredential({ type: 'profile' });
     });
+
     mm(instanceRamRoleCredentialsProvider, 'getCredential', function () {
       return new DefaultCredential({ type: 'instanceRamRole' });
     });
   });
+
   after(function () {
     mm.restore();
   });
+
   it('should return EnvironmentVariableCredential first', async function () {
     let cred = ProviderChain.getCredentials();
     let type = cred.getType();
@@ -36,16 +40,20 @@ describe('ProviderChain', function () {
     mm(environmentVariableCredentialsProvider, 'getCredential', function () {
       return null;
     });
+
     mm(profileCredentialsProvider, 'getCredential', function () {
       return new DefaultCredential({ type: 'profile' });
     });
+
     mm(instanceRamRoleCredentialsProvider, 'getCredential', function () {
       return new DefaultCredential({ type: 'instanceRamRole' });
     });
   });
+
   after(function () {
     mm.restore();
   });
+
   it('should return profileCredential second', async function () {
     let cred = ProviderChain.getCredentials();
     let type = cred.getType();

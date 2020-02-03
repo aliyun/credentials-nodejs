@@ -1,11 +1,12 @@
-'use strict';
 
-const expect = require('expect.js');
-const DefaultCredential = require('../lib/default_credential');
+
+import expect from 'expect.js';
+import DefaultCredential from '../src/default_credential';
+import 'mocha';
 
 describe('DefaultCredential get correct value', function () {
   it('should success', async function () {
-    const cred = new DefaultCredential();
+    const cred = new DefaultCredential({});
     let id = await cred.getAccessKeyId();
     expect(id).to.be('');
     let secret = await cred.getAccessKeySecret();

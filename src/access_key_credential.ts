@@ -1,15 +1,15 @@
-'use strict';
-const DefaultCredential = require('./default_credential');
+import DefaultCredential from './default_credential';
+import ICredential from './icredential';
 
-
-class AccessKeyCredential extends DefaultCredential {
-  constructor(accessKeyId, accessKeySecret) {
+export default class AccessKeyCredential extends DefaultCredential implements ICredential {
+  constructor(accessKeyId: string, accessKeySecret: string) {
     if (!accessKeyId) {
       throw new Error('Missing required accessKeyId option in config for access_key');
     }
     if (!accessKeySecret) {
       throw new Error('Missing required accessKeySecret option in config for access_key');
     }
+
     super({
       type: 'access_key',
       accessKeyId,
@@ -17,5 +17,3 @@ class AccessKeyCredential extends DefaultCredential {
     });
   }
 }
-
-module.exports = AccessKeyCredential;

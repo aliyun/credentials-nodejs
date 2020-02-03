@@ -1,13 +1,16 @@
-'use strict';
 
-const expect = require('expect.js');
-const environmentVariableCredentialsProvider = require('../lib/provider/environment_variable_credentials_provider');
-const mm = require('mm');
+
+import expect from 'expect.js';
+import environmentVariableCredentialsProvider from '../src/provider/environment_variable_credentials_provider';
+import mm from 'mm';
+import 'mocha';
+
 describe('environmentVariableCredentialsProvider with env variables', function () {
   before(function () {
     mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_ID', 'accessKeyId');
     mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_SECRET', 'accessKeySecret');
   });
+
   after(function () {
     mm.restore();
   });
@@ -22,24 +25,29 @@ describe('environmentVariableCredentialsProvider with env variables', function (
     expect(type).to.be('access_key');
   });
 });
+
 describe('environmentVariableCredentialsProvider with no env variables ', function () {
   before(function () {
     delete process.env.ALIBABA_CLOUD_ACCESS_KEY_ID;
     delete process.env.ALIBABA_CLOUD_ACCESS_KEY_SECRET;
   });
+
   after(function () {
     mm.restore();
   });
+
   it('should return null', async function () {
     const cred = environmentVariableCredentialsProvider.getCredential();
     expect(cred).to.be(null);
   });
 });
+
 describe('environmentVariableCredentialsProvider with empty ALIBABA_CLOUD_ACCESS_KEY_ID ', function () {
   before(function () {
     mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_ID', '');
     mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_SECRET', 'accessKeySecret');
   });
+
   after(function () {
     mm.restore();
   });
@@ -50,11 +58,13 @@ describe('environmentVariableCredentialsProvider with empty ALIBABA_CLOUD_ACCESS
     }).throwException(/Environment variable ALIBABA_CLOUD_ACCESS_KEY_ID cannot be empty/);
   });
 });
+
 describe('environmentVariableCredentialsProvider with empty ALIBABA_CLOUD_ACCESS_KEY_SECRET ', function () {
   before(function () {
     mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_ID', 'accessKeyId');
     mm(process.env, 'ALIBABA_CLOUD_ACCESS_KEY_SECRET', '');
   });
+
   after(function () {
     mm.restore();
   });

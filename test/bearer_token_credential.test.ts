@@ -1,7 +1,6 @@
-'use strict';
-
-const expect = require('expect.js');
-const BearerTokenCredential = require('../lib/bearer_token_credential');
+import expect from 'expect.js';
+import BearerTokenCredential from '../src/bearer_token_credential';
+import 'mocha';
 
 describe('BearerTokenCredential should get correct value', function () {
   it('should success', async function () {
@@ -12,11 +11,11 @@ describe('BearerTokenCredential should get correct value', function () {
     expect(type).to.be('bearer');
   });
 });
+
 describe('BearerTokenCredential with invalid config ', function () {
   it('should failed when config has no bearerToken', async function () {
     expect(function () {
-      new BearerTokenCredential();
+      new BearerTokenCredential(undefined);
     }).throwException(/Missing required bearerToken option in config for bearer/);
   });
 });
-

@@ -1,12 +1,82 @@
 
+import ICredential from "./icredential";
+
+import AccessKeyCredential from './access_key_credential';
+import StsTokenCredential from './sts_token_credential';
+import EcsRamRoleCredential from './ecs_ram_role_credential';
+import RamRoleArnCredential from './ram_role_arn_credential';
+import RsaKeyPairCredential from './rsa_key_pair_credential';
+import BearerTokenCredential from './bearer_token_credential';
+import * as DefaultProvider from './provider/provider_chain';
+
 export class Config {
-    accessKeyId: string;
-    accessKeySecret: string;
+    accessKeyId?: string;
+    accessKeySecret?: string;
     securityToken?: string;
+    bearerToken?: string;
     durationSeconds?: number;
     roleArn?: string;
     policy?: string;
     roleSessionExpiration?: number;
     roleSessionName?: string;
-    type: string;
+    publicKeyId?: string;
+    privateKeyFile?: string;
+    roleName?: string;
+    type?: string;
+}
+
+export default class Credential implements ICredential {
+    credential: ICredential;
+    constructor(config: Config = null, runtime = {}) {
+        this.load(config, runtime);
+    }
+
+    getAccessKeyId(): Promise<string> {
+        return this.credential.getAccessKeyId();
+    }
+
+    getAccessKeySecret(): Promise<string> {
+        return this.credential.getAccessKeySecret();
+    }
+
+    getSecurityToken(): Promise<string> {
+        return this.credential.getSecurityToken();
+    }
+    getType(): string {
+        return this.credential.getType();
+    }
+
+    private load(config, runtime): void {
+        if (!config) {
+            this.credential = DefaultProvider.getCredentials();
+            return;
+        }
+
+        if (!config.type) {
+            throw new Error('Missing required type option');
+        }
+        switch (config.type) {
+            case 'access_key':
+                this.credential = new AccessKeyCredential(config.accessKeyId, config.accessKeySecret);
+                break;
+            case 'sts':
+                this.credential = new StsTokenCredential(config.accessKeyId, config.accessKeySecret, config.securityToken);
+                break;
+            case 'ecs_ram_role':
+                this.credential = new EcsRamRoleCredential(config.roleName);
+                break;
+            case 'ram_role_arn':
+                this.credential = new RamRoleArnCredential(config, runtime);
+                break;
+            case 'rsa_key_pair':
+                this.credential = new RsaKeyPairCredential(config.publicKeyId, config.privateKeyFile);
+                break;
+            case 'bearer':
+                this.credential = new BearerTokenCredential(config.bearerToken);
+                break;
+            default:
+                throw new Error('Invalid type option, support: access_key, sts, ecs_ram_role, ram_role_arn, rsa_key_pair');
+        }
+    }
+
 }

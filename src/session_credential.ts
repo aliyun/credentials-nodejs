@@ -1,4 +1,4 @@
-'use strict';
+
 
 import DefaultCredential from "./default_credential";
 import * as utils from './util/utils';
@@ -22,7 +22,7 @@ export default class SessionCredential extends DefaultCredential {
   }
 
   async ensureCredential(): Promise<void> {
-    let needUpdate = this.needUpdateCredential();
+    const needUpdate = this.needUpdateCredential();
     if (needUpdate) {
       await this.updateCredential();
     }

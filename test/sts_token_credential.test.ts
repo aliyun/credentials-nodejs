@@ -1,7 +1,8 @@
-'use strict';
 
-const expect = require('expect.js');
-const StsTokenCredential = require('../lib/sts_token_credential');
+
+import expect from 'expect.js';
+import StsTokenCredential from '../src/sts_token_credential';
+import 'mocha';
 
 describe('StsTokenCredential should get correct value ', function () {
   it('should success', async function () {

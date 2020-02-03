@@ -1,8 +1,9 @@
-'use strict';
+
 
 import { Config } from "./client";
+import ICredential from "./icredential";
 
-export default class DefaultCredential {
+export default class DefaultCredential implements ICredential {
   accessKeyId: string;
   accessKeySecret: string;
   securityToken?: string;
