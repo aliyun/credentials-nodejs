@@ -1,9 +1,8 @@
 {
   "name": "@alicloud/credentials",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "alibaba cloud node.js sdk credentials",
-  "main": "lib/credentials.js",
-  "types": "lib/credentials.d.ts",
+  "main": "dist/credentials.js",
   "scripts": {
     "lint": "eslint --fix lib/*.js test/*.js",
     "test": "mocha -R spec test/*.test.js  --timeout 15000",
@@ -24,14 +23,15 @@
   "author": "Alibaba Cloud SDK",
   "license": "MIT",
   "devDependencies": {
-    "muk": "^0.5.3",
     "codecov": "^3.1.0",
     "eslint": "^5.10.0",
     "expect.js": "^0.3.1",
     "mm": "^2.4.1",
     "mocha": "^5.2.0",
+    "muk": "^0.5.3",
     "nyc": "^13.1.0",
-    "rewire": "^4.0.1"
+    "rewire": "^4.0.1",
+    "typescript": "^3.7.5"
   },
   "dependencies": {
     "httpx": "^2.2.0",

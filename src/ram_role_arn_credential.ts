@@ -1,10 +1,18 @@
-'use strict';
-const SessionCredential = require('./session_credential');
+import SessionCredential from './session_credential';
+import { Config } from './client';
+
 const httpUtil = require('./util/http');
 
 
-class RamRoleArnCredential extends SessionCredential {
-  constructor(config, runtime) {
+export default class RamRoleArnCredential extends SessionCredential {
+  roleArn: string;
+  policy: string;
+  durationSeconds: number;
+  roleSessionName: string;
+  runtime: {[key: string]: any};
+  host: string;
+
+  constructor(config: Config, runtime) {
     if (!config.accessKeyId) {
       throw new Error('Missing required accessKeyId option in config for ram_role_arn');
     }
@@ -28,7 +36,7 @@ class RamRoleArnCredential extends SessionCredential {
   }
 
   async updateCredential() {
-    let params = {
+    let params: {[key: string]: any} = {
       accessKeyId: this.accessKeyId,
       roleArn: this.roleArn,
       action: 'AssumeRole',
@@ -42,5 +50,3 @@ class RamRoleArnCredential extends SessionCredential {
     this.sessionCredential = json.Credentials;
   }
 }
-
-module.exports = RamRoleArnCredential;
