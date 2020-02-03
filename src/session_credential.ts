@@ -1,39 +1,45 @@
 'use strict';
-const DefaultCredential = require('./default_credential');
-const utils = require('./util/utils');
 
+import DefaultCredential from "./default_credential";
+import * as utils from './util/utils';
+import { Config } from "./client";
 
-class SessionCredential extends DefaultCredential {
-  constructor(props) {
+export default class SessionCredential extends DefaultCredential {
+  sessionCredential: any;
+  durationSeconds: number;
+  constructor(config: Config) {
     super({
-      type: props.type,
-      accessKeyId: props.accessKeyId,
-      accessKeySecret: props.accessKeySecret,
+      type: config.type,
+      accessKeyId: config.accessKeyId,
+      accessKeySecret: config.accessKeySecret,
     });
     this.sessionCredential = null;
-    this.durationSeconds = props.durationSeconds || 3600;
+    this.durationSeconds = config.durationSeconds || 3600;
   }
-  async getAccessKeyId() {
+
+  async updateCredential(): Promise<void> {
+    throw new Error('need implemented in sub-class');
+  }
+
+  async ensureCredential(): Promise<void> {
     let needUpdate = this.needUpdateCredential();
     if (needUpdate) {
       await this.updateCredential();
     }
+  }
+
+  async getAccessKeyId() {
+    await this.ensureCredential();
     return this.sessionCredential.AccessKeyId;
   }
 
   async getAccessKeySecret() {
-    let needUpdate = this.needUpdateCredential();
-    if (needUpdate) {
-      await this.updateCredential();
-    }
+    await this.ensureCredential();
     return this.sessionCredential.AccessKeySecret;
   }
 
   async getSecurityToken() {
-    let needUpdate = this.needUpdateCredential();
-    if (needUpdate) {
-      await this.updateCredential();
-    }
+    await this.ensureCredential();
     return this.sessionCredential.SecurityToken;
   }
 
@@ -48,5 +54,3 @@ class SessionCredential extends DefaultCredential {
     return false;
   }
 }
-
-module.exports = SessionCredential;

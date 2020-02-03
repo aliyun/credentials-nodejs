@@ -1,9 +1,10 @@
 'use strict';
-const kitx = require('kitx');
-const ini = require('ini');
-const fs = require('fs');
 
-function timestamp(dateStr, timeChange) {
+import * as ini from 'ini';
+import * as kitx from 'kitx';
+import * as fs from 'fs';
+
+export function timestamp(dateStr: string, timeChange: number): string {
   let date = new Date(dateStr);
   if (!dateStr || isNaN(date.getTime())) {
     date = new Date();
@@ -21,7 +22,7 @@ function timestamp(dateStr, timeChange) {
   return `${YYYY}-${MM}-${DD}T${HH}:${mm}:${ss}Z`;
 }
 
-function parseFile(file, ignoreErr) {
+export function parseFile(file: string, ignoreErr: boolean): any {
   // check read permission
   try {
     fs.accessSync(file, fs.constants.R_OK);
@@ -31,11 +32,5 @@ function parseFile(file, ignoreErr) {
     }
     throw new Error('Has no read permission to credentials file');
   }
-  const content = ini.parse(fs.readFileSync(file, 'utf-8'));
-  return content;
+  return ini.parse(fs.readFileSync(file, 'utf-8'));
 }
-
-module.exports = {
-  timestamp: timestamp,
-  parseFile: parseFile
-};
