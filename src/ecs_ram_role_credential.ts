@@ -17,7 +17,7 @@ export default class EcsRamRoleCredential extends SessionCredential implements I
     this.sessionCredential = null;
   }
 
-  async getBody(url): Promise<string> {
+  async getBody(url: string): Promise<string> {
     const response = await httpx.request(url, {});
     return (await httpx.read(response, 'utf8')) as string;
   }

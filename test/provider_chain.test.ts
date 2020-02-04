@@ -8,6 +8,7 @@ import DefaultCredential from '../src/default_credential';
 import mm from 'mm';
 import expect from 'expect.js';
 import 'mocha';
+import ICredential from '../src/icredential';
 
 describe('ProviderChain', function () {
   before(function () {
@@ -37,15 +38,15 @@ describe('ProviderChain', function () {
 
 describe('ProviderChain', function () {
   before(function () {
-    mm(environmentVariableCredentialsProvider, 'getCredential', function () {
+    mm(environmentVariableCredentialsProvider, 'getCredential', function (): ICredential {
       return null;
     });
 
-    mm(profileCredentialsProvider, 'getCredential', function () {
+    mm(profileCredentialsProvider, 'getCredential', function (): ICredential {
       return new DefaultCredential({ type: 'profile' });
     });
 
-    mm(instanceRamRoleCredentialsProvider, 'getCredential', function () {
+    mm(instanceRamRoleCredentialsProvider, 'getCredential', function (): ICredential {
       return new DefaultCredential({ type: 'instanceRamRole' });
     });
   });
@@ -62,19 +63,21 @@ describe('ProviderChain', function () {
 });
 describe('ProviderChain', function () {
   before(function () {
-    mm(environmentVariableCredentialsProvider, 'getCredential', function () {
+    mm(environmentVariableCredentialsProvider, 'getCredential', function (): ICredential {
       return null;
     });
-    mm(profileCredentialsProvider, 'getCredential', function () {
+    mm(profileCredentialsProvider, 'getCredential', function (): ICredential {
       return null;
     });
-    mm(instanceRamRoleCredentialsProvider, 'getCredential', function () {
+    mm(instanceRamRoleCredentialsProvider, 'getCredential', function (): ICredential {
       return new DefaultCredential({ type: 'instanceRamRole' });
     });
   });
+
   after(function () {
     mm.restore();
   });
+
   it('should return instanceRamRoleCredential third', async function () {
     let cred = ProviderChain.getCredentials();
     let type = cred.getType();
