@@ -6,6 +6,7 @@ export default class AccessKeyCredential extends DefaultCredential implements IC
     if (!accessKeyId) {
       throw new Error('Missing required accessKeyId option in config for access_key');
     }
+
     if (!accessKeySecret) {
       throw new Error('Missing required accessKeySecret option in config for access_key');
     }

@@ -1,4 +1,3 @@
-
 import DefaultCredential from './default_credential';
 import ICredential from './icredential';
 

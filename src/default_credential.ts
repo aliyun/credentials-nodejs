@@ -1,5 +1,3 @@
-
-
 import { Config } from "./client";
 import ICredential from "./icredential";
 

@@ -1,5 +1,3 @@
-
-
 export default interface ICredential {
     getAccessKeyId: () => Promise<string>;
     getAccessKeySecret: () => Promise<string>;
