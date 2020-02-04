@@ -5,7 +5,7 @@ import * as utils from '../src/util/utils';
 const REQUEST_URL = 'http://100.100.100.200/latest/meta-data/ram/security-credentials/';
 import 'mocha';
 
-const beforeMock = (cred) => {
+const beforeMock = (cred: EcsRamRoleCredential) => {
   before(function () {
     mm(cred, 'getBody', async function (url: string): Promise<string> {
       if (url === REQUEST_URL) {

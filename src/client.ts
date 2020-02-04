@@ -27,7 +27,7 @@ export class Config {
 
 export default class Credential implements ICredential {
     credential: ICredential;
-    constructor(config: Config = null, runtime = {}) {
+    constructor(config: Config = null, runtime: {[key: string]: any} = {}) {
         this.load(config, runtime);
     }
 
@@ -42,11 +42,12 @@ export default class Credential implements ICredential {
     getSecurityToken(): Promise<string> {
         return this.credential.getSecurityToken();
     }
+
     getType(): string {
         return this.credential.getType();
     }
 
-    private load(config, runtime): void {
+    private load(config: Config, runtime: {[key: string]: any} = {}): void {
         if (!config) {
             this.credential = DefaultProvider.getCredentials();
             return;

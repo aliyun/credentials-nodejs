@@ -5,7 +5,7 @@ import ICredential from './icredential';
 export default class BearerTokenCredential extends DefaultCredential implements ICredential {
   bearerToken: string;
 
-  constructor(bearerToken) {
+  constructor(bearerToken: string) {
     if (!bearerToken) {
       throw new Error('Missing required bearerToken option in config for bearer');
     }

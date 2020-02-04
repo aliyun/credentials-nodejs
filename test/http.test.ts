@@ -7,13 +7,13 @@ import httpx from 'httpx';
 import rewire from 'rewire';
 import 'mocha';
 
-const mock = (response, body) => {
+const mock = (response: any, body: any) => {
   before(function () {
-    mm(httpx, 'request', async function (url, opts) {
+    mm(httpx, 'request', async function (url: string, opts: {[key: string]: any}) {
       return response;
     });
 
-    mm(httpx, 'read', async function (response, encoding) {
+    mm(httpx, 'read', async function (response: any, encoding: string) {
       return body;
     });
   });
@@ -106,7 +106,7 @@ describe('http request', function () {
         'testValue1', 'testValue2'
       ]
     };
-    let options = {
+    let options: {[key: string]: any} = {
       method: 'POST',
       formatParams: false,
       headers: undefined
@@ -162,7 +162,7 @@ describe('http private methods', function () {
 
   it('replaceRepeatList should ok', function () {
     const replaceRepeatList = http.__get__('replaceRepeatList');
-    function helper(target, key, repeat) {
+    function helper(target: {[key: string]: any}, key: string, repeat: any) {
       replaceRepeatList(target, key, repeat);
       return target;
     }

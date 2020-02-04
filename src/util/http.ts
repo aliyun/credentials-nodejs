@@ -2,7 +2,6 @@
 
 import httpx from 'httpx';
 import * as kitx from 'kitx';
-import JSON from 'json-bigint';
 import * as helper from './helper';
 import * as utils from './utils';
 
@@ -14,7 +13,7 @@ function firstLetterUpper(str: string): string {
 
 function formatParams(params: {[key: string]: any}): {[key: string]: any} {
   const keys = Object.keys(params);
-  const newParams = {};
+  const newParams: {[key: string]: string} = {};
   for (const key of keys) {
     newParams[firstLetterUpper(key)] = params[key];
   }
@@ -31,7 +30,7 @@ function encode(str: string): string {
     .replace(/\*/g, '%2A');
 }
 
-function replaceRepeatList(target, key, repeat) {
+function replaceRepeatList(target: {[key: string]: any}, key: string, repeat: any) {
   for (let i = 0; i < repeat.length; i++) {
     const item = repeat[i];
 
@@ -46,8 +45,8 @@ function replaceRepeatList(target, key, repeat) {
   }
 }
 
-function flatParams(params): {[key: string]: any} {
-  const target = {};
+function flatParams(params: {[key: string]: any}): {[key: string]: any} {
+  const target: {[key: string]: any} = {};
   const keys = Object.keys(params);
     for (const key of keys) {
     const value = params[key];
@@ -60,7 +59,7 @@ function flatParams(params): {[key: string]: any} {
   return target;
 }
 
-function normalize(params): string[][] {
+function normalize(params: {[key: string]: any}): string[][] {
   const list = [];
   const flated = flatParams(params);
   const keys = Object.keys(flated).sort();
@@ -71,7 +70,7 @@ function normalize(params): string[][] {
   return list;
 }
 
-function canonicalize(normalized): string {
+function canonicalize(normalized: string[][]): string {
   const fields = [];
   for (const [key, value] of normalized) {
     fields.push(key + '=' + value);
@@ -133,7 +132,7 @@ export async function request(host: string, params: {[key: string]: any} = {}, o
   }
   const response = await httpx.request(url, opts);
   const buffer = await httpx.read(response, 'utf8');
-  const json = JSON.parse(buffer);
+  const json = JSON.parse(buffer as string);
   if (json.Code && !STATUS_CODE.has(json.Code)) {
     const err = new Error(`${json.Message}`) as any;
     err.name = json.Code + 'Error';

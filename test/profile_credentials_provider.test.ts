@@ -300,11 +300,11 @@ describe('profileCredentialsProvider with no env file_path', function () {
   describe('when defaultFile is empty', function () {
     before(function () {
       delete process.env.ALIBABA_CLOUD_CREDENTIALS_FILE;
-      mm(fs, 'existsSync', function () {
+      mm(fs, 'existsSync', function (): boolean {
         return true;
       });
 
-      mm(utils, 'parseFile', function () {
+      mm(utils, 'parseFile', function (): any {
         return null;
       });
     });
@@ -323,10 +323,10 @@ describe('profileCredentialsProvider with no env file_path', function () {
 describe('profileCredentialsProvider with no env file_path and no defaultFile content', function () {
   before(function () {
     delete process.env.ALIBABA_CLOUD_CREDENTIALS_FILE;
-    mm(fs, 'existsSync', function () {
+    mm(fs, 'existsSync', function (): boolean {
       return false;
     });
-    mm(utils, 'parseFile', function () {
+    mm(utils, 'parseFile', function (): any {
       return null;
     });
   });
@@ -336,7 +336,7 @@ describe('profileCredentialsProvider with no env file_path and no defaultFile co
 
   it('should return null', async function () {
     const credential = profileCredentialsProvider.getCredential();
-    expect(credential).to.be.null;
+    expect(credential).to.be(null);
   });
 
 });

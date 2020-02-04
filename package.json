@@ -2,7 +2,7 @@
   "name": "@alicloud/credentials",
   "version": "2.0.0",
   "description": "alibaba cloud node.js sdk credentials",
-  "main": "dist/credentials.js",
+  "main": "dist/client.js",
   "scripts": {
     "prepublishOnly": "tsc",
     "build": "tsc",
@@ -24,13 +24,14 @@
   "author": "Alibaba Cloud SDK",
   "license": "MIT",
   "devDependencies": {
+    "@types/expect.js": "^0.3.29",
+    "@types/ini": "^1.3.30",
     "@types/mocha": "^7.0.1",
+    "@types/rewire": "^2.5.28",
     "codecov": "^3.1.0",
-    "eslint": "^5.10.0",
     "expect.js": "^0.3.1",
     "mm": "^2.4.1",
     "mocha": "^5.2.0",
-    "muk": "^0.5.3",
     "nyc": "^13.1.0",
     "rewire": "^4.0.1",
     "ts-node": "^8.6.2",
@@ -48,6 +49,7 @@
   },
   "homepage": "https://github.com/aliyun/nodejs-credentials#readme",
   "files": [
-    "lib"
+    "src",
+    "dist"
   ]
 }
