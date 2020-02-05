@@ -1,6 +1,6 @@
 [English](README.md) | 简体中文
 
-# Alibaba Cloud Credentials for nodejs
+# Alibaba Cloud Credentials for TypeScript/Node.js
 [![npm version](https://badge.fury.io/js/@alicloud%2fcredentials.svg)](https://badge.fury.io/js/@alicloud%2fcredentials.svg)
 [![Travis Build Status](https://api.travis-ci.org/aliyun/credentials-nodejs.svg?branch=master)](https://travis-ci.org/aliyun/credentials-nodejs)
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/m9wp3edgrt2c098a?svg=true)](https://ci.appveyor.com/project/aliyun/credentials-nodejs)
@@ -10,12 +10,12 @@
 
 ![](https://aliyunsdk-pages.alicdn.com/icons/AlibabaCloud.svg)
 
-Alibaba Cloud Credentials for nodejs 是帮助 nodejs 开发者管理凭据的工具。
+Alibaba Cloud Credentials for TypeScript/Node.js 是帮助 Node.js 开发者管理凭据的工具。
                    
-本文将介绍如何获取和使用 Alibaba Cloud Credentials for nodejs。
+本文将介绍如何获取和使用 Alibaba Cloud Credentials for TypeScript/Node.js。
 
 ## 要求
-- 请确保你的系统安装了不低于 8.5.0 版本的 nodejs 环境。
+- 请确保你的系统安装了不低于 8.5.0 版本的 Node.js 环境。
 
 ## 安装
 使用 `npm` 下载安装
@@ -32,41 +32,41 @@ npm install @alicloud/credentials
 
 #### access_key
 通过[用户信息管理][ak]设置 access_key，它们具有该账户完全的权限，请妥善保管。有时出于安全考虑，您不能把具有完全访问权限的主账户 AccessKey 交于一个项目的开发者使用，您可以[创建RAM子账户][ram]并为子账户[授权][permissions]，使用RAM子用户的 AccessKey 来进行API调用。
-```js
-const Credentials = require('@alicloud/credentials');
-const config = {
+```ts
+import Credential, { Config } from '@alicloud/credentials';
+const config: Config = {
 	type:               'access_key',       // 凭证类型
 	accessKeyId: 	    'accessKeyId',      // AccessKeyId
 	accessKeySecret:    'accessKeySecret',  // AccessKeySecret
 }
-const cred = new Credentials(config);
-let accessKeyId = await cred.getAccessKeyId();
-let accessKeySecret = await cred.getAccessKeySecret();
-let type = cred.getType();
+const cred = new Credential(config);
+let accessKeyId: string = await cred.getAccessKeyId();
+let accessKeySecret: string = await cred.getAccessKeySecret();
+let type: string = cred.getType();
 
 ```
 
 #### sts
 通过安全令牌服务（Security Token Service，简称 STS），申请临时安全凭证（Temporary Security Credentials，简称 TSC），创建临时安全凭证。
-```js
-const Credentials = require('@alicloud/credentials');
-const config = {
+```ts
+import Credential, { Config } from '@alicloud/credentials';
+const config: Config = {
 	type:                   'sts',             // 凭证类型
 	accessKeyId:            'accessKeyId',     // AccessKeyId
 	accessKeySecret:        'accessKeySecret', // AccessKeySecret
 	securityToken:          'securityToken',   // STS Token
 }
-const cred = new Credentials(config);
-let accessKeyId = await cred.getAccessKeyId();
-let accessKeySecret = await cred.getAccessKeySecret();
-let type = cred.getType();
+const cred = new Credential(config);
+let accessKeyId: string = await cred.getAccessKeyId();
+let accessKeySecret: string = await cred.getAccessKeySecret();
+let type: string = cred.getType();
 ```
 
 #### ram_role_arn
 通过指定[RAM角色][RAM Role]，让凭证自动申请维护 STS Token。你可以通过为 `Policy` 赋值来限制获取到的 STS Token 的权限。
-```js
-const Credentials = require('@alicloud/credentials');
-const config = {
+```ts
+import Credential, { Config } from '@alicloud/credentials';
+const config: Config = {
 	type:                   'ram_role_arn',     // 凭证类型
 	accessKeyId:            'accessKeyId',      // AccessKeyId
 	accessKeySecret:        'accessKeySecret',  // AccessKeySecret
@@ -75,57 +75,57 @@ const config = {
 	policy:                 'policy',           // 可选, 限制 STS Token 的权限
 	roleSessionExpiration:   3600,              // 可选, 限制 STS Token 的有效时间
 }
-const cred = new Credentials(config);
-let accessKeyId = await cred.getAccessKeyId();
-let accessKeySecret = await cred.getAccessKeySecret();
-let securityToken = await cred.getSecurityToken();
-let type = cred.getType();
+const cred = new Credential(config);
+let accessKeyId: string = await cred.getAccessKeyId();
+let accessKeySecret: string = await cred.getAccessKeySecret();
+let securityToken: string = await cred.getSecurityToken();
+let type: string = cred.getType();
 
 ```
 
 #### ecs_ram_role
 通过指定角色名称，让凭证自动申请维护 STS Token
-```js
-const Credentials = require('@alicloud/credentials');
-const config = {
+```ts
+import Credential, { Config } from '@alicloud/credentials';
+const config: Config = {
 	type:                 'ecs_ram_role',       // 凭证类型
 	roleName:             'roleName',           // 账户RoleName，非必填，不填则自动获取，建议设置，可以减少请求
 }
-const cred = new Credentials(config);
-let accessKeyId = await cred.getAccessKeyId();
-let accessKeySecret = await cred.getAccessKeySecret();
-let securityToken = await cred.getSecurityToken();
-let type = cred.getType();
+const cred = new Credential(config);
+let accessKeyId: string = await cred.getAccessKeyId();
+let accessKeySecret: string = await cred.getAccessKeySecret();
+let securityToken: string = await cred.getSecurityToken();
+let type: string = cred.getType();
 ```
 
 #### rsa_key_pair
 通过指定公钥ID和私钥文件，让凭证自动申请维护 AccessKey。仅支持日本站。 
 By specifying the public key ID and the private key file, the credential will be able to automatically request maintenance of the AccessKey before sending the request. Only Japan station is supported. 
-```js
-const Credentials = require('@alicloud/credentials');
-const config = {
+```ts
+import Credential, { Config } from '@alicloud/credentials';
+const config: Config = {
 	type:                    'rsa_key_pair',       // 凭证类型
 	privateKeyFile:          'privateKeyFile',     // PrivateKey文件路径
 	publicKeyId:             'publicKeyId',        // 账户PublicKeyId
 }
-const cred = new Credentials(config);
-let accessKeyId = await cred.getAccessKeyId();
-let accessKeySecret = await cred.getAccessKeySecret();
-let securityToken = await cred.getSecurityToken();
-let type = cred.getType();
+const cred = new Credential(config);
+let accessKeyId: string = await cred.getAccessKeyId();
+let accessKeySecret: string = await cred.getAccessKeySecret();
+let securityToken: string = await cred.getSecurityToken();
+let type: string = cred.getType();
 ```
 
 #### bearer
 如呼叫中心(CCC)需用此凭证，请自行申请维护 Bearer Token。
-```js
-const Credentials = require('@alicloud/credentials');
-const config = {
+```ts
+import Credential, { Config } from '@alicloud/credentials';
+const config: Config = {
 	type:                 'bearer',            // 凭证类型
 	bearerToken:          'bearerToken',       // BearerToken
 }
-const cred = new Credentials(config);
-let bearerToken = cred.getBearerToken();
-let type = cred.getType();
+const cred = new Credential(config);
+let bearerToken: string = cred.getBearerToken();
+let type: string = cred.getType();
 ```
 
 ### 凭证提供程序链
