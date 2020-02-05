@@ -1,6 +1,6 @@
 [English](README.md) | 简体中文
 
-# Alibaba Cloud Credentials for TypeScript/Nodejs
+# Alibaba Cloud Credentials for TypeScript/Node.js
 [![npm version](https://badge.fury.io/js/@alicloud%2fcredentials.svg)](https://badge.fury.io/js/@alicloud%2fcredentials.svg)
 [![Travis Build Status](https://api.travis-ci.org/aliyun/credentials-nodejs.svg?branch=master)](https://travis-ci.org/aliyun/credentials-nodejs)
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/m9wp3edgrt2c098a?svg=true)](https://ci.appveyor.com/project/aliyun/credentials-nodejs)
@@ -10,12 +10,12 @@
 
 ![](https://aliyunsdk-pages.alicdn.com/icons/AlibabaCloud.svg)
 
-Alibaba Cloud Credentials for nodejs 是帮助 nodejs 开发者管理凭据的工具。
+Alibaba Cloud Credentials for TypeScript/Node.js 是帮助 Node.js 开发者管理凭据的工具。
                    
-本文将介绍如何获取和使用 Alibaba Cloud Credentials for TypeScript/Nodejs。
+本文将介绍如何获取和使用 Alibaba Cloud Credentials for TypeScript/Node.js。
 
 ## 要求
-- 请确保你的系统安装了不低于 8.5.0 版本的 nodejs 环境。
+- 请确保你的系统安装了不低于 8.5.0 版本的 Node.js 环境。
 
 ## 安装
 使用 `npm` 下载安装
