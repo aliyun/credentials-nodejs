@@ -1,6 +1,6 @@
 import SessionCredential from './session_credential';
-import { Config } from './client';
 import { request } from './util/http';
+import Config from './config';
 
 export default class RamRoleArnCredential extends SessionCredential {
   roleArn: string;
@@ -23,11 +23,12 @@ export default class RamRoleArnCredential extends SessionCredential {
       throw new Error('Missing required roleArn option in config for ram_role_arn');
     }
 
-    super({
+    const conf = new Config({
       type: 'ram_role_arn',
       accessKeyId: config.accessKeyId,
       accessKeySecret: config.accessKeySecret,
     });
+    super(conf);
     this.roleArn = config.roleArn;
     this.policy = config.policy;
     this.durationSeconds = config.roleSessionExpiration || 3600;

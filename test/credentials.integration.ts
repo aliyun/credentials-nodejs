@@ -1,13 +1,14 @@
 import expect from 'expect.js';
 import RamRoleArnCredential from '../src/ram_role_arn_credential';
+import Config from '../src/config';
 import 'mocha';
 
-const defaultConfig = {
+const defaultConfig = new Config({
   type: 'ram_role_arn',
   roleArn: process.env.ROLE_ARN,
   accessKeyId: process.env.SUB_ACCESS_KEY_ID,
   accessKeySecret: process.env.SUB_ACCESS_KEY_SECRET
-};
+});
 
 describe('RamRoleArnCredential with correct config', function () {
   const cred = new RamRoleArnCredential(defaultConfig);

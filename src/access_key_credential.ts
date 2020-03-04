@@ -1,5 +1,6 @@
 import DefaultCredential from './default_credential';
 import ICredential from './icredential';
+import Config from './config';
 
 export default class AccessKeyCredential extends DefaultCredential implements ICredential {
   constructor(accessKeyId: string, accessKeySecret: string) {
@@ -10,11 +11,11 @@ export default class AccessKeyCredential extends DefaultCredential implements IC
     if (!accessKeySecret) {
       throw new Error('Missing required accessKeySecret option in config for access_key');
     }
-
-    super({
+    const conf = new Config({
       type: 'access_key',
       accessKeyId,
       accessKeySecret
     });
+    super(conf);
   }
 }

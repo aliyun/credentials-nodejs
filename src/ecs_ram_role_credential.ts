@@ -1,6 +1,7 @@
 import SessionCredential from './session_credential';
 import httpx from 'httpx';
 import ICredential from './icredential';
+import Config from './config';
 
 const SECURITY_CRED_URL = 'http://100.100.100.200/latest/meta-data/ram/security-credentials/';
 
@@ -8,10 +9,11 @@ export default class EcsRamRoleCredential extends SessionCredential implements I
   roleName: string;
   runtime: {[key: string]: any};
 
-  constructor(roleName: string = '', runtime: {[key: string]: any} = {}) {
-    super({
+  constructor(roleName: string = '', runtime: { [key: string]: any } = {}) {
+    const conf = new Config({
       type: 'ecs_ram_role',
     });
+    super(conf);
     this.roleName = roleName;
     this.runtime = runtime;
     this.sessionCredential = null;
@@ -38,5 +40,3 @@ export default class EcsRamRoleCredential extends SessionCredential implements I
     return await this.getBody(SECURITY_CRED_URL);
   }
 }
-
-module.exports = EcsRamRoleCredential;

@@ -1,5 +1,6 @@
 import DefaultCredential from './default_credential';
 import ICredential from './icredential';
+import Config from './config';
 
 export default class BearerTokenCredential extends DefaultCredential implements ICredential {
   bearerToken: string;
@@ -8,9 +9,10 @@ export default class BearerTokenCredential extends DefaultCredential implements 
     if (!bearerToken) {
       throw new Error('Missing required bearerToken option in config for bearer');
     }
-    super({
+    const conf = new Config({
       type: 'bearer'
     });
+    super(conf);
     this.bearerToken = bearerToken;
   }
 

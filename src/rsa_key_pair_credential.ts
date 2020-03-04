@@ -3,6 +3,7 @@ import SessionCredential from './session_credential';
 import * as utils from './util/utils';
 import { request } from './util/http';
 import ICredential from './icredential';
+import Config from './config';
 
 const SECURITY_CRED_URL = 'http://100.100.100.200/latest/meta-data/ram/security-credentials/';
 
@@ -24,9 +25,10 @@ export default class RsaKeyPairCredential extends SessionCredential implements I
       throw new Error(`privateKeyFile ${privateKeyFile} cannot be empty`);
     }
 
-    super({
+    const conf = new Config({
       type: 'rsa_key_pair'
     });
+    super(conf);
     this.privateKey = utils.parseFile(privateKeyFile);
     this.publicKeyId = publicKeyId;
   }
