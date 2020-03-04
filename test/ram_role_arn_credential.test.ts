@@ -6,14 +6,14 @@ import mm from 'mm';
 import * as utils from '../src/util/utils';
 import * as httpUtil from '../src/util/http';
 import 'mocha';
-import { Config } from '../src/client';
+import Config from '../src/config';
 
-const defaultConfig: Config = {
+const defaultConfig: Config = new Config({
   type: 'ram_role_arn',
   roleArn: 'roleArn',
   accessKeyId: 'accessKeyId',
   accessKeySecret: 'accessKeySecret'
-};
+});
 
 describe('RamRoleArnCredential with correct config', function () {
   const cred = new RamRoleArnCredential(defaultConfig);
@@ -93,29 +93,32 @@ describe('RamRoleArnCredential with correct config', function () {
 describe('RamRoleArnCredential should filed with invalid config ', function () {
   it('should failed when config has no accessKeyId', async function () {
     expect(function () {
-      new RamRoleArnCredential({
+      const conf = new Config({
         type: 'ram_role_arn',
         roleArn: 'roleArn',
         accessKeySecret: 'accessKeySecret',
-      });
+      })
+      new RamRoleArnCredential(conf);
     }).throwException(/Missing required accessKeyId option in config for ram_role_arn/);
   });
   it('should failed when config has no accessKeySecret', async function () {
     expect(function () {
-      new RamRoleArnCredential({
+      const conf = new Config({
         type: 'ram_role_arn',
         roleArn: 'roleArn',
         accessKeyId: 'accessKeyId'
-      });
+      })
+      new RamRoleArnCredential(conf);
     }).throwException(/Missing required accessKeySecret option in config for ram_role_arn/);
   });
   it('should failed when config has no roleArn', async function () {
     expect(function () {
-      new RamRoleArnCredential({
+      const conf = new Config({
         type: 'ram_role_arn',
         accessKeyId: 'accessKeyId',
         accessKeySecret: 'accessKeySecret'
-      });
+      })
+      new RamRoleArnCredential(conf);
     }).throwException(/Missing required roleArn option in config for ram_role_arn/);
   });
 });

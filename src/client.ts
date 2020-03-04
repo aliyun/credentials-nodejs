@@ -7,22 +7,9 @@ import RamRoleArnCredential from './ram_role_arn_credential';
 import RsaKeyPairCredential from './rsa_key_pair_credential';
 import BearerTokenCredential from './bearer_token_credential';
 import * as DefaultProvider from './provider/provider_chain';
+import Config from './config';
 
-export class Config {
-    accessKeyId?: string;
-    accessKeySecret?: string;
-    securityToken?: string;
-    bearerToken?: string;
-    durationSeconds?: number;
-    roleArn?: string;
-    policy?: string;
-    roleSessionExpiration?: number;
-    roleSessionName?: string;
-    publicKeyId?: string;
-    privateKeyFile?: string;
-    roleName?: string;
-    type?: string;
-}
+export { Config };
 
 export default class Credential implements ICredential {
     credential: ICredential;

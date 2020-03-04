@@ -1,16 +1,17 @@
 import DefaultCredential from "./default_credential";
 import * as utils from './util/utils';
-import { Config } from "./client";
+import Config from './config';
 
 export default class SessionCredential extends DefaultCredential {
   sessionCredential: any;
   durationSeconds: number;
   constructor(config: Config) {
-    super({
+    const conf = new Config({
       type: config.type,
       accessKeyId: config.accessKeyId,
       accessKeySecret: config.accessKeySecret,
     });
+    super(conf);
     this.sessionCredential = null;
     this.durationSeconds = config.durationSeconds || 3600;
   }
@@ -52,3 +53,4 @@ export default class SessionCredential extends DefaultCredential {
     return false;
   }
 }
+

@@ -9,19 +9,23 @@ import mm from 'mm';
 import expect from 'expect.js';
 import 'mocha';
 import ICredential from '../src/icredential';
+import Config from '../src/config';
 
 describe('ProviderChain', function () {
   before(function () {
     mm(environmentVariableCredentialsProvider, 'getCredential', function () {
-      return new DefaultCredential({ type: 'environment' });
+      const conf = new Config({ type: 'environment' });
+      return new DefaultCredential(conf);
     });
 
     mm(profileCredentialsProvider, 'getCredential', function () {
-      return new DefaultCredential({ type: 'profile' });
+      const conf = new Config({ type: 'profile' });
+      return new DefaultCredential(conf);
     });
 
     mm(instanceRamRoleCredentialsProvider, 'getCredential', function () {
-      return new DefaultCredential({ type: 'instanceRamRole' });
+      const conf = new Config({ type: 'instanceRamRole' });
+      return new DefaultCredential(conf);
     });
   });
 
@@ -43,11 +47,13 @@ describe('ProviderChain', function () {
     });
 
     mm(profileCredentialsProvider, 'getCredential', function (): ICredential {
-      return new DefaultCredential({ type: 'profile' });
+      const conf = new Config({ type: 'profile' });
+      return new DefaultCredential(conf);
     });
 
     mm(instanceRamRoleCredentialsProvider, 'getCredential', function (): ICredential {
-      return new DefaultCredential({ type: 'instanceRamRole' });
+      const conf = new Config({ type: 'instanceRamRole' });
+      return new DefaultCredential(conf);
     });
   });
 
@@ -70,7 +76,8 @@ describe('ProviderChain', function () {
       return null;
     });
     mm(instanceRamRoleCredentialsProvider, 'getCredential', function (): ICredential {
-      return new DefaultCredential({ type: 'instanceRamRole' });
+      const conf = new Config({ type: 'instanceRamRole' });
+      return new DefaultCredential(conf);
     });
   });
 

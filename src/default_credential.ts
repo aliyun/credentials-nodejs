@@ -1,4 +1,4 @@
-import { Config } from "./client";
+import Config from './config';
 import ICredential from "./icredential";
 
 export default class DefaultCredential implements ICredential {

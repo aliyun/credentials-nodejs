@@ -8,6 +8,7 @@ import BearerTokenCredential from '../bearer_token_credential';
 import * as utils from '../util/utils';
 import fs from 'fs';
 import ICredential from '../icredential';
+import Config from '../config';
 
 const DEFAULT_PATH = '~/.alibabacloud/credentials';
 
@@ -49,11 +50,12 @@ export default {
       case 'ecs_ram_role':
         return new EcsRamRoleCredential(config.role_name);
       case 'ram_role_arn':
-        return new RamRoleArnCredential({
+        const conf = new Config({
           roleArn: config.role_arn,
           accessKeyId: config.access_key_id,
           accessKeySecret: config.access_key_secret
         });
+        return new RamRoleArnCredential(conf);
       case 'rsa_key_pair':
         return new RsaKeyPairCredential(config.public_key_id, config.private_key_file);
       case 'bearer':
