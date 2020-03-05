@@ -1,6 +1,6 @@
 {
   "name": "@alicloud/credentials",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "alibaba cloud node.js sdk credentials",
   "main": "dist/client.js",
   "scripts": {
