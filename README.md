@@ -1,9 +1,8 @@
 English | [简体中文](README-CN.md)
 # Alibaba Cloud Credentials for TypeScript/Node.js
 
-[![npm version](https://badge.fury.io/js/@alicloud%2fcredentials.svg)](https://badge.fury.io/js/@alicloud%2fcredentials.svg)
+[![npm version](https://badge.fury.io/js/@alicloud%2fcredentials.svg)](https://www.npmjs.com/package/@alicloud/credentials)
 [![Travis Build Status](https://api.travis-ci.org/aliyun/credentials-nodejs.svg?branch=master)](https://travis-ci.org/aliyun/credentials-nodejs)
-[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/m9wp3edgrt2c098a?svg=true)](https://ci.appveyor.com/project/aliyun/credentials-nodejs)
 [![codecov](https://codecov.io/gh/aliyun/credentials-nodejs/branch/master/graph/badge.svg)](https://codecov.io/gh/aliyun/credentials-nodejs)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
@@ -116,6 +115,25 @@ const cred = new Credential(config);
 let bearerToken: string = await cred.getBearerToken();
 let type: string = cred.getType();
 ```
+
+### Provider
+If you call `new Credential()` with empty, it will use provider chain to get credential for you.
+
+#### 1. Environment Credentials
+The program first looks for environment credentials in the environment variable. If the `ALICLOUD_ACCESS_KEY` and `ALICLOUD_SECRET_KEY` environment variables are defined and are not empty, the program will use them to create the default credential. If not, the program loads and looks for the client in the configuration file.
+
+#### 2. Config File
+If there is `~/.alibabacloud/credentials` default file (Windows shows `C:\Users\USER_NAME\.alibabacloud\credentials`), the program will automatically create credential with the name of 'default'. The default file may not exist, but a parse error throws an exception. The specified files can also be loaded indefinitely: `AlibabaCloud::load('/data/credentials', 'vfs://AlibabaCloud/credentials', ...);` This configuration file can be shared between different projects and between different tools. Because it is outside the project and will not be accidentally committed to the version control. Environment variables can be used on Windows to refer to the home directory %UserProfile%. Unix-like systems can use the environment variable $HOME or ~ (tilde). The path to the default file can be modified by defining the `ALIBABA_CLOUD_CREDENTIALS_FILE` environment variable.
+
+```ini
+[default]                          # Default credential
+type = access_key                  # Certification type: access_key
+access_key_id = foo                # access key id
+access_key_secret = bar            # access key secret
+```
+
+#### 3. Instance RAM Role
+If the environment variable `ALIBABA_CLOUD_ECS_METADATA` is defined and not empty, the program will take the value of the environment variable as the role name and request `http://100.100.100.200/latest/meta-data/ram/security-credentials/` to get the temporary Security credential.
 
 
 ## Test & Coverage

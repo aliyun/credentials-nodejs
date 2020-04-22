@@ -1,9 +1,8 @@
 [English](README.md) | 简体中文
 
 # Alibaba Cloud Credentials for TypeScript/Node.js
-[![npm version](https://badge.fury.io/js/@alicloud%2fcredentials.svg)](https://badge.fury.io/js/@alicloud%2fcredentials.svg)
+[![npm version](https://badge.fury.io/js/@alicloud%2fcredentials.svg)](https://www.npmjs.com/package/@alicloud/credentials)
 [![Travis Build Status](https://api.travis-ci.org/aliyun/credentials-nodejs.svg?branch=master)](https://travis-ci.org/aliyun/credentials-nodejs)
-[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/m9wp3edgrt2c098a?svg=true)](https://ci.appveyor.com/project/aliyun/credentials-nodejs)
 [![codecov](https://codecov.io/gh/aliyun/credentials-nodejs/branch/master/graph/badge.svg)](https://codecov.io/gh/aliyun/credentials-nodejs)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
