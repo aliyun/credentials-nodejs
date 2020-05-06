@@ -34,9 +34,9 @@ npm install @alicloud/credentials
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
-	type:               'access_key',       // 凭证类型
-	accessKeyId: 	    'accessKeyId',      // AccessKeyId
-	accessKeySecret:    'accessKeySecret',  // AccessKeySecret
+  type:               'access_key',       // 凭证类型
+  accessKeyId:        'accessKeyId',      // AccessKeyId
+  accessKeySecret:    'accessKeySecret',  // AccessKeySecret
 }
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();
@@ -50,10 +50,10 @@ let type: string = cred.getType();
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
-	type:                   'sts',             // 凭证类型
-	accessKeyId:            'accessKeyId',     // AccessKeyId
-	accessKeySecret:        'accessKeySecret', // AccessKeySecret
-	securityToken:          'securityToken',   // STS Token
+  type:                   'sts',             // 凭证类型
+  accessKeyId:            'accessKeyId',     // AccessKeyId
+  accessKeySecret:        'accessKeySecret', // AccessKeySecret
+  securityToken:          'securityToken',   // STS Token
 }
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();
@@ -66,13 +66,13 @@ let type: string = cred.getType();
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
-	type:                   'ram_role_arn',     // 凭证类型
-	accessKeyId:            'accessKeyId',      // AccessKeyId
-	accessKeySecret:        'accessKeySecret',  // AccessKeySecret
-	roleArn:                'roleArn',          // 格式: acs:ram::用户ID:role/角色名
-	roleSessionName:        'roleSessionName',  // 角色会话名称
-	policy:                 'policy',           // 可选, 限制 STS Token 的权限
-	roleSessionExpiration:   3600,              // 可选, 限制 STS Token 的有效时间
+  type:                   'ram_role_arn',     // 凭证类型
+  accessKeyId:            'accessKeyId',      // AccessKeyId
+  accessKeySecret:        'accessKeySecret',  // AccessKeySecret
+  roleArn:                'roleArn',          // 格式: acs:ram::用户ID:role/角色名
+  roleSessionName:        'roleSessionName',  // 角色会话名称
+  policy:                 'policy',           // 可选, 限制 STS Token 的权限
+  roleSessionExpiration:   3600,              // 可选, 限制 STS Token 的有效时间
 }
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();
@@ -87,8 +87,8 @@ let type: string = cred.getType();
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
-	type:                 'ecs_ram_role',       // 凭证类型
-	roleName:             'roleName',           // 账户RoleName，非必填，不填则自动获取，建议设置，可以减少请求
+  type:                 'ecs_ram_role',       // 凭证类型
+  roleName:             'roleName',           // 账户RoleName，非必填，不填则自动获取，建议设置，可以减少请求
 }
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();
@@ -103,9 +103,9 @@ By specifying the public key ID and the private key file, the credential will be
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
-	type:                    'rsa_key_pair',       // 凭证类型
-	privateKeyFile:          'privateKeyFile',     // PrivateKey文件路径
-	publicKeyId:             'publicKeyId',        // 账户PublicKeyId
+  type:                    'rsa_key_pair',       // 凭证类型
+  privateKeyFile:          'privateKeyFile',     // PrivateKey文件路径
+  publicKeyId:             'publicKeyId',        // 账户PublicKeyId
 }
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();
@@ -119,8 +119,8 @@ let type: string = cred.getType();
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
-	type:                 'bearer',            // 凭证类型
-	bearerToken:          'bearerToken',       // BearerToken
+  type:                 'bearer',            // 凭证类型
+  bearerToken:          'bearerToken',       // BearerToken
 }
 const cred = new Credential(config);
 let bearerToken: string = cred.getBearerToken();
