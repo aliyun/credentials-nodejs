@@ -14,16 +14,15 @@ const beforeMock = (cred: EcsRamRoleCredential) => {
 
       let result = {
         RequestId: '76C9056D-0E40-4ED9-A82E-D69B30E733C8',
-        Credentials: {
-          AccessKeySecret: 'AccessKeySecret',
-          AccessKeyId: 'AccessKeyId',
-          Expiration: utils.timestamp(new Date(), 1000 * 3600),
-          SecurityToken: 'SecurityToken'
-        }
+        AccessKeySecret: 'AccessKeySecret',
+        AccessKeyId: 'AccessKeyId',
+        Expiration: utils.timestamp(new Date(), 1000 * 3600),
+        SecurityToken: 'SecurityToken'
       };
 
       if (url === (REQUEST_URL + 'tem_role_name')) {
-        result.Credentials = {
+        result = {
+          RequestId: '76C9056D-0E40-4ED9-A82E-D69B30E733C8',
           AccessKeySecret: 'temAccessKeySecret',
           AccessKeyId: 'temAccessKeyId',
           Expiration: utils.timestamp(new Date(), 1000 * 3600),

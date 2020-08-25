@@ -29,7 +29,12 @@ export default class EcsRamRoleCredential extends SessionCredential implements I
     const url = SECURITY_CRED_URL + roleName;
     const body = await this.getBody(url);
     const json = JSON.parse(body);
-    this.sessionCredential = json.Credentials;
+    this.sessionCredential = {
+      AccessKeyId: json.AccessKeyId,
+      AccessKeySecret: json.AccessKeySecret,
+      Expiration: json.Expiration,
+      SecurityToken: json.SecurityToken,
+    };
   }
 
   async getRoleName(): Promise<string> {
