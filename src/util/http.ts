@@ -48,7 +48,7 @@ function replaceRepeatList(target: {[key: string]: any}, key: string, repeat: an
 function flatParams(params: {[key: string]: any}): {[key: string]: any} {
   const target: {[key: string]: any} = {};
   const keys = Object.keys(params);
-    for (const key of keys) {
+  for (const key of keys) {
     const value = params[key];
     if (Array.isArray(value)) {
       replaceRepeatList(target, key, value);

@@ -1,4 +1,5 @@
 import * as $tea from '@alicloud/tea-typescript';
+
 export default class Config extends $tea.Model {
   accessKeyId?: string;
   accessKeySecret?: string;
@@ -12,7 +13,9 @@ export default class Config extends $tea.Model {
   publicKeyId?: string;
   privateKeyFile?: string;
   roleName?: string;
+  credentialsURI?: string;
   type?: string;
+
   static names(): { [key: string]: string } {
     return {
       accessKeyId: 'accessKeyId',
@@ -27,6 +30,7 @@ export default class Config extends $tea.Model {
       publicKeyId: 'publicKeyId',
       privateKeyFile: 'privateKeyFile',
       roleName: 'roleName',
+      credentialsURI: 'credentialsURI',
       type: 'type',
     };
   }
@@ -45,9 +49,11 @@ export default class Config extends $tea.Model {
       publicKeyId: 'string',
       privateKeyFile: 'string',
       roleName: 'string',
+      credentialsURI: 'string',
       type: 'string',
     };
   }
+
   constructor(config?: { [key: string]: any }) {
     super(config);
   }

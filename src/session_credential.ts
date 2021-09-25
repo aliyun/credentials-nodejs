@@ -1,4 +1,4 @@
-import DefaultCredential from "./default_credential";
+import DefaultCredential from './default_credential';
 import * as utils from './util/utils';
 import Config from './config';
 

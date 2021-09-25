@@ -4,12 +4,13 @@ import mm from 'mm';
 import * as utils from '../src/util/utils';
 const REQUEST_URL = 'http://100.100.100.200/latest/meta-data/ram/security-credentials/';
 import 'mocha';
+import httpx from 'httpx';
 
-const beforeMock = (cred: EcsRamRoleCredential) => {
+const mock = () => {
   before(function () {
-    mm(cred, 'getBody', async function (url: string): Promise<string> {
+    mm(httpx, 'request', async function (url: string, opts: {[key: string]: any}) {
       if (url === REQUEST_URL) {
-        return 'tem_role_name';
+        return {body: 'tem_role_name'};
       }
 
       let result = {
@@ -30,7 +31,11 @@ const beforeMock = (cred: EcsRamRoleCredential) => {
         };
       }
 
-      return JSON.stringify(result);
+      return {body: JSON.stringify(result)};
+    });
+
+    mm(httpx, 'read', async function (response: any, encoding: string) {
+      return response.body;
     });
   });
 
@@ -42,7 +47,7 @@ const beforeMock = (cred: EcsRamRoleCredential) => {
 describe('EcsRamRoleCredential with role_name', function () {
   const cred = new EcsRamRoleCredential('roleName');
 
-  beforeMock(cred);
+  mock();
 
   it('should success', async function () {
     let id = await cred.getAccessKeyId();
@@ -76,7 +81,8 @@ describe('EcsRamRoleCredential with role_name', function () {
 
 describe('EcsRamRoleCredential with no role_name', function () {
   const cred = new EcsRamRoleCredential();
-  beforeMock(cred);
+
+  mock();
 
   it('should success', async function () {
     let id = await cred.getAccessKeyId();

@@ -1,11 +1,11 @@
-
-
 import expect from 'expect.js';
-import RamRoleArnCredential from '../src/ram_role_arn_credential';
 import mm from 'mm';
+import 'mocha';
+
+import RamRoleArnCredential from '../src/ram_role_arn_credential';
 import * as utils from '../src/util/utils';
 import * as httpUtil from '../src/util/http';
-import 'mocha';
+
 import Config from '../src/config';
 
 const defaultConfig: Config = new Config({
@@ -30,9 +30,11 @@ describe('RamRoleArnCredential with correct config', function () {
       };
     });
   });
+
   after(function () {
     mm.restore();
   });
+
   it('should success', async function () {
     let id = await cred.getAccessKeyId();
     expect(id).to.be('AccessKeyId');
@@ -43,6 +45,7 @@ describe('RamRoleArnCredential with correct config', function () {
     let type = cred.getType();
     expect(type).to.be('ram_role_arn');
   });
+
   it('should refresh credentials with sessionCredential expired', async function () {
     cred.sessionCredential.Expiration = utils.timestamp(cred.sessionCredential.Expiration, -1000 * 3600 * 0.96);
     let needRefresh = cred.needUpdateCredential();
@@ -50,6 +53,7 @@ describe('RamRoleArnCredential with correct config', function () {
     let token = await cred.getSecurityToken();
     expect(token).to.be('SecurityToken');
   });
+
   it('should refresh credentials with no sessionCredential', async function () {
     cred.sessionCredential = null;
     let needRefresh = cred.needUpdateCredential();
@@ -60,6 +64,7 @@ describe('RamRoleArnCredential with correct config', function () {
     expect(id).to.be('AccessKeyId');
   });
 });
+
 describe('RamRoleArnCredential with correct config', function () {
   defaultConfig.policy = 'policy';
   const cred = new RamRoleArnCredential(defaultConfig);
@@ -122,5 +127,3 @@ describe('RamRoleArnCredential should filed with invalid config ', function () {
     }).throwException(/Missing required roleArn option in config for ram_role_arn/);
   });
 });
-
-

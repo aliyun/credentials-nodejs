@@ -33,7 +33,7 @@ export default class RamRoleArnCredential extends SessionCredential {
     this.policy = config.policy;
     this.durationSeconds = config.roleSessionExpiration || 3600;
     this.roleSessionName = config.roleSessionName || 'role_session_name';
-    this.runtime = runtime || {};
+    this.runtime = runtime;
     this.host = 'https://sts.aliyuncs.com';
   }
 

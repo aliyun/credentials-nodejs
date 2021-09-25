@@ -39,8 +39,7 @@ describe('http request', function () {
 });
 
 describe('http request', function () {
-  mock({
-  }, '{}');
+  mock({}, '{}');
 
   it('should success with undefined params', async function () {
     let result = await request('https://sts.aliyuncs.com', {
