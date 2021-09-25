@@ -1,6 +1,7 @@
 import environmentVariableCredentialsProvider from './environment_variable_credentials_provider';
 import profileCredentialsProvider from './profile_credentials_provider';
 import instanceRamRoleCredentialsProvider from './instance_ram_role_credentials_provider';
+import credentialsUriProvider from './credentials_uri_provider';
 
 import ICredential from '../icredential';
 
@@ -11,7 +12,8 @@ type IProvider = {
 const defaultProviders: IProvider[]  = [
   environmentVariableCredentialsProvider,
   profileCredentialsProvider,
-  instanceRamRoleCredentialsProvider
+  instanceRamRoleCredentialsProvider,
+  credentialsUriProvider
 ];
 
 export function getCredentials(providers: IProvider[] = null): ICredential {
@@ -22,5 +24,6 @@ export function getCredentials(providers: IProvider[] = null): ICredential {
       return credential;
     }
   }
+
   return null;
 }

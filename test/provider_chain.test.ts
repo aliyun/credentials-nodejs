@@ -10,6 +10,7 @@ import expect from 'expect.js';
 import 'mocha';
 import ICredential from '../src/icredential';
 import Config from '../src/config';
+import assert from 'assert'
 
 describe('ProviderChain', function () {
   before(function () {
@@ -67,6 +68,7 @@ describe('ProviderChain', function () {
     expect(type).to.be('profile');
   });
 });
+
 describe('ProviderChain', function () {
   before(function () {
     mm(environmentVariableCredentialsProvider, 'getCredential', function (): ICredential {
@@ -92,3 +94,9 @@ describe('ProviderChain', function () {
   });
 });
 
+describe('ProviderChain', function () {
+  it('should return null', async function () {
+    let cred = ProviderChain.getCredentials();
+    assert.deepStrictEqual(cred, null);
+  });
+});

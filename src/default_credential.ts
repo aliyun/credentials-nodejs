@@ -1,5 +1,5 @@
 import Config from './config';
-import ICredential from "./icredential";
+import ICredential from './icredential';
 
 export default class DefaultCredential implements ICredential {
   accessKeyId: string;

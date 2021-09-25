@@ -9,6 +9,7 @@ import * as utils from '../src/util/utils';
 import Config from '../src/config';
 import 'mocha';
 import fs from 'fs';
+import assert from 'assert'
 
 describe('Credentials with no config', function () {
   before(function () {
@@ -105,6 +106,16 @@ describe('Credentials with valid config', function () {
     let type = cred.getType();
     expect(type).to.be('rsa_key_pair');
   });
+
+  it('should return URICredential when type is credentials_uri', async function () {
+    const conf = new Config({
+      type: 'credentials_uri',
+      credentialsURI: 'http://a_local_or_remote_address/'
+    });
+    let cred = new Credentials(conf);
+    let type = cred.getType();
+    expect(type).to.be('credentials_uri');
+  });
 });
 
 describe('Credentials with invalid config ', function () {
@@ -121,8 +132,20 @@ describe('Credentials with invalid config ', function () {
         type: 'invalid_type'
       });
       new Credentials(conf);
-    }).throwException(/Invalid type option, support: access_key, sts, ecs_ram_role, ram_role_arn, rsa_key_pair/);
+    }).throwException(/Invalid type option, support: access_key, sts, ecs_ram_role, ram_role_arn, rsa_key_pair, credentials_uri/);
   });
 });
 
-
+describe('Credentials', function () {
+  it('should ok', async function () {
+    const conf = new Config({
+      type: 'access_key',
+      accessKeyId: 'akid',
+      accessKeySecret: 'aksecret'
+    });
+    const cred = new Credentials(conf);
+    assert.strictEqual(await cred.getAccessKeyId(), 'akid');
+    assert.strictEqual(await cred.getAccessKeySecret(), 'aksecret');
+    assert.strictEqual(await cred.getSecurityToken(), '');
+  });
+});
