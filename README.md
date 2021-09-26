@@ -103,6 +103,36 @@ let securityToken: string = await cred.getSecurityToken();
 let type: string = cred.getType();
 ```
 
+#### credentials_uri
+By specifying a local or remote URI to get credentials and refresh automanticly.
+
+```ts
+import Credential, { Config } from '@alicloud/credentials';
+const config: Config = {
+  type: 'credentials_uri',
+  credentialsURI: 'http://a_local_or_remote_address/'
+};
+const cred = new Credential(config);
+let accessKeyId: string = await cred.getAccessKeyId();
+let accessKeySecret: string = await cred.getAccessKeySecret();
+let securityToken: string = await cred.getSecurityToken();
+let type: string = cred.getType();
+```
+
+The URI must reponse meets following conditions:
+- response status code is 200
+- response body struct must be:
+
+```json
+{
+  "Code": "Success",
+  "AccessKeySecret": "AccessKeySecret",
+  "AccessKeyId": "AccessKeyId",
+  "Expiration": "2021-09-26T03:46:38Z",
+  "SecurityToken": "SecurityToken"
+}
+```
+
 #### bearer
 If credential is required by the Cloud Call Centre (CCC), please apply for Bearer Token maintenance by yourself.
 ```ts
@@ -135,6 +165,9 @@ access_key_secret = bar            # access key secret
 #### 3. Instance RAM Role
 If the environment variable `ALIBABA_CLOUD_ECS_METADATA` is defined and not empty, the program will take the value of the environment variable as the role name and request `http://100.100.100.200/latest/meta-data/ram/security-credentials/` to get the temporary Security credential.
 
+#### 4. Credentials URI
+If the environment variable `ALIBABA_CLOUD_CREDENTIALS_URI` is defined and not empty,
+the program will take the value of the environment variable as the credentials uri.
 
 ## Test & Coverage
 
