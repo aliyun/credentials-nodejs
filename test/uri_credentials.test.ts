@@ -4,18 +4,16 @@ import mm from 'mm';
 import httpx from 'httpx';
 
 import * as utils from '../src/util/utils';
-import * as httpUtil from '../src/util/http';
-import Config from '../src/config';
 import URICredential from '../src/uri_credential';
 import assert from 'assert';
 
 const mock = (response: any, body: any) => {
   before(function () {
-    mm(httpx, 'request', async function (url: string, opts: { [key: string]: any }) {
+    mm(httpx, 'request', async function () {
       return response;
     });
 
-    mm(httpx, 'read', async function (response: any, encoding: string) {
+    mm(httpx, 'read', async function () {
       return body;
     });
   });

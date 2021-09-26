@@ -31,22 +31,23 @@ npm install @alicloud/credentials
 
 #### access_key
 通过[用户信息管理][ak]设置 access_key，它们具有该账户完全的权限，请妥善保管。有时出于安全考虑，您不能把具有完全访问权限的主账户 AccessKey 交于一个项目的开发者使用，您可以[创建RAM子账户][ram]并为子账户[授权][permissions]，使用RAM子用户的 AccessKey 来进行API调用。
+
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
-  type:               'access_key',       // 凭证类型
-  accessKeyId:        'accessKeyId',      // AccessKeyId
-  accessKeySecret:    'accessKeySecret',  // AccessKeySecret
+  type: 'access_key',                 // 凭证类型
+  accessKeyId: 'accessKeyId',         // AccessKeyId
+  accessKeySecret: 'accessKeySecret', // AccessKeySecret
 }
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();
 let accessKeySecret: string = await cred.getAccessKeySecret();
 let type: string = cred.getType();
-
 ```
 
 #### sts
 通过安全令牌服务（Security Token Service，简称 STS），申请临时安全凭证（Temporary Security Credentials，简称 TSC），创建临时安全凭证。
+
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
@@ -79,7 +80,6 @@ let accessKeyId: string = await cred.getAccessKeyId();
 let accessKeySecret: string = await cred.getAccessKeySecret();
 let securityToken: string = await cred.getSecurityToken();
 let type: string = cred.getType();
-
 ```
 
 #### ecs_ram_role
@@ -87,8 +87,8 @@ let type: string = cred.getType();
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
-  type:                 'ecs_ram_role',       // 凭证类型
-  roleName:             'roleName',           // 账户RoleName，非必填，不填则自动获取，建议设置，可以减少请求
+  type: 'ecs_ram_role',    // 凭证类型
+  roleName: 'roleName',    // 账户RoleName，非必填，不填则自动获取，建议设置，可以减少请求
 }
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();
@@ -112,6 +112,36 @@ let accessKeyId: string = await cred.getAccessKeyId();
 let accessKeySecret: string = await cred.getAccessKeySecret();
 let securityToken: string = await cred.getSecurityToken();
 let type: string = cred.getType();
+```
+
+#### credentials_uri
+通过本地或者远程的 URI，来获取凭证，并支持自动刷新。
+
+```ts
+import Credential, { Config } from '@alicloud/credentials';
+const config: Config = {
+  type: 'credentials_uri',
+  credentialsURI: 'http://a_local_or_remote_address/'
+};
+const cred = new Credential(config);
+let accessKeyId: string = await cred.getAccessKeyId();
+let accessKeySecret: string = await cred.getAccessKeySecret();
+let securityToken: string = await cred.getSecurityToken();
+let type: string = cred.getType();
+```
+
+该地址必须满足如下条件：
+- 响应 200 状态码
+- 响应体为如下的结构：
+
+```json
+{
+  "Code": "Success",
+  "AccessKeySecret": "AccessKeySecret",
+  "AccessKeyId": "AccessKeyId",
+  "Expiration": "2021-09-26T03:46:38Z",
+  "SecurityToken": "SecurityToken"
+}
 ```
 
 #### bearer
@@ -146,6 +176,8 @@ access_key_secret = bar            # access key secret
 #### 3. 实例 RAM 角色
 如果定义了环境变量 `ALIBABA_CLOUD_ECS_METADATA` 且不为空，程序会将该环境变量的值作为角色名称，请求 `http://100.100.100.200/latest/meta-data/ram/security-credentials/` 获取临时安全凭证。
 
+#### 4. Credentials URI
+如果定义了环境变量 `ALIBABA_CLOUD_CREDENTIALS_URI` 且不为空，程序会将该环境变量的值作为 credentials_uri 模式的地址，在调用时获取临时安全凭证。
 
 [ak]: https://usercenter.console.aliyun.com/#/manage/ak
 [ram]: https://ram.console.aliyun.com/users
