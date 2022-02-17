@@ -14,6 +14,8 @@ export default class Config extends $tea.Model {
   privateKeyFile?: string;
   roleName?: string;
   credentialsURI?: string;
+  oidcProviderArn: string;
+  oidcTokenFilePath: string;
   type?: string;
 
   static names(): { [key: string]: string } {
@@ -31,6 +33,8 @@ export default class Config extends $tea.Model {
       privateKeyFile: 'privateKeyFile',
       roleName: 'roleName',
       credentialsURI: 'credentialsURI',
+      oidcProviderArn: 'oidcProviderArn',
+      oidcTokenFilePath: 'oidcTokenFilePath',
       type: 'type',
     };
   }
@@ -50,6 +54,8 @@ export default class Config extends $tea.Model {
       privateKeyFile: 'string',
       roleName: 'string',
       credentialsURI: 'string',
+      oidcProviderArn: 'string',
+      oidcTokenFilePath: 'string',
       type: 'string',
     };
   }
