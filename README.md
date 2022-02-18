@@ -72,6 +72,28 @@ let securityToken: string = await cred.getSecurityToken();
 let type: string = cred.getType();
 ```
 
+#### oidc_role_arn
+By specifying [OIDC Role][OIDC Role], the credential will be able to automatically request maintenance of STS Token. If you want to limit the permissions([How to make a policy][policy]) of STS Token, you can assign value for `Policy`.
+```ts
+import Credential, { Config } from '@alicloud/credentials';
+const config: Config = {
+  type:                   'oidc_role_arn',    // credential type 
+  accessKeyId:            'accessKeyId',      // Not required, AccessKeyId
+  accessKeySecret:        'accessKeySecret',  // Not required, AccessKeySecret
+  roleArn:                'roleArn',          // Format: acs:ram::USER_Id:role/ROLE_NAME
+  oidcProviderArn:        'oidcProviderArn',  // Format: acs:ram::USER_Id:oidc-provider/ROLE_NAME
+  oidcTokenFilePath:      '/Users/xxx/xxx',   // Format: path  OIDCTokenFilePath can be replaced by setting environment variable: ALIBABA_CLOUD_OIDC_TOKEN_FILE
+  roleSessionName:        'roleSessionName',  // Role Session Name
+  policy:                 'policy',           // Not required, limit the permissions of STS Token
+  roleSessionExpiration:   3600,              // Not required, limit the Valid time of STS Token
+}
+const cred = new Credential(config);
+let accessKeyId: string = await cred.getAccessKeyId();
+let accessKeySecret: string = await cred.getAccessKeySecret();
+let securityToken: string = await cred.getSecurityToken();
+let type: string = cred.getType();
+```
+
 #### ecs_ram_role
 By specifying the role name, the credential will be able to automatically request maintenance of STS Token.
 ```ts

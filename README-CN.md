@@ -82,6 +82,28 @@ let securityToken: string = await cred.getSecurityToken();
 let type: string = cred.getType();
 ```
 
+#### oidc_role_arn
+通过指定[OIDC 角色][OIDC Role]，让凭证自动申请维护 STS Token。你可以通过为 `Policy` 赋值来限制获取到的 STS Token 的权限。
+```ts
+import Credential, { Config } from '@alicloud/credentials';
+const config: Config = {
+  type:                   'oidc_role_arn',     // 凭证类型
+  accessKeyId:            'accessKeyId',      // 可选, AccessKeyId
+  accessKeySecret:        'accessKeySecret',  // 可选, AccessKeySecret
+  roleArn:                'roleArn',          // 格式: acs:ram::用户ID:role/角色名
+  oidcProviderArn:        'oidcProviderArn',  // 格式: acs:ram::用户Id:oidc-provider/角色名
+  oidcTokenFilePath:      '/Users/xxx/xxx',   // 格式: path  OIDCTokenFilePath 可不设，但需要通过设置 ALIBABA_CLOUD_OIDC_TOKEN_FILE 来代替
+  roleSessionName:        'roleSessionName',  // 角色会话名称
+  policy:                 'policy',           // 可选, 限制 STS Token 的权限
+  roleSessionExpiration:   3600,              // 可选, 限制 STS Token 的有效时间
+}
+const cred = new Credential(config);
+let accessKeyId: string = await cred.getAccessKeyId();
+let accessKeySecret: string = await cred.getAccessKeySecret();
+let securityToken: string = await cred.getSecurityToken();
+let type: string = cred.getType();
+```
+
 #### ecs_ram_role
 通过指定角色名称，让凭证自动申请维护 STS Token
 ```ts
