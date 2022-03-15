@@ -10,7 +10,7 @@ import fs from 'fs';
 import ICredential from '../icredential';
 import Config from '../config';
 
-const DEFAULT_PATH = '~/.alibabacloud/credentials';
+const DEFAULT_PATH = process.env.HOME + '/.alibabacloud/credentials';
 
 export default {
   getCredential(credentialName: string = 'default'): ICredential {
