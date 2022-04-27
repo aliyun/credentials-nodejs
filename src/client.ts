@@ -31,6 +31,10 @@ export default class Credential implements ICredential {
     return this.credential.getSecurityToken();
   }
 
+  getBearerToken(): string {
+    return this.credential.getBearerToken();
+  }
+
   getType(): string {
     return this.credential.getType();
   }

@@ -15,6 +15,8 @@ describe('DefaultCredential get correct value', function () {
     expect(secret).to.be('');
     let securityToken = await cred.getSecurityToken();
     expect(securityToken).to.be('');
+    let bearerToken = cred.getBearerToken();
+    expect(bearerToken).to.be('');
   });
 });
 
