@@ -48,8 +48,11 @@ describe('Credentials with valid config', function () {
       accessKeySecret: 'accessKeySecret'
     });
     let cred = new Credentials(conf);
-    let type = cred.getType();
-    expect(type).to.be('access_key');
+    expect(cred.getType()).to.be('access_key');
+    expect(await cred.getAccessKeyId()).to.be('accessKeyId');
+    expect(await cred.getAccessKeySecret()).to.be('accessKeySecret');
+    expect(await cred.getSecurityToken()).to.be('');
+    expect(cred.getBearerToken()).to.be('');
   });
 
   it('should return BearerTokenCredential when type is bearer', async function () {
@@ -58,8 +61,11 @@ describe('Credentials with valid config', function () {
       bearerToken: 'bearerToken'
     });
     let cred = new Credentials(conf);
-    let type = cred.getType();
-    expect(type).to.be('bearer');
+    expect(cred.getType()).to.be('bearer');
+    expect(await cred.getAccessKeyId()).to.be('');
+    expect(await cred.getAccessKeySecret()).to.be('');
+    expect(await cred.getSecurityToken()).to.be('');
+    expect(cred.getBearerToken()).to.be('bearerToken');
   });
 
   it('should return StsTokenCredential when type is sts', async function () {
@@ -70,8 +76,11 @@ describe('Credentials with valid config', function () {
       securityToken: 'securityToken'
     });
     let cred = new Credentials(conf);
-    let type = cred.getType();
-    expect(type).to.be('sts');
+    expect(cred.getType()).to.be('sts');
+    expect(await cred.getAccessKeyId()).to.be('accessKeyId');
+    expect(await cred.getAccessKeySecret()).to.be('accessKeySecret');
+    expect(await cred.getSecurityToken()).to.be('securityToken');
+    expect(cred.getBearerToken()).to.be('');
   });
 
   it('should return EcsRamRoleCredential when type is ecs_ram_role', async function () {
@@ -147,5 +156,6 @@ describe('Credentials', function () {
     assert.strictEqual(await cred.getAccessKeyId(), 'akid');
     assert.strictEqual(await cred.getAccessKeySecret(), 'aksecret');
     assert.strictEqual(await cred.getSecurityToken(), '');
+    assert.strictEqual(cred.getBearerToken(), '');
   });
 });

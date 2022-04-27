@@ -3,7 +3,6 @@ import ICredential from './icredential';
 import Config from './config';
 
 export default class BearerTokenCredential extends DefaultCredential implements ICredential {
-  bearerToken: string;
 
   constructor(bearerToken: string) {
     if (!bearerToken) {
@@ -14,9 +13,5 @@ export default class BearerTokenCredential extends DefaultCredential implements 
     });
     super(conf);
     this.bearerToken = bearerToken;
-  }
-
-  getBearerToken(): string {
-    return this.bearerToken;
   }
 }

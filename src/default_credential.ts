@@ -5,12 +5,14 @@ export default class DefaultCredential implements ICredential {
   accessKeyId: string;
   accessKeySecret: string;
   securityToken?: string;
+  bearerToken?: string;
   type: string;
 
   constructor(config: Config) {
     this.accessKeyId = config.accessKeyId || '';
     this.accessKeySecret = config.accessKeySecret || '';
     this.securityToken = config.securityToken || '';
+    this.bearerToken = config.bearerToken || '';
     this.type = config.type || '';
   }
 
@@ -24,6 +26,10 @@ export default class DefaultCredential implements ICredential {
 
   async getSecurityToken(): Promise<string> {
     return this.securityToken;
+  }
+
+  getBearerToken(): string {
+    return this.bearerToken;
   }
 
   getType(): string {
