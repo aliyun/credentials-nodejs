@@ -15,7 +15,7 @@ const defaultConfig: Config = new Config({
   accessKeyId: 'accessKeyId',
   accessKeySecret: 'accessKeySecret',
   oidcProviderArn: 'acs:ram::roleArn',
-  oidcTokenFilePath: path.join(__dirname, '/fixtures/oidcToken.txt')
+  oidcTokenFilePath: path.join(__dirname, '/fixtures/OIDCToken.txt')
 });
 
 describe('OidcRoleArnCredential with correct config', function () {
