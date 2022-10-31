@@ -7,7 +7,7 @@ export default {
     if (credentialsURI) {
       return new URICredential(credentialsURI);
     }
-  
+
     return null;
   }
 }

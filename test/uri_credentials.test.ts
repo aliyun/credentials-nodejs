@@ -6,6 +6,7 @@ import httpx from 'httpx';
 import * as utils from '../src/util/utils';
 import URICredential from '../src/uri_credential';
 import assert from 'assert';
+import { before } from 'mocha';
 
 const mock = (response: any, body: any) => {
   before(function () {
@@ -27,7 +28,22 @@ describe('URICredential should failed with invalid config ', function () {
   it('should failed when config has no credentialsURI', async function () {
     expect(function () {
       new URICredential('');
-    }).throwException(/Missing required credentialsURI option in config for credentials_uri/);
+    }).throwException(/Missing required credentialsURI option in config or environment variable for credentials_uri/);
+  });
+});
+
+describe('URICredential should get uri from env', function () {
+  before(() => {
+    process.env.ALIBABA_CLOUD_CREDENTIALS_URI = 'http://localhost:3000/';
+  });
+
+  after(() => {
+    process.env.ALIBABA_CLOUD_CREDENTIALS_URI = '';
+  });
+
+  it('should failed when config has no credentialsURI', function () {
+    const credential = new URICredential('');
+    assert.strictEqual(credential.credentialsURI, 'http://localhost:3000/');
   });
 });
 
