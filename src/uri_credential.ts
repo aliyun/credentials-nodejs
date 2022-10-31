@@ -8,17 +8,21 @@ export default class URICredential extends SessionCredential implements ICredent
   credentialsURI: string;
 
   constructor(uri: string) {
-    if (!uri) {
-      throw new Error('Missing required credentialsURI option in config for credentials_uri');
-    }
-
     const conf = new Config({
       type: 'credentials_uri',
       credentialsURI: uri
     });
 
     super(conf);
-    this.credentialsURI = uri;
+    if (!uri) {
+      this.credentialsURI = process.env['ALIBABA_CLOUD_CREDENTIALS_URI']
+    } else {
+      this.credentialsURI = uri;
+    }
+
+    if (!this.credentialsURI) {
+      throw new Error('Missing required credentialsURI option in config or environment variable for credentials_uri');
+    }
   }
 
   async updateCredential(): Promise<void> {
