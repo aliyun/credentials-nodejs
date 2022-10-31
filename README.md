@@ -132,7 +132,7 @@ By specifying a local or remote URI to get credentials and refresh automanticly.
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
   type: 'credentials_uri',
-  credentialsURI: 'http://a_local_or_remote_address/'
+  credentialsURI: 'http://a_local_or_remote_address/'  //credentialsURI can be replaced by setting environment variable: ALIBABA_CLOUD_CREDENTIALS_URI
 };
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();

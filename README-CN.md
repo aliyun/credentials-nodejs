@@ -143,7 +143,7 @@ let type: string = cred.getType();
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
   type: 'credentials_uri',
-  credentialsURI: 'http://a_local_or_remote_address/'
+  credentialsURI: 'http://a_local_or_remote_address/'  // credentialsURI 可不设，但需要通过设置 ALIBABA_CLOUD_CREDENTIALS_URI 来代替
 };
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();
