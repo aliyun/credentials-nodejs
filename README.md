@@ -77,11 +77,9 @@ By specifying [OIDC Role][OIDC Role], the credential will be able to automatical
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
-  type:                   'oidc_role_arn',    // credential type 
-  accessKeyId:            'accessKeyId',      // Not required, AccessKeyId
-  accessKeySecret:        'accessKeySecret',  // Not required, AccessKeySecret
-  roleArn:                'roleArn',          // Format: acs:ram::USER_Id:role/ROLE_NAME
-  oidcProviderArn:        'oidcProviderArn',  // Format: acs:ram::USER_Id:oidc-provider/ROLE_NAME
+  type:                   'oidc_role_arn',    // credential type
+  roleArn:                'roleArn',          // Format: acs:ram::USER_Id:role/ROLE_NAME roleArn can be replaced by setting environment variable: ALIBABA_CLOUD_ROLE_ARN
+  oidcProviderArn:        'oidcProviderArn',  // Format: acs:ram::USER_Id:oidc-provider/ROLE_NAME oidcProviderArn can be replaced by setting environment variable: ALIBABA_CLOUD_OIDC_PROVIDER_ARN
   oidcTokenFilePath:      '/Users/xxx/xxx',   // Format: path  OIDCTokenFilePath can be replaced by setting environment variable: ALIBABA_CLOUD_OIDC_TOKEN_FILE
   roleSessionName:        'roleSessionName',  // Role Session Name
   policy:                 'policy',           // Not required, limit the permissions of STS Token

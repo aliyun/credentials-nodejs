@@ -7,7 +7,7 @@
     "prepublishOnly": "tsc",
     "build": "tsc",
     "lint": "eslint --fix ./src --ext .ts",
-    "test": "mocha -b -r ts-node/register test/**/*.test.ts --timeout 15000",
+    "test": "mocha -b -r ts-node/register test/**/*.test.ts test/*.test.ts --timeout 15000",
     "cov": "nyc -e .ts -r=html -r=text -r=lcov npm run test",
     "ci": "npm run cov && codecov",
     "test-integration": "mocha -b -r ts-node/register -R spec test/*.integration.ts",

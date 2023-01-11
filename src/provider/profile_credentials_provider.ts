@@ -2,6 +2,7 @@ import AccessKeyCredential from '../access_key_credential';
 import StsTokenCredential from '../sts_token_credential';
 import EcsRamRoleCredential from '../ecs_ram_role_credential';
 import RamRoleArnCredential from '../ram_role_arn_credential';
+import OidcRoleArnCredential from '../oidc_role_arn_credential';
 import RsaKeyPairCredential from '../rsa_key_pair_credential';
 import BearerTokenCredential from '../bearer_token_credential';
 
@@ -57,12 +58,19 @@ export default {
       });
       return new RamRoleArnCredential(conf);
     }
+    case 'oidc_role_arn':
+      const conf = new Config({
+        roleArn: config.role_arn,
+        oidcProviderArn: config.oidc_provider_arn,
+        oidcTokenFilePath: config.oidc_token_file_path
+      });
+      return new OidcRoleArnCredential(conf);
     case 'rsa_key_pair':
       return new RsaKeyPairCredential(config.public_key_id, config.private_key_file);
     case 'bearer':
       return new BearerTokenCredential(config.bearer_token);
     default:
-      throw new Error('Invalid type option, support: access_key, sts, ecs_ram_role, ram_role_arn, rsa_key_pair');
+      throw new Error('Invalid type option, support: access_key, sts, ecs_ram_role, ram_role_arn, oidc_role_arn, rsa_key_pair, bearer');
     }
   }
 }

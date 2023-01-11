@@ -11,9 +11,9 @@ function firstLetterUpper(str: string): string {
   return str.slice(0, 1).toUpperCase() + str.slice(1);
 }
 
-function formatParams(params: {[key: string]: any}): {[key: string]: any} {
+function formatParams(params: { [key: string]: any }): { [key: string]: any } {
   const keys = Object.keys(params);
-  const newParams: {[key: string]: string} = {};
+  const newParams: { [key: string]: string } = {};
   for (const key of keys) {
     newParams[firstLetterUpper(key)] = params[key];
   }
@@ -30,7 +30,7 @@ function encode(str: string): string {
     .replace(/\*/g, '%2A');
 }
 
-function replaceRepeatList(target: {[key: string]: any}, key: string, repeat: any) {
+function replaceRepeatList(target: { [key: string]: any }, key: string, repeat: any) {
   for (let i = 0; i < repeat.length; i++) {
     const item = repeat[i];
 
@@ -45,8 +45,8 @@ function replaceRepeatList(target: {[key: string]: any}, key: string, repeat: an
   }
 }
 
-function flatParams(params: {[key: string]: any}): {[key: string]: any} {
-  const target: {[key: string]: any} = {};
+function flatParams(params: { [key: string]: any }): { [key: string]: any } {
+  const target: { [key: string]: any } = {};
   const keys = Object.keys(params);
   for (const key of keys) {
     const value = params[key];
@@ -59,7 +59,7 @@ function flatParams(params: {[key: string]: any}): {[key: string]: any} {
   return target;
 }
 
-function normalize(params: {[key: string]: any}): string[][] {
+function normalize(params: { [key: string]: any }): string[][] {
   const list = [];
   const flated = flatParams(params);
   const keys = Object.keys(flated).sort();
@@ -78,7 +78,7 @@ function canonicalize(normalized: string[][]): string {
   return fields.join('&');
 }
 
-function _buildParams(): {[key: string]: any} {
+function _buildParams(): { [key: string]: any } {
   const defaultParams = {
     Format: 'JSON',
     SignatureMethod: 'HMAC-SHA1',
@@ -92,9 +92,9 @@ function _buildParams(): {[key: string]: any} {
   return defaultParams;
 }
 
-export async function request(host: string, params: {[key: string]: any} = {}, opts: {[key: string]: any} = {}, accessKeySecret: string): Promise<any> {
+export async function request(host: string, params: { [key: string]: any } = {}, opts: { [key: string]: any } = {}, accessKeySecret?: string): Promise<any> {
   // 1. compose params and opts
-  let options: {[key: string]: any} = {
+  let options: { [key: string]: any } = {
     headers: {
       'x-sdk-client': helper.DEFAULT_CLIENT,
       'user-agent': helper.DEFAULT_UA
@@ -114,14 +114,16 @@ export async function request(host: string, params: {[key: string]: any} = {}, o
   // 2. calculate signature
   const method = (opts.method || 'GET').toUpperCase();
   const normalized = normalize(params);
-  const canonicalized = canonicalize(normalized);
-  // 2.1 get string to sign
-  const stringToSign = `${method}&${encode('/')}&${encode(canonicalized)}`;
-  // 2.2 get signature
-  const key = accessKeySecret + '&';
-  const signature = kitx.sha1(stringToSign, key, 'base64') as string;
-  // add signature
-  normalized.push(['Signature', encode(signature)]);
+  if (!options.anonymous) {
+    const canonicalized = canonicalize(normalized);
+    // 2.1 get string to sign
+    const stringToSign = `${method}&${encode('/')}&${encode(canonicalized)}`;
+    // 2.2 get signature
+    const key = accessKeySecret + '&';
+    const signature = kitx.sha1(stringToSign, key, 'base64') as string;
+    // add signature
+    normalized.push(['Signature', encode(signature)]);
+  }
   // 3. generate final url
   const url = opts.method === 'POST' ? `${host}/` : `${host}/?${canonicalize(normalized)}`;
   // 4. send request

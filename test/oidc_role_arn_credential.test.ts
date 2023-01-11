@@ -12,8 +12,6 @@ import Config from '../src/config';
 const defaultConfig: Config = new Config({
   type: 'oidc_role_arn',
   roleArn: 'acs:ram::roleArn:role/roleArn',
-  accessKeyId: 'accessKeyId',
-  accessKeySecret: 'accessKeySecret',
   oidcProviderArn: 'acs:ram::roleArn',
   oidcTokenFilePath: path.join(__dirname, '/fixtures/OIDCToken.txt')
 });
@@ -67,7 +65,7 @@ describe('OidcRoleArnCredential should filed with invalid config ', function () 
         oidcTokenFilePath: 'oidcTokenFilePath'
       })
       new OidcRoleArnCredential(conf);
-    }).throwException(/Missing required roleArn option in config for oidc_role_arn/);
+    }).throwException(/roleArn does not exist and env ALIBABA_CLOUD_ROLE_ARN is null./);
   });
   it('should failed when config has no oidcProviderArn', async function () {
     expect(function () {
@@ -78,7 +76,7 @@ describe('OidcRoleArnCredential should filed with invalid config ', function () 
         oidcTokenFilePath: 'oidcTokenFilePath'
       })
       new OidcRoleArnCredential(conf);
-    }).throwException(/Missing required oidcProviderArn option in config for oidc_role_arn/);
+    }).throwException(/oidcProviderArn does not exist and env ALIBABA_CLOUD_OIDC_PROVIDER_ARN is null./);
   });
   it('should failed when config has no oidcTokenFilePath', async function () {
     expect(function () {

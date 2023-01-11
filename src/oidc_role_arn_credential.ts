@@ -15,24 +15,32 @@ export default class OidcRoleArnCredential extends SessionCredential {
 
   constructor(config: Config, runtime: { [key: string]: any } = {}) {
     if (!config.roleArn) {
-      throw new Error('Missing required roleArn option in config for oidc_role_arn');
+      config.roleArn = process.env.ALIBABA_CLOUD_ROLE_ARN;
+      if (!config.roleArn) {
+        throw new Error('roleArn does not exist and env ALIBABA_CLOUD_ROLE_ARN is null.');
+      }
     }
 
     if (!config.oidcProviderArn) {
-      throw new Error('Missing required oidcProviderArn option in config for oidc_role_arn');
+      config.oidcProviderArn = process.env.ALIBABA_CLOUD_OIDC_PROVIDER_ARN;
+      if (!config.oidcProviderArn) {
+        throw new Error('oidcProviderArn does not exist and env ALIBABA_CLOUD_OIDC_PROVIDER_ARN is null.');
+      }
     }
 
     if (!config.oidcTokenFilePath) {
-      config.oidcTokenFilePath = process.env['ALIBABA_CLOUD_OIDC_TOKEN_FILE'];
+      config.oidcTokenFilePath = process.env.ALIBABA_CLOUD_OIDC_TOKEN_FILE;
       if (!config.oidcTokenFilePath) {
         throw new Error('oidcTokenFilePath is not exists and env ALIBABA_CLOUD_OIDC_TOKEN_FILE is null.');
       }
     }
 
+    if (!config.roleSessionName && process.env.ALIBABA_CLOUD_ROLE_SESSION_NAME) {
+      config.roleSessionName = process.env.ALIBABA_CLOUD_ROLE_SESSION_NAME;
+    }
+
     const conf = new Config({
-      type: 'oidc_role_arn',
-      accessKeyId: config.accessKeyId,
-      accessKeySecret: config.accessKeySecret
+      type: 'oidc_role_arn'
     });
     super(conf);
     this.oidcTokenFilePath = config.oidcTokenFilePath;
@@ -41,7 +49,8 @@ export default class OidcRoleArnCredential extends SessionCredential {
     this.oidcProviderArn = config.oidcProviderArn;
     this.durationSeconds = config.roleSessionExpiration || 3600;
     this.roleSessionName = config.roleSessionName || 'role_session_name';
-    runtime.method = 'POST'
+    runtime.method = 'POST';
+    runtime.anonymous = true;
     this.runtime = runtime;
     this.host = 'https://sts.aliyuncs.com';
   }
@@ -72,7 +81,7 @@ export default class OidcRoleArnCredential extends SessionCredential {
     if (this.policy) {
       params.policy = this.policy;
     }
-    const json = await request(this.host, params, this.runtime, this.accessKeySecret);
+    const json = await request(this.host, params, this.runtime);
     this.sessionCredential = json.Credentials;
   }
 }
