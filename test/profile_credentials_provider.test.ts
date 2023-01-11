@@ -263,7 +263,7 @@ describe('profileCredentialsProvider with env file_path exists', function () {
     it('should failed', async function () {
       expect(function () {
         profileCredentialsProvider.getCredential();
-      }).throwError(/Invalid type option, support: access_key, sts, ecs_ram_role, ram_role_arn, rsa_key_pair/);
+      }).throwError(/Invalid type option, support: access_key, sts, ecs_ram_role, ram_role_arn, oidc_role_arn, rsa_key_pair, bearer/);
     });
   });
 });

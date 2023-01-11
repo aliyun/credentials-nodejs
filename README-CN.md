@@ -88,10 +88,8 @@ let type: string = cred.getType();
 import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
   type:                   'oidc_role_arn',     // 凭证类型
-  accessKeyId:            'accessKeyId',      // 可选, AccessKeyId
-  accessKeySecret:        'accessKeySecret',  // 可选, AccessKeySecret
-  roleArn:                'roleArn',          // 格式: acs:ram::用户ID:role/角色名
-  oidcProviderArn:        'oidcProviderArn',  // 格式: acs:ram::用户Id:oidc-provider/角色名
+  roleArn:                'roleArn',          // 格式: acs:ram::用户ID:role/角色名 roleArn 可不设，但需要通过设置 ALIBABA_CLOUD_ROLE_ARN 来代替
+  oidcProviderArn:        'oidcProviderArn',  // 格式: acs:ram::用户Id:oidc-provider/角色名 oidcProviderArn 可不设，但需要通过设置 ALIBABA_CLOUD_OIDC_PROVIDER_ARN 来代替
   oidcTokenFilePath:      '/Users/xxx/xxx',   // 格式: path  OIDCTokenFilePath 可不设，但需要通过设置 ALIBABA_CLOUD_OIDC_TOKEN_FILE 来代替
   roleSessionName:        'roleSessionName',  // 角色会话名称
   policy:                 'policy',           // 可选, 限制 STS Token 的权限
