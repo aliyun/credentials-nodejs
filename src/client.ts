@@ -10,6 +10,7 @@ import BearerTokenCredential from './bearer_token_credential';
 import * as DefaultProvider from './provider/provider_chain';
 import Config from './config';
 import URICredential from './uri_credential';
+import CredentialModel from './credential_model';
 
 export { Config };
 
@@ -37,6 +38,10 @@ export default class Credential implements ICredential {
 
   getType(): string {
     return this.credential.getType();
+  }
+
+  getCredential(): Promise<CredentialModel> {
+    return this.credential.getCredential();
   }
 
   private load(config: Config, runtime: { [key: string]: any }): void {

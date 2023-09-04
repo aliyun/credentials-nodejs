@@ -1,6 +1,7 @@
 import DefaultCredential from './default_credential';
 import * as utils from './util/utils';
 import Config from './config';
+import CredentialModel from './credential_model';
 
 export default class SessionCredential extends DefaultCredential {
   sessionCredential: any;
@@ -51,6 +52,17 @@ export default class SessionCredential extends DefaultCredential {
       return true;
     }
     return false;
+  }
+
+  async getCredential(): Promise<CredentialModel> {
+    await this.ensureCredential();
+    return new CredentialModel({
+      accessKeyId: this.sessionCredential.AccessKeyId,
+      accessKeySecret: this.sessionCredential.AccessKeySecret,
+      securityToken: this.sessionCredential.SecurityToken,
+      bearerToken: this.bearerToken,
+      type: this.type,
+    });
   }
 }
 
