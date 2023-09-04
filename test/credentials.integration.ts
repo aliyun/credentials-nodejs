@@ -31,12 +31,11 @@ describe('RamRoleArnCredential with correct config', function () {
     let type = cred.getType();
     expect(type).to.be('ram_role_arn');
     // repeat
-    let repeatId = await cred.getAccessKeyId();
-    expect(repeatId).to.be(id);
-    let repeatSecret = await cred.getAccessKeySecret();
-    expect(repeatSecret).to.be(secret);
-    let repeatToken = await cred.getSecurityToken();
-    expect(repeatToken).to.be(token);
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be(id);
+    expect(credentialModel.accessKeySecret).to.be(secret);
+    expect(credentialModel.securityToken).to.be(token);
+    expect(credentialModel.type).to.be('ram_role_arn');
   });
 });
 

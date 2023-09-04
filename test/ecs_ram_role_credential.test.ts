@@ -58,6 +58,12 @@ describe('EcsRamRoleCredential with role_name', function () {
     expect(token).to.be('SecurityToken');
     let type = cred.getType();
     expect(type).to.be('ecs_ram_role');
+    
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('AccessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('AccessKeySecret');
+    expect(credentialModel.securityToken).to.be('SecurityToken');
+    expect(credentialModel.type).to.be('ecs_ram_role');
   });
 
   it('should refresh credentials with sessionCredential expired', async function () {
@@ -66,6 +72,11 @@ describe('EcsRamRoleCredential with role_name', function () {
     expect(needRefresh).to.be(true);
     let token = await cred.getSecurityToken();
     expect(token).to.be('SecurityToken');
+
+    cred.sessionCredential.Expiration = utils.timestamp(cred.sessionCredential.Expiration, -1000 * 3600);
+    expect(cred.needUpdateCredential()).to.be(true);
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.securityToken).to.be('SecurityToken');
   });
 
   it('should refresh credentials with no sessionCredential', async function () {
@@ -76,6 +87,11 @@ describe('EcsRamRoleCredential with role_name', function () {
     expect(secret).to.be('AccessKeySecret');
     let id = await cred.getAccessKeyId();
     expect(id).to.be('AccessKeyId');
+
+    cred.sessionCredential = null;
+    expect(cred.needUpdateCredential()).to.be(true);
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('AccessKeyId');
   });
 });
 
@@ -93,6 +109,12 @@ describe('EcsRamRoleCredential with no role_name', function () {
     expect(token).to.be('temSecurityToken');
     let type = cred.getType();
     expect(type).to.be('ecs_ram_role');
+
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('temAccessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('temAccessKeySecret');
+    expect(credentialModel.securityToken).to.be('temSecurityToken');
+    expect(credentialModel.type).to.be('ecs_ram_role');
   });
 
   it('should refresh credentials with sessionCredential expired', async function () {
@@ -101,6 +123,11 @@ describe('EcsRamRoleCredential with no role_name', function () {
     expect(needRefresh).to.be(true);
     let token = await cred.getSecurityToken();
     expect(token).to.be('temSecurityToken');
+
+    cred.sessionCredential.Expiration = utils.timestamp(cred.sessionCredential.Expiration, -1000 * 3600);
+    expect(cred.needUpdateCredential()).to.be(true);
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.securityToken).to.be('temSecurityToken');
   });
 
   it('should refresh credentials with no sessionCredential', async function () {
@@ -111,5 +138,11 @@ describe('EcsRamRoleCredential with no role_name', function () {
     expect(secret).to.be('temAccessKeySecret');
     let id = await cred.getAccessKeyId();
     expect(id).to.be('temAccessKeyId');
+
+    cred.sessionCredential = null;
+    expect(cred.needUpdateCredential()).to.be(true);
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('temAccessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('temAccessKeySecret');
   });
 });

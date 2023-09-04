@@ -9,6 +9,10 @@ describe('BearerTokenCredential should get correct value', function () {
     expect(token).to.be('bearerToken');
     let type = cred.getType();
     expect(type).to.be('bearer');
+
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.bearerToken).to.be('bearerToken');
+    expect(credentialModel.type).to.be('bearer');
   });
 });
 

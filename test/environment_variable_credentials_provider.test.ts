@@ -23,6 +23,10 @@ describe('environmentVariableCredentialsProvider with env variables', function (
     expect(secret).to.be('accessKeySecret');
     let type = await cred.getType();
     expect(type).to.be('access_key');
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('accessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('accessKeySecret');
+    expect(credentialModel.type).to.be('access_key');
   });
 });
 

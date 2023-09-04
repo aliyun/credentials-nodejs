@@ -17,6 +17,11 @@ describe('DefaultCredential get correct value', function () {
     expect(securityToken).to.be('');
     let bearerToken = cred.getBearerToken();
     expect(bearerToken).to.be('');
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('');
+    expect(credentialModel.accessKeySecret).to.be('');
+    expect(credentialModel.securityToken).to.be('');
+    expect(credentialModel.bearerToken).to.be('');
   });
 });
 

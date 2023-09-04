@@ -53,6 +53,13 @@ describe('Credentials with valid config', function () {
     expect(await cred.getAccessKeySecret()).to.be('accessKeySecret');
     expect(await cred.getSecurityToken()).to.be('');
     expect(cred.getBearerToken()).to.be('');
+
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.type).to.be('access_key');
+    expect(credentialModel.accessKeyId).to.be('accessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('accessKeySecret');
+    expect(credentialModel.securityToken).to.be('');
+    expect(credentialModel.bearerToken).to.be('');
   });
 
   it('should return BearerTokenCredential when type is bearer', async function () {
@@ -66,6 +73,13 @@ describe('Credentials with valid config', function () {
     expect(await cred.getAccessKeySecret()).to.be('');
     expect(await cred.getSecurityToken()).to.be('');
     expect(cred.getBearerToken()).to.be('bearerToken');
+
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.type).to.be('bearer');
+    expect(credentialModel.accessKeyId).to.be('');
+    expect(credentialModel.accessKeySecret).to.be('');
+    expect(credentialModel.securityToken).to.be('');
+    expect(credentialModel.bearerToken).to.be('bearerToken');
   });
 
   it('should return StsTokenCredential when type is sts', async function () {
@@ -81,6 +95,13 @@ describe('Credentials with valid config', function () {
     expect(await cred.getAccessKeySecret()).to.be('accessKeySecret');
     expect(await cred.getSecurityToken()).to.be('securityToken');
     expect(cred.getBearerToken()).to.be('');
+
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.type).to.be('sts');
+    expect(credentialModel.accessKeyId).to.be('accessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('accessKeySecret');
+    expect(credentialModel.securityToken).to.be('securityToken');
+    expect(credentialModel.bearerToken).to.be('');
   });
 
   it('should return EcsRamRoleCredential when type is ecs_ram_role', async function () {
@@ -91,6 +112,8 @@ describe('Credentials with valid config', function () {
     let cred = new Credentials(conf);
     let type = cred.getType();
     expect(type).to.be('ecs_ram_role');
+    // let credentialModel = await cred.getCredential();
+    // expect(credentialModel.type).to.be('ecs_ram_role');
   });
 
   it('should return RamRoleArnCredential when type is ram_role_arn', async function () {
@@ -103,6 +126,8 @@ describe('Credentials with valid config', function () {
     let cred = new Credentials(conf);
     let type = cred.getType();
     expect(type).to.be('ram_role_arn');
+    // let credentialModel = await cred.getCredential();
+    // expect(credentialModel.type).to.be('ram_role_arn');
   });
 
   it('should return RsaKeyPairCredential when type is rsa_key_pair', async function () {
@@ -114,6 +139,8 @@ describe('Credentials with valid config', function () {
     let cred = new Credentials(conf);
     let type = cred.getType();
     expect(type).to.be('rsa_key_pair');
+    // let credentialModel = await cred.getCredential();
+    // expect(credentialModel.type).to.be('rsa_key_pair');
   });
 
   it('should return URICredential when type is credentials_uri', async function () {
@@ -124,6 +151,8 @@ describe('Credentials with valid config', function () {
     let cred = new Credentials(conf);
     let type = cred.getType();
     expect(type).to.be('credentials_uri');
+    // let credentialModel = await cred.getCredential();
+    // expect(credentialModel.type).to.be('credentials_uri');
   });
 });
 
@@ -157,5 +186,10 @@ describe('Credentials', function () {
     assert.strictEqual(await cred.getAccessKeySecret(), 'aksecret');
     assert.strictEqual(await cred.getSecurityToken(), '');
     assert.strictEqual(cred.getBearerToken(), '');
+    let credentialModel = await cred.getCredential();
+    assert.strictEqual(credentialModel.accessKeyId, 'akid');
+    assert.strictEqual(credentialModel.accessKeySecret, 'aksecret');
+    assert.strictEqual(credentialModel.securityToken, '');
+    assert.strictEqual(credentialModel.bearerToken, '');
   });
 });
