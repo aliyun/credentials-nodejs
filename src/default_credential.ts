@@ -1,4 +1,5 @@
 import Config from './config';
+import CredentialModel from './credential_model';
 import ICredential from './icredential';
 
 export default class DefaultCredential implements ICredential {
@@ -34,5 +35,15 @@ export default class DefaultCredential implements ICredential {
 
   getType(): string {
     return this.type;
+  }
+
+  async getCredential(): Promise<CredentialModel> {
+    return new CredentialModel({
+      accessKeyId: this.accessKeyId,
+      accessKeySecret: this.accessKeySecret,
+      securityToken: this.securityToken,
+      bearerToken: this.bearerToken,
+      type: this.type,
+    });
   }
 }
