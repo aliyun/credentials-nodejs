@@ -9,7 +9,7 @@
     "lint": "eslint --fix ./src --ext .ts",
     "test": "mocha -b -r ts-node/register test/**/*.test.ts test/*.test.ts --timeout 15000",
     "cov": "nyc -e .ts -r=html -r=text -r=lcov npm run test",
-    "ci": "npm run cov && codecov",
+    "ci": "npm run cov",
     "test-integration": "mocha -b -r ts-node/register -R spec test/*.integration.ts",
     "clean": "rm -rf coverage"
   },
@@ -31,7 +31,6 @@
     "@types/rewire": "^2.5.28",
     "@typescript-eslint/eslint-plugin": "^4.31.2",
     "@typescript-eslint/parser": "^4.31.2",
-    "codecov": "^3.1.0",
     "eslint": "^7.32.0",
     "expect.js": "^0.3.1",
     "mm": "^2.4.1",
