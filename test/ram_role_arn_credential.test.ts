@@ -44,6 +44,12 @@ describe('RamRoleArnCredential with correct config', function () {
     expect(token).to.be('SecurityToken');
     let type = cred.getType();
     expect(type).to.be('ram_role_arn');
+
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('AccessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('AccessKeySecret');
+    expect(credentialModel.securityToken).to.be('SecurityToken');
+    expect(credentialModel.type).to.be('ram_role_arn');
   });
 
   it('should refresh credentials with sessionCredential expired', async function () {
@@ -52,6 +58,11 @@ describe('RamRoleArnCredential with correct config', function () {
     expect(needRefresh).to.be(true);
     let token = await cred.getSecurityToken();
     expect(token).to.be('SecurityToken');
+
+    cred.sessionCredential.Expiration = utils.timestamp(cred.sessionCredential.Expiration, -1000 * 3600 * 0.96);
+    expect(cred.needUpdateCredential()).to.be(true);
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.securityToken).to.be('SecurityToken');
   });
 
   it('should refresh credentials with no sessionCredential', async function () {
@@ -62,6 +73,12 @@ describe('RamRoleArnCredential with correct config', function () {
     expect(secret).to.be('AccessKeySecret');
     let id = await cred.getAccessKeyId();
     expect(id).to.be('AccessKeyId');
+
+    cred.sessionCredential = null;
+    expect(cred.needUpdateCredential()).to.be(true);
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('AccessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('AccessKeySecret');
   });
 });
 
@@ -93,6 +110,12 @@ describe('RamRoleArnCredential with correct config', function () {
     expect(token).to.be('SecurityToken');
     let type = cred.getType();
     expect(type).to.be('ram_role_arn');
+
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('AccessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('AccessKeySecret');
+    expect(credentialModel.securityToken).to.be('SecurityToken');
+    expect(credentialModel.type).to.be('ram_role_arn');
   });
 });
 describe('RamRoleArnCredential should filed with invalid config ', function () {

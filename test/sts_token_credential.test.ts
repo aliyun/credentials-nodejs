@@ -15,6 +15,12 @@ describe('StsTokenCredential should get correct value ', function () {
     expect(token).to.be('securityToken');
     let type = await cred.getType();
     expect(type).to.be('sts');
+
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('accessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('accessKeySecret');
+    expect(credentialModel.securityToken).to.be('securityToken');
+    expect(credentialModel.type).to.be('sts');
   });
 });
 describe('StsTokenCredential should filed with invalid config ', function () {

@@ -42,6 +42,11 @@ describe('OidcRoleArnCredential with correct config', function () {
     expect(secret).to.be('AccessKeySecret');
     let id = await cred.getAccessKeyId();
     expect(id).to.be('AccessKeyId');
+
+    await cred.updateCredential();
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('AccessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('AccessKeySecret');
   });
 
   it('should refresh credentials with no sessionCredential', async function () {
@@ -52,6 +57,12 @@ describe('OidcRoleArnCredential with correct config', function () {
     expect(secret).to.be('AccessKeySecret');
     let id = await cred.getAccessKeyId();
     expect(id).to.be('AccessKeyId');
+
+    cred.sessionCredential = null;
+    expect(cred.needUpdateCredential()).to.be(true);
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('AccessKeyId');
+    expect(credentialModel.accessKeySecret).to.be('AccessKeySecret');
   });
 });
 
