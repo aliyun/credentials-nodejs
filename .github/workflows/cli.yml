@@ -34,3 +34,6 @@ jobs:
           ROLE_ARN: ${{ secrets.ROLE_ARN }}
           SUB_ACCESS_KEY_ID: ${{ secrets.SUB_ACCESS_KEY_ID }}
           SUB_ACCESS_KEY_SECRET: ${{ secrets.SUB_ACCESS_KEY_SECRET }}
+
+    - name: Upload Coverage Report
+      run: bash <(curl -s https://codecov.io/bash)
