@@ -27,6 +27,7 @@ export default class RamRoleArnCredential extends SessionCredential {
       type: 'ram_role_arn',
       accessKeyId: config.accessKeyId,
       accessKeySecret: config.accessKeySecret,
+      securityToken: config.securityToken
     });
     super(conf);
     this.roleArn = config.roleArn;
@@ -40,6 +41,7 @@ export default class RamRoleArnCredential extends SessionCredential {
   async updateCredential() {
     const params: {[key: string]: any} = {
       accessKeyId: this.accessKeyId,
+      securityToken: this.securityToken,
       roleArn: this.roleArn,
       action: 'AssumeRole',
       durationSeconds: this.durationSeconds,
