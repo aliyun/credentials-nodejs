@@ -6,11 +6,13 @@ import CredentialModel from './credential_model';
 export default class SessionCredential extends DefaultCredential {
   sessionCredential: any;
   durationSeconds: number;
+
   constructor(config: Config) {
     const conf = new Config({
       type: config.type,
       accessKeyId: config.accessKeyId,
       accessKeySecret: config.accessKeySecret,
+      securityToken: config.securityToken
     });
     super(conf);
     this.sessionCredential = null;

@@ -13,7 +13,8 @@ jobs:
     strategy:
       matrix:
         node-version: [12.x, 14.x, 16.x, 18.x, 20.x]
-    
+      fail-fast: false
+
     steps:
     - uses: actions/checkout@v3
 
@@ -31,9 +32,10 @@ jobs:
     - name: Integration Test
       run: test -z $SUB_ACCESS_KEY_ID -a -z $SUB_ACCESS_KEY_SECRET || npm run test-integration
       env:
-          ROLE_ARN: ${{ secrets.ROLE_ARN }}
-          SUB_ACCESS_KEY_ID: ${{ secrets.SUB_ACCESS_KEY_ID }}
-          SUB_ACCESS_KEY_SECRET: ${{ secrets.SUB_ACCESS_KEY_SECRET }}
+        ROLE_ARN: ${{ secrets.ROLE_ARN }}
+        SUB_ACCESS_KEY_ID: ${{ secrets.SUB_ACCESS_KEY_ID }}
+        SUB_ACCESS_KEY_SECRET: ${{ secrets.SUB_ACCESS_KEY_SECRET }}
+        ROLE_ARN_TO_ASSUME: ${{ secrets.ROLE_ARN_TO_ASSUME }}
 
     - name: Upload Coverage Report
       run: bash <(curl -s https://codecov.io/bash)
