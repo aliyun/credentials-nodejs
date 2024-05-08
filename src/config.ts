@@ -13,6 +13,8 @@ export default class Config extends $tea.Model {
   publicKeyId?: string;
   privateKeyFile?: string;
   roleName?: string;
+  enableIMDSv2?: boolean;
+  metadataTokenDuration?: number;
   credentialsURI?: string;
   oidcProviderArn: string;
   oidcTokenFilePath: string;
@@ -32,6 +34,8 @@ export default class Config extends $tea.Model {
       publicKeyId: 'publicKeyId',
       privateKeyFile: 'privateKeyFile',
       roleName: 'roleName',
+      enableIMDSv2: 'enableIMDSv2',
+      metadataTokenDuration: 'metadataTokenDuration',
       credentialsURI: 'credentialsURI',
       oidcProviderArn: 'oidcProviderArn',
       oidcTokenFilePath: 'oidcTokenFilePath',
@@ -53,6 +57,8 @@ export default class Config extends $tea.Model {
       publicKeyId: 'string',
       privateKeyFile: 'string',
       roleName: 'string',
+      enableIMDSv2: 'boolean',
+      metadataTokenDuration: 'number',
       credentialsURI: 'string',
       oidcProviderArn: 'string',
       oidcTokenFilePath: 'string',

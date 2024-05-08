@@ -77,7 +77,7 @@ describe('OidcRoleArnCredential with correct config', function () {
     try {
       await cred.updateCredential();
     } catch (error) {
-      expect(error.code).to.be('AuthenticationFail.OIDCToken.Invalid');
+      expect(error.code).to.be('AuthenticationFail.NoPermission');
     }
   });
 });
