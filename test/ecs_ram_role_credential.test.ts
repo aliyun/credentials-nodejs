@@ -3,6 +3,7 @@ import EcsRamRoleCredential from '../src/ecs_ram_role_credential';
 import mm from 'mm';
 import * as utils from '../src/util/utils';
 const REQUEST_URL = 'http://100.100.100.200/latest/meta-data/ram/security-credentials/';
+const SECURITY_CRED_TOKEN_URL = 'http://100.100.100.200/latest/api/token';
 import 'mocha';
 import httpx from 'httpx';
 
@@ -11,6 +12,10 @@ const mock = () => {
     mm(httpx, 'request', async function (url: string, opts: {[key: string]: any}) {
       if (url === REQUEST_URL) {
         return {body: 'tem_role_name'};
+      }
+
+      if (url === SECURITY_CRED_TOKEN_URL) {
+        return {body: 'token', statusCode: 200};
       }
 
       let result = {
@@ -144,5 +149,43 @@ describe('EcsRamRoleCredential with no role_name', function () {
     let credentialModel = await cred.getCredential();
     expect(credentialModel.accessKeyId).to.be('temAccessKeyId');
     expect(credentialModel.accessKeySecret).to.be('temAccessKeySecret');
+  });
+});
+
+describe('EcsRamRoleCredential enable IMDSv2', function () {
+  const cred = new EcsRamRoleCredential('roleName', {}, true, 1000);
+
+  mock();
+
+  it('should success', async function () {
+    let credential = await cred.getCredential();
+    let id = credential.accessKeyId;
+    expect(id).to.be('AccessKeyId');
+    let secret = credential.accessKeySecret;
+    expect(secret).to.be('AccessKeySecret');
+    let token = credential.securityToken;
+    expect(token).to.be('SecurityToken');
+    let type = credential.type;
+    expect(type).to.be('ecs_ram_role');
+  });
+
+  it('should refresh credentials with sessionCredential expired', async function () {
+    cred.sessionCredential.Expiration = utils.timestamp(cred.sessionCredential.Expiration, -1000 * 3600);
+    let needRefresh = cred.needUpdateCredential();
+    expect(needRefresh).to.be(true);
+    let credential = await cred.getCredential();
+    let token = credential.securityToken;
+    expect(token).to.be('SecurityToken');
+  });
+
+  it('should refresh credentials with no sessionCredential', async function () {
+    cred.sessionCredential = null;
+    let needRefresh = cred.needUpdateCredential();
+    expect(needRefresh).to.be(true);
+    let credential = await cred.getCredential();
+    let secret = credential.accessKeySecret;
+    expect(secret).to.be('AccessKeySecret');
+    let id = credential.accessKeyId;
+    expect(id).to.be('AccessKeyId');
   });
 });

@@ -33,6 +33,36 @@ describe('instanceRamRoleCredentialsProvider with env ALIBABA_CLOUD_ECS_METADATA
       instanceRamRoleCredentialsProvider.getCredential();
     });
   });
+
+  describe('when ALIBABA_CLOUD_ECS_IMDSV2_ENABLE is true', function () {
+    before(function () {
+      mm(process.env, 'ALIBABA_CLOUD_ECS_METADATA', 'roleName');
+      mm(process.env, 'ALIBABA_CLOUD_ECS_IMDSV2_ENABLE', 'true');
+    });
+
+    after(function () {
+      mm.restore();
+    });
+
+    it('should success', async function () {
+      instanceRamRoleCredentialsProvider.getCredential();
+    });
+  });
+
+  describe('when ALIBABA_CLOUD_ECS_IMDSV2_ENABLE is false', function () {
+    before(function () {
+      mm(process.env, 'ALIBABA_CLOUD_ECS_METADATA', 'roleName');
+      mm(process.env, 'ALIBABA_CLOUD_ECS_IMDSV2_ENABLE', 'false');
+    });
+
+    after(function () {
+      mm.restore();
+    });
+
+    it('should success', async function () {
+      instanceRamRoleCredentialsProvider.getCredential();
+    });
+  });
 });
 
 describe('instanceRamRoleCredentialsProvider with no env ALIBABA_CLOUD_ECS_METADATA', function () {
