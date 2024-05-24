@@ -110,6 +110,7 @@ import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
   type:                 'ecs_ram_role',       // credential type
   roleName:             'roleName',           // `roleName` is optional. It will be retrieved automatically if not set. It is highly recommended to set it up to reduce requests.
+  enableIMDSv2:         true,                 // `enableIMDSv2` is optional and is recommended to be turned on. It can be replaced by setting environment variable: ALIBABA_CLOUD_ECS_IMDSV2_ENABLE
 }
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();
