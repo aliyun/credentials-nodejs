@@ -117,6 +117,7 @@ import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
   type: 'ecs_ram_role',    // 凭证类型
   roleName: 'roleName',    // 账户RoleName，非必填，不填则自动获取，建议设置，可以减少请求
+  enableIMDSv2: true,      // 开启 V2 安全访问，非必填，可以设置环境变量来开启：ALIBABA_CLOUD_ECS_IMDSV2_ENABLE=true
 }
 const cred = new Credential(config);
 let accessKeyId: string = await cred.getAccessKeyId();
