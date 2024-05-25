@@ -27,5 +27,5 @@ export function getCredentials(providers: IProvider[] = null): ICredential {
     }
   }
 
-  return null;
+  throw new Error('Not found credentials');
 }
