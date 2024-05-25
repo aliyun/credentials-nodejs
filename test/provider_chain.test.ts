@@ -141,8 +141,9 @@ describe('ProviderChain', function () {
 });
 
 describe('ProviderChain', function () {
-  it('should return null', async function () {
-    let cred = ProviderChain.getCredentials();
-    assert.deepStrictEqual(cred, null);
+  it('should return error', async function () {
+    expect(function () {
+      ProviderChain.getCredentials();
+    }).throwException(/Not found credentials/);
   });
 });
