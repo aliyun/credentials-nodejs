@@ -20,14 +20,23 @@ export default class Credential implements ICredential {
     this.load(config, runtime);
   }
 
+  /**
+   * @deprecated Use getCredential() instead of
+   */
   getAccessKeyId(): Promise<string> {
     return this.credential.getAccessKeyId();
   }
 
+  /**
+   * @deprecated Use getCredential() instead of
+   */
   getAccessKeySecret(): Promise<string> {
     return this.credential.getAccessKeySecret();
   }
 
+  /**
+   * @deprecated Use getCredential() instead of
+   */
   getSecurityToken(): Promise<string> {
     return this.credential.getSecurityToken();
   }
