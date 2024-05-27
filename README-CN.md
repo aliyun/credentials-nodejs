@@ -19,7 +19,7 @@ Alibaba Cloud Credentials for TypeScript/Node.js 是帮助 Node.js 开发者管�
 
 使用 `npm` 下载安装
 
-```sh
+```bash
 npm install @alicloud/credentials
 ```
 
@@ -71,7 +71,7 @@ const {
 
 #### ram_role_arn
 
-通过指定[RAM角色][RAM Role]，让凭证自动申请维护 STS Token。你可以通过为 `Policy` 赋值来限制获取到的 STS Token 的权限。
+通过指定[RAM角色][RAM Role]，让凭证自动申请维护 STS Token。你可以通过为 `Policy` 赋值来限制获取到的 STS Token 的权限([如何创建策略][policy])。
 
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
@@ -234,14 +234,15 @@ access_key_secret = bar            # access key secret
 
 如果定义了环境变量 `ALIBABA_CLOUD_CREDENTIALS_URI` 且不为空，程序会将该环境变量的值作为 credentials_uri 模式的地址，在调用时获取临时安全凭证。
 
-[ak]: https://usercenter.console.aliyun.com/#/manage/ak
-[ram]: https://ram.console.aliyun.com/users
-[permissions]: https://ram.console.aliyun.com/permissions
-[RAM Role]: https://ram.console.aliyun.com/#/role/list
-[OIDC Role]: https://help.aliyun.com/zh/ram/user-guide/role-based-sso-by-using-oidc
-
 ## License
 
 [MIT](LICENSE)
 
 Copyright (c) 2009-present, Alibaba Cloud All rights reserved.
+
+[ak]: https://usercenter.console.aliyun.com/#/manage/ak
+[ram]: https://ram.console.aliyun.com/users
+[permissions]: https://ram.console.aliyun.com/permissions
+[RAM Role]: https://ram.console.aliyun.com/#/role/list
+[OIDC Role]: https://help.aliyun.com/zh/ram/user-guide/role-based-sso-by-using-oidc
+[policy]: https://help.aliyun.com/zh/ram/user-guide/policy-management/
