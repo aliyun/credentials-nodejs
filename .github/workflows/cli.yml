@@ -29,6 +29,11 @@ jobs:
     - name: Unit Test
       run: npm run ci
 
+    - name: Upload Coverage Report
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # required
+
     - name: Integration Test
       run: test -z $SUB_ACCESS_KEY_ID -a -z $SUB_ACCESS_KEY_SECRET || npm run test-integration
       env:
@@ -37,5 +42,3 @@ jobs:
         SUB_ACCESS_KEY_SECRET: ${{ secrets.SUB_ACCESS_KEY_SECRET }}
         ROLE_ARN_TO_ASSUME: ${{ secrets.ROLE_ARN_TO_ASSUME }}
 
-    - name: Upload Coverage Report
-      run: bash <(curl -s https://codecov.io/bash)
