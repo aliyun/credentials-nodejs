@@ -58,13 +58,14 @@ export default {
       });
       return new RamRoleArnCredential(conf);
     }
-    case 'oidc_role_arn':
+    case 'oidc_role_arn': {
       const conf = new Config({
         roleArn: config.role_arn,
         oidcProviderArn: config.oidc_provider_arn,
         oidcTokenFilePath: config.oidc_token_file_path
       });
       return new OidcRoleArnCredential(conf);
+    }
     case 'rsa_key_pair':
       return new RsaKeyPairCredential(config.public_key_id, config.private_key_file);
     case 'bearer':
