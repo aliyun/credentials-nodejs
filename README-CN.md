@@ -238,6 +238,7 @@ access_key_secret = bar            # access key secret
 [ram]: https://ram.console.aliyun.com/users
 [permissions]: https://ram.console.aliyun.com/permissions
 [RAM Role]: https://ram.console.aliyun.com/#/role/list
+[OIDC Role]: https://help.aliyun.com/zh/ram/user-guide/role-based-sso-by-using-oidc
 
 ## License
 
