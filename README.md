@@ -27,6 +27,7 @@ Setup access_key credential through [User Information Management][ak], it have f
 
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
+
 const config: Config = {
   type:               'access_key',       // credential type
   accessKeyId:        'accessKeyId',      // AccessKeyId of your account
@@ -46,6 +47,7 @@ Create a temporary security credential by applying Temporary Security Credential
 
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
+
 const config: Config = {
   type:                  'sts',             // credential type
   accessKeyId:           'accessKeyId',     // AccessKeyId of your account
@@ -67,6 +69,7 @@ By specifying [RAM Role][RAM Role], the credential will be able to automatically
 
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
+
 const config: Config = {
   type:                 'ram_role_arn',     // credential type
   accessKeyId:          'accessKeyId',      // AccessKeyId of your account
@@ -91,6 +94,7 @@ By specifying [OIDC Role][OIDC Role], the credential will be able to automatical
 
 ```ts
 import Credential, { Config } from '@alicloud/credentials';
+
 const config: Config = {
   type:                   'oidc_role_arn',    // credential type
   roleArn:                'roleArn',          // Format: acs:ram::USER_Id:role/ROLE_NAME roleArn can be replaced by setting environment variable: ALIBABA_CLOUD_ROLE_ARN
@@ -230,13 +234,13 @@ the program will take the value of the environment variable as the credentials u
 
 - run test
 
-```
+```sh
 npm run test
 ```
 
 - run code coverage
 
-```
+```sh
 npm run cov
 ```
 
@@ -251,3 +255,4 @@ Copyright (c) 2009-present, Alibaba Cloud All rights reserved.
 [permissions]: https://ram.console.aliyun.com/permissions
 [RAM Role]: https://ram.console.aliyun.com/#/role/list
 [OIDC Role]: https://help.aliyun.com/zh/ram/user-guide/role-based-sso-by-using-oidc
+[policy]: https://help.aliyun.com/zh/ram/user-guide/policy-management/
