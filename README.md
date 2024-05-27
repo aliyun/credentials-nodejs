@@ -33,10 +33,11 @@ const config: Config = {
   accessKeySecret:    'accessKeySecret',  // AccessKeySecret of your account
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let type: string = cred.getType();
-  
+const {
+  accessKeyId,
+  accessKeySecret,
+  type
+} = await cred.getCredential();
 ```
 
 #### sts
@@ -52,9 +53,12 @@ const config: Config = {
   securityToken:         'securityToken',   // Temporary Security Token
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 #### ram_role_arn
@@ -73,10 +77,12 @@ const config: Config = {
   roleSessionExpiration: 3600,              // Not required, limit the Valid time of STS Token
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let securityToken: string = await cred.getSecurityToken();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 #### oidc_role_arn
@@ -95,10 +101,12 @@ const config: Config = {
   roleSessionExpiration:   3600,              // Not required, limit the Valid time of STS Token
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let securityToken: string = await cred.getSecurityToken();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 #### ecs_ram_role
@@ -113,10 +121,12 @@ const config: Config = {
   enableIMDSv2:         true,                 // `enableIMDSv2` is optional and is recommended to be turned on. It can be replaced by setting environment variable: ALIBABA_CLOUD_ECS_IMDSV2_ENABLE
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let securityToken: string = await cred.getSecurityToken();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 #### rsa_key_pair
@@ -131,10 +141,12 @@ const config: Config = {
   publicKeyId:              'publicKeyId',        // PublicKeyId of your account
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let securityToken: string = await cred.getSecurityToken();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 #### credentials_uri
@@ -148,10 +160,12 @@ const config: Config = {
   credentialsURI: 'http://a_local_or_remote_address/'  //credentialsURI can be replaced by setting environment variable: ALIBABA_CLOUD_CREDENTIALS_URI
 };
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let securityToken: string = await cred.getSecurityToken();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 The URI must reponse meets following conditions:

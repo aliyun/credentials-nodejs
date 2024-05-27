@@ -41,9 +41,11 @@ const config: Config = {
   accessKeySecret: 'accessKeySecret', // AccessKeySecret
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  type
+} = await cred.getCredential();
 ```
 
 #### sts
@@ -59,9 +61,12 @@ const config: Config = {
   securityToken:          'securityToken',   // STS Token
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 #### ram_role_arn
@@ -80,10 +85,12 @@ const config: Config = {
   roleSessionExpiration:   3600,              // 可选, 限制 STS Token 的有效时间
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let securityToken: string = await cred.getSecurityToken();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 #### oidc_role_arn
@@ -102,10 +109,12 @@ const config: Config = {
   roleSessionExpiration:   3600,              // 可选, 限制 STS Token 的有效时间
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let securityToken: string = await cred.getSecurityToken();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 #### ecs_ram_role
@@ -120,10 +129,12 @@ const config: Config = {
   enableIMDSv2: true,      // 开启 V2 安全访问，非必填，可以设置环境变量来开启：ALIBABA_CLOUD_ECS_IMDSV2_ENABLE=true
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let securityToken: string = await cred.getSecurityToken();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 #### rsa_key_pair
@@ -139,10 +150,12 @@ const config: Config = {
   publicKeyId:             'publicKeyId',        // 账户PublicKeyId
 }
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let securityToken: string = await cred.getSecurityToken();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 #### credentials_uri
@@ -156,10 +169,12 @@ const config: Config = {
   credentialsURI: 'http://a_local_or_remote_address/'  // credentialsURI 可不设，但需要通过设置 ALIBABA_CLOUD_CREDENTIALS_URI 来代替
 };
 const cred = new Credential(config);
-let accessKeyId: string = await cred.getAccessKeyId();
-let accessKeySecret: string = await cred.getAccessKeySecret();
-let securityToken: string = await cred.getSecurityToken();
-let type: string = cred.getType();
+const {
+  accessKeyId,
+  accessKeySecret,
+  securityToken,
+  type
+} = await cred.getCredential();
 ```
 
 该地址必须满足如下条件：
