@@ -8,19 +8,19 @@ const SECURITY_CRED_TOKEN_URL = 'http://100.100.100.200/latest/api/token';
 
 export default class EcsRamRoleCredential extends SessionCredential implements ICredential {
   roleName: string;
-  enableIMDSv2: boolean;
+  disableIMDSv1: boolean;
   metadataTokenDuration?: number;
   runtime: { [key: string]: any };
   metadataToken?: string;
   staleTime?: number
 
-  constructor(roleName: string = '', runtime: { [key: string]: any } = {}, enableIMDSv2: boolean = false, metadataTokenDuration: number = 21600) {
+  constructor(roleName: string = '', runtime: { [key: string]: any } = {}, disableIMDSv1: boolean = false, metadataTokenDuration: number = 21600) {
     const conf = new Config({
       type: 'ecs_ram_role',
     });
     super(conf);
     this.roleName = roleName;
-    this.enableIMDSv2 = enableIMDSv2;
+    this.disableIMDSv1 = disableIMDSv1;
     this.metadataTokenDuration = metadataTokenDuration;
     this.runtime = runtime;
     this.sessionCredential = null;
@@ -30,6 +30,9 @@ export default class EcsRamRoleCredential extends SessionCredential implements I
 
   async getBody(url: string, options: { [key: string]: any } = {}): Promise<string> {
     const response = await httpx.request(url, options);
+    if (response.statusCode !== 200) {
+      throw new Error(`Failed to get metadata from ECS Metadata Service. HttpCode=${response.statusCode}`);
+    }
     return (await httpx.read(response, 'utf8')) as string;
   }
 
@@ -42,7 +45,10 @@ export default class EcsRamRoleCredential extends SessionCredential implements I
         }
       });
       if (response.statusCode !== 200) {
-        throw new Error(`Failed to get token from ECS Metadata Service. HttpCode=${response.statusCode}`);
+        if(this.disableIMDSv1) {
+          throw new Error(`Failed to get token from ECS Metadata Service. HttpCode=${response.statusCode}`);
+        }
+        return null;
       }
       this.staleTime = tmpTime;
       return (await httpx.read(response, 'utf8')) as string;
@@ -52,8 +58,8 @@ export default class EcsRamRoleCredential extends SessionCredential implements I
 
   async updateCredential(): Promise<void> {
     let options = {};
-    if (this.enableIMDSv2) {
-      this.metadataToken = await this.getMetadataToken();
+    this.metadataToken = await this.getMetadataToken();
+    if (this.disableIMDSv1 !== null && typeof this.disableIMDSv1 !== 'undefined') {
       options = {
         headers: {
           'X-aliyun-ecs-metadata-token': this.metadataToken
