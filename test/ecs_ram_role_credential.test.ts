@@ -11,11 +11,21 @@ const mock = () => {
   before(function () {
     mm(httpx, 'request', async function (url: string, opts: {[key: string]: any}) {
       if (url === REQUEST_URL) {
-        return {body: 'tem_role_name'};
+        return {statusCode: 200, body: 'tem_role_name'};
       }
 
       if (url === SECURITY_CRED_TOKEN_URL) {
+        if(opts.headers['X-aliyun-ecs-metadata-token-ttl-seconds'] === '123456') {
+          return {body: 'Get Token Err', statusCode: 404};
+        }
+        if(opts.headers['X-aliyun-ecs-metadata-token-ttl-seconds'] === '654321') {
+          return {body: 'wrongToken', statusCode: 200};
+        }
         return {body: 'token', statusCode: 200};
+      }
+
+      if(opts.headers['X-aliyun-ecs-metadata-token'] && opts.headers['X-aliyun-ecs-metadata-token'] !== 'token') {
+        return {body: 'Token Err', statusCode: 403};
       }
 
       let result = {
@@ -36,7 +46,7 @@ const mock = () => {
         };
       }
 
-      return {body: JSON.stringify(result)};
+      return {statusCode: 200, body: JSON.stringify(result)};
     });
 
     mm(httpx, 'read', async function (response: any, encoding: string) {
@@ -150,9 +160,33 @@ describe('EcsRamRoleCredential with no role_name', function () {
     expect(credentialModel.accessKeyId).to.be('temAccessKeyId');
     expect(credentialModel.accessKeySecret).to.be('temAccessKeySecret');
   });
+
+  it('wrong token should get 403', async function(){
+    try {
+      cred.roleName = 'disableV1';
+      cred.metadataTokenDuration = 654321;
+      cred.sessionCredential = null;
+      await cred.getCredential();
+    } catch(err) {
+      expect(err.message).to.be('Failed to get metadata from ECS Metadata Service. HttpCode=403');
+    }
+  });
+
+  it('can use v1 to compatible', async function(){
+    cred.sessionCredential = null;
+    cred.roleName = 'disableV1';
+    cred.metadataTokenDuration = 123456;
+    let needRefresh = cred.needUpdateCredential();
+    expect(needRefresh).to.be(true);
+    let credential = await cred.getCredential();
+    let secret = credential.accessKeySecret;
+    expect(secret).to.be('AccessKeySecret');
+    let id = credential.accessKeyId;
+    expect(id).to.be('AccessKeyId');
+  });
 });
 
-describe('EcsRamRoleCredential enable IMDSv2', function () {
+describe('EcsRamRoleCredential with disabled v1', function () {
   const cred = new EcsRamRoleCredential('roleName', {}, true, 1000);
 
   mock();
@@ -187,5 +221,17 @@ describe('EcsRamRoleCredential enable IMDSv2', function () {
     expect(secret).to.be('AccessKeySecret');
     let id = credential.accessKeyId;
     expect(id).to.be('AccessKeyId');
+  });
+
+
+  it('should throw error when v2 token get failed', async function () {
+    try {
+      cred.roleName = 'disableV1';
+      cred.metadataTokenDuration = 123456;
+      cred.sessionCredential = null;
+      await cred.getCredential();
+    } catch(err) {
+      expect(err.message).to.be('Failed to get token from ECS Metadata Service. HttpCode=404');
+    }
   });
 });

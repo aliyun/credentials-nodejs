@@ -34,10 +34,10 @@ describe('instanceRamRoleCredentialsProvider with env ALIBABA_CLOUD_ECS_METADATA
     });
   });
 
-  describe('when ALIBABA_CLOUD_ECS_IMDSV2_ENABLE is true', function () {
+  describe('when ALIBABA_CLOUD_IMDSV1_DISABLE is true', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_ECS_METADATA', 'roleName');
-      mm(process.env, 'ALIBABA_CLOUD_ECS_IMDSV2_ENABLE', 'true');
+      mm(process.env, 'ALIBABA_CLOUD_IMDSV1_DISABLE', 'true');
     });
 
     after(function () {
@@ -49,10 +49,10 @@ describe('instanceRamRoleCredentialsProvider with env ALIBABA_CLOUD_ECS_METADATA
     });
   });
 
-  describe('when ALIBABA_CLOUD_ECS_IMDSV2_ENABLE is false', function () {
+  describe('when ALIBABA_CLOUD_IMDSV1_DISABLE is false', function () {
     before(function () {
       mm(process.env, 'ALIBABA_CLOUD_ECS_METADATA', 'roleName');
-      mm(process.env, 'ALIBABA_CLOUD_ECS_IMDSV2_ENABLE', 'false');
+      mm(process.env, 'ALIBABA_CLOUD_IMDSV1_DISABLE', 'false');
     });
 
     after(function () {
