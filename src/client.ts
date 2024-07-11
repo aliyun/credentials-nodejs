@@ -71,7 +71,7 @@ export default class Credential implements ICredential {
         this.credential = new StsTokenCredential(config.accessKeyId, config.accessKeySecret, config.securityToken);
         break;
       case 'ecs_ram_role':
-        this.credential = new EcsRamRoleCredential(config.roleName, runtime, config.enableIMDSv2, config.metadataTokenDuration);
+        this.credential = new EcsRamRoleCredential(config.roleName, runtime, config.disableIMDSv1, config.metadataTokenDuration);
         break;
       case 'ram_role_arn':
         this.credential = new RamRoleArnCredential(config, runtime);
