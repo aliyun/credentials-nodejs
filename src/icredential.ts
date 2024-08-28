@@ -1,4 +1,4 @@
-import CredentialModel from "./credential_model";
+import CredentialModel from './credential_model';
 export default interface ICredential {
     getAccessKeyId: () => Promise<string>;
     getAccessKeySecret: () => Promise<string>;

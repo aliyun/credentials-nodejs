@@ -50,16 +50,16 @@ describe('Credentials with valid config', function () {
     let cred = new Credentials(conf);
     expect(cred.getType()).to.be('access_key');
     expect(await cred.getAccessKeyId()).to.be('accessKeyId');
-    expect(await cred.getAccessKeySecret()).to.be('accessKeySecret');
-    expect(await cred.getSecurityToken()).to.be('');
-    expect(cred.getBearerToken()).to.be('');
+    assert.strictEqual(await cred.getAccessKeySecret(), 'accessKeySecret');
+    assert.strictEqual(await cred.getSecurityToken(), undefined);
+    assert.strictEqual(cred.getBearerToken(), undefined);
 
     let credentialModel = await cred.getCredential();
     expect(credentialModel.type).to.be('access_key');
     expect(credentialModel.accessKeyId).to.be('accessKeyId');
     expect(credentialModel.accessKeySecret).to.be('accessKeySecret');
-    expect(credentialModel.securityToken).to.be('');
-    expect(credentialModel.bearerToken).to.be('');
+    assert.strictEqual(credentialModel.securityToken, undefined);
+    assert.strictEqual(credentialModel.bearerToken, undefined);
   });
 
   it('should return BearerTokenCredential when type is bearer', async function () {
@@ -94,14 +94,14 @@ describe('Credentials with valid config', function () {
     expect(await cred.getAccessKeyId()).to.be('accessKeyId');
     expect(await cred.getAccessKeySecret()).to.be('accessKeySecret');
     expect(await cred.getSecurityToken()).to.be('securityToken');
-    expect(cred.getBearerToken()).to.be('');
+    assert.strictEqual(cred.getBearerToken(), undefined);
 
     let credentialModel = await cred.getCredential();
     expect(credentialModel.type).to.be('sts');
     expect(credentialModel.accessKeyId).to.be('accessKeyId');
     expect(credentialModel.accessKeySecret).to.be('accessKeySecret');
     expect(credentialModel.securityToken).to.be('securityToken');
-    expect(credentialModel.bearerToken).to.be('');
+    assert.strictEqual(credentialModel.bearerToken, undefined);
   });
 
   it('should return EcsRamRoleCredential when type is ecs_ram_role', async function () {
@@ -184,12 +184,12 @@ describe('Credentials', function () {
     const cred = new Credentials(conf);
     assert.strictEqual(await cred.getAccessKeyId(), 'akid');
     assert.strictEqual(await cred.getAccessKeySecret(), 'aksecret');
-    assert.strictEqual(await cred.getSecurityToken(), '');
-    assert.strictEqual(cred.getBearerToken(), '');
+    assert.strictEqual(await cred.getSecurityToken(), undefined);
+    assert.strictEqual(cred.getBearerToken(), undefined);
     let credentialModel = await cred.getCredential();
     assert.strictEqual(credentialModel.accessKeyId, 'akid');
     assert.strictEqual(credentialModel.accessKeySecret, 'aksecret');
-    assert.strictEqual(credentialModel.securityToken, '');
-    assert.strictEqual(credentialModel.bearerToken, '');
+    assert.strictEqual(credentialModel.securityToken, undefined);
+    assert.strictEqual(credentialModel.bearerToken, undefined);
   });
 });
