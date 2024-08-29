@@ -21,11 +21,19 @@ export class StaticAKCredentialsProviderBuilder {
 
   public build(): StaticAKCredentialsProvider {
     if (!this.accessKeyId) {
+      this.accessKeyId = process.env['ALIBABA_CLOUD_ACCESS_KEY_ID'];
+    }
+
+    if (!this.accessKeyId) {
       throw new Error('the access key id is empty');
     }
 
     if (!this.accessKeySecret) {
-      throw new Error('this access key secret is empty');
+      this.accessKeySecret = process.env['ALIBABA_CLOUD_ACCESS_KEY_SECRET'];
+    }
+
+    if (!this.accessKeySecret) {
+      throw new Error('the access key secret is empty');
     }
 
     return new StaticAKCredentialsProvider(this);
@@ -47,15 +55,17 @@ export default class StaticAKCredentialsProvider implements CredentialsProvider 
     this.accessKeyId = builder.accessKeyId;
     this.accessKeySecret = builder.accessKeySecret;
   }
+
   getProviderName() : string {
     return 'static_ak';
   }
 
   async getCredentials() : Promise<Credentials> {
-    return Credentials.builder()
-      .withAccessKeyId(this.accessKeyId)
-      .withAccessKeySecret(this.accessKeySecret)
+    const credentials = Credentials
+      .builder()
+      .withAccessKeyId(this.accessKeyId).withAccessKeySecret(this.accessKeySecret)
       .withProviderName('static_ak')
       .build();
+    return credentials;
   }
 }

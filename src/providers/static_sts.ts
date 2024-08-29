@@ -27,15 +27,27 @@ export class StaticSTSCredentialsProviderBuilder {
 
   public build(): StaticSTSCredentialsProvider {
     if (!this.accessKeyId) {
+      this.accessKeyId = process.env['ALIBABA_CLOUD_ACCESS_KEY_ID'];
+    }
+
+    if (!this.accessKeyId) {
       throw new Error('the access key id is empty');
     }
 
     if (!this.accessKeySecret) {
-      throw new Error('this access key secret is empty');
+      this.accessKeySecret = process.env['ALIBABA_CLOUD_ACCESS_KEY_SECRET'];
+    }
+
+    if (!this.accessKeySecret) {
+      throw new Error('the access key secret is empty');
     }
 
     if (!this.securityToken) {
-      throw new Error('this security token is empty');
+      this.securityToken = process.env['ALIBABA_CLOUD_SECURITY_TOKEN'];
+    }
+
+    if (!this.securityToken) {
+      throw new Error('the security token is empty');
     }
 
     return new StaticSTSCredentialsProvider(this);
