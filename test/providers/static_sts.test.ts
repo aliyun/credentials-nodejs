@@ -7,7 +7,7 @@ describe('StaticSTSCredentialsProvider', function () {
   it('should failed when no accessKeyId', async function () {
     assert.throws(() => {
       StaticSTSCredentialsProvider.builder().build();
-    }, (err) => {
+    }, (err: Error) => {
       assert.strictEqual('the access key id is empty', err.message);
       return true;
     });
@@ -16,7 +16,7 @@ describe('StaticSTSCredentialsProvider', function () {
       StaticSTSCredentialsProvider.builder()
         .withAccessKeyId('akid')
         .build();
-    }, (err) => {
+    }, (err: Error) => {
       assert.strictEqual('the access key secret is empty', err.message);
       return true;
     });
@@ -26,7 +26,7 @@ describe('StaticSTSCredentialsProvider', function () {
         .withAccessKeyId('akid')
         .withAccessKeySecret('aksecret')
         .build();
-    }, (err) => {
+    }, (err: Error) => {
       assert.strictEqual('the security token is empty', err.message);
       return true;
     });
