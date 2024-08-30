@@ -117,6 +117,16 @@ class RAMRoleARNCredentialsProviderBuilder {
   // }
 }
 
+function encode(str: string): string {
+  const result = encodeURIComponent(str);
+
+  return result.replace(/!/g, '%21')
+    .replace(/'/g, '%27')
+    .replace(/\(/g, '%28')
+    .replace(/\)/g, '%29')
+    .replace(/\*/g, '%2A');
+}
+
 export default class RAMRoleARNCredentialsProvider implements CredentialsProvider {
   private readonly credentialsProvider: CredentialsProvider;
   private readonly stsEndpoint: string;
@@ -178,35 +188,35 @@ export default class RAMRoleARNCredentialsProvider implements CredentialsProvide
     bodyForm['DurationSeconds'] = `${this.durationSeconds}`;
     builder.withBodyForm(bodyForm);
 
-    // 	// caculate signature
-    // 	signParams := make(map[string]string)
-    // 	for key, value := range queries {
-    // 		signParams[key] = value
-    // 	}
-    // 	for key, value := range bodyForm {
-    // 		signParams[key] = value
-    // 	}
+    // caculate signature
+    const signParams = Object.create(null);
+    for (const [key, value] of Object.entries(queries)) {
+      signParams[key] = value
+    }
+    for (const [key, value] of Object.entries(bodyForm)) {
+      signParams[key] = value
+    }
 
-    // 	stringToSign := utils.GetURLFormedMap(signParams)
-    // 	stringToSign = strings.Replace(stringToSign, "+", "%20", -1)
-    // 	stringToSign = strings.Replace(stringToSign, "*", "%2A", -1)
-    // 	stringToSign = strings.Replace(stringToSign, "%7E", "~", -1)
-    // 	stringToSign = url.QueryEscape(stringToSign)
-    // 	stringToSign = method + "&%2F&" + stringToSign
-    // 	secret := cc.AccessKeySecret + "&"
-    // 	queries["Signature"] = utils.ShaHmac1(stringToSign, secret)
+    const keys = Object.keys(signParams).sort();
+    const stringToSign = `${method}&%2F&${keys.map((key) => {
+      return `${encode(key)}=${encode(signParams[key])}`;
+    }).join('&')}`;
 
+    const secret = credentials.accessKeySecret + '&';
+    const signature = kitx.sha1(stringToSign, secret, 'base64') as string;
+    queries['Signature'] = encode(signature);
     builder.withQueries(queries);
 
-    // 	// set headers
-    // 	req.Headers["Accept-Encoding"] = "identity"
-    // 	req.Headers["Content-Type"] = "application/x-www-form-urlencoded"
-    // 	req.Headers["x-acs-credentials-provider"] = cc.ProviderName
+    const headers = Object.create(null);
+    // set headers
+    headers['Accept-Encoding'] = 'identity'
+    headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    headers['x-acs-credentials-provider'] = credentials.providerName
 
-    // 	if provider.httpOptions != nil {
-    // 		req.ConnectTimeout = time.Duration(provider.httpOptions.ConnectTimeout) * time.Second
-    // 		req.ReadTimeout = time.Duration(provider.httpOptions.ReadTimeout) * time.Second
-    // 		req.Proxy = provider.httpOptions.Proxy
+    // 	if (this.httpOptions) {
+    // 		req.connectTimeout = this.httpOptions.connectTimeout;
+    // 		req.readTimeout = this.httpOptions.readTimeout;
+    // 		req.proxy = this.httpOptions.proxy;
     // 	}
 
     const request = builder.build();
@@ -269,34 +279,3 @@ export default class RAMRoleARNCredentialsProvider implements CredentialsProvide
     return 'ram_role_arn';
   }
 }
-
-// type RAMRoleARNCredentialsProvider struct {
-// 	credentialsProvider CredentialsProvider
-// 	roleArn            : string
-// 	roleSessionName    : string
-// 	durationSeconds     int
-// 	policy             : string
-// 	externalId         : string
-// 	// for sts endpoint
-// 	stsRegionId: string
-// 	stsEndpoint: string
-// 	// for http options
-// 	httpOptions *HttpOptions
-// 	// inner
-// 	expirationTimestamp int64
-// 	lastUpdateTimestamp int64
-// 	sessionCredentials  *sessionCredentials
-// }
-
-// type RAMRoleARNCredentialsProviderBuilder struct {
-// 	provider *RAMRoleARNCredentialsProvider
-// }
-
-
-// func (provider *RAMRoleARNCredentialsProvider) needUpdateCredential() (result bool) {
-// 	if (!this.expirationTimestamp) {
-// 		return true
-// 	}
-
-// 	return this.expirationTimestamp- Date.now() / 1000 <= 180
-// }
