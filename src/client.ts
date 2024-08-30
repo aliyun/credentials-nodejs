@@ -1,7 +1,6 @@
 import ICredential from './icredential';
 
 import EcsRamRoleCredential from './ecs_ram_role_credential';
-import RamRoleArnCredential from './ram_role_arn_credential';
 import OidcRoleArnCredential from './oidc_role_arn_credential'
 import RsaKeyPairCredential from './rsa_key_pair_credential';
 import BearerTokenCredential from './bearer_token_credential';
@@ -13,6 +12,7 @@ import CredentialModel from './credential_model';
 import CredentialsProvider from './credentials_provider';
 import StaticAKCredentialsProvider from './providers/static_ak';
 import StaticSTSCredentialsProvider from './providers/static_sts';
+import RAMRoleARNCredentialsProvider from './providers/ram_role_arn';
 
 export { Config };
 
@@ -138,8 +138,29 @@ export default class Credential implements ICredential {
     case 'ecs_ram_role':
       this.credential = new EcsRamRoleCredential(config.roleName, runtime, config.enableIMDSv2, config.metadataTokenDuration);
       break;
-    case 'ram_role_arn':
-      this.credential = new RamRoleArnCredential(config, runtime);
+    case 'ram_role_arn': {
+      let credentialsProvider: CredentialsProvider;
+      if (config.securityToken) {
+        credentialsProvider = StaticSTSCredentialsProvider.builder()
+          .withAccessKeyId(config.accessKeyId)
+          .withAccessKeySecret(config.accessKeySecret)
+          .withSecurityToken(config.securityToken)
+          .build();
+      } else {
+        credentialsProvider = StaticAKCredentialsProvider.builder()
+          .withAccessKeyId(config.accessKeyId)
+          .withAccessKeySecret(config.accessKeySecret)
+          .build();
+      }
+      this.credential = new InnerCredentialsClient('ram_role_arn', RAMRoleARNCredentialsProvider.builder()
+        .withCredentialsProvider(credentialsProvider)
+        .withRoleArn(config.roleArn)
+        .withPolicy(config.policy)
+        .withDurationSeconds(config.roleSessionExpiration)
+        .withRoleSessionName(config.roleSessionName)
+        // .withHttpOptions(runtime)
+        .build());
+    }
       break;
     case 'oidc_role_arn':
       this.credential = new OidcRoleArnCredential(config, runtime);
