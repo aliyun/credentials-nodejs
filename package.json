@@ -8,6 +8,7 @@
     "build": "tsc",
     "lint": "eslint --fix ./src --ext .ts",
     "test": "mocha -b -r ts-node/register test/**/*.test.ts test/*.test.ts --timeout 15000",
+    "test-dev": "nyc -e .ts -r=html -r=text -r=lcov mocha -b -r ts-node/register",
     "cov": "nyc -e .ts -r=html -r=text -r=lcov npm run test",
     "ci": "npm run cov",
     "test-integration": "mocha -b -r ts-node/register -R spec test/*.integration.ts",

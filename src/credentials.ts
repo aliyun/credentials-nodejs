@@ -1,8 +1,8 @@
 export default class Credentials {
-  accessKeyId: string;
-  accessKeySecret: string;
-  securityToken: string;
-  providerName: string;
+  readonly accessKeyId: string;
+  readonly accessKeySecret: string;
+  readonly securityToken: string;
+  readonly providerName: string;
 
   constructor(builder : CredentialsBuilder) {
     this.accessKeyId = builder.accessKeyId;
@@ -42,7 +42,7 @@ export class CredentialsBuilder {
     return this;
   }
 
-  public build(): CredentialsBuilder {
-    return this;
+  public build(): Credentials {
+    return new Credentials(this);
   }
 }
