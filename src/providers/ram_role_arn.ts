@@ -6,6 +6,10 @@ import CredentialsProvider from '../credentials_provider'
 import { doRequest, Request } from './http';
 import { parseUTC } from './time';
 
+import debug from 'debug';
+
+const log = debug('sign');
+
 class Session {
   accessKeyId: string;
   accessKeySecret: string;
@@ -198,20 +202,22 @@ export default class RAMRoleARNCredentialsProvider implements CredentialsProvide
     }
 
     const keys = Object.keys(signParams).sort();
-    const stringToSign = `${method}&%2F&${keys.map((key) => {
+    const stringToSign = `${method}&${encode('/')}&${encode(keys.map((key) => {
       return `${encode(key)}=${encode(signParams[key])}`;
-    }).join('&')}`;
+    }).join('&'))}`;
 
+    log('stringToSign[Client]:');
+    log(stringToSign);
     const secret = credentials.accessKeySecret + '&';
     const signature = kitx.sha1(stringToSign, secret, 'base64') as string;
-    queries['Signature'] = encode(signature);
+    queries['Signature'] = signature;
     builder.withQueries(queries);
 
     const headers = Object.create(null);
     // set headers
-    headers['Accept-Encoding'] = 'identity'
-    headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    headers['Content-Type'] = 'application/x-www-form-urlencoded';
     headers['x-acs-credentials-provider'] = credentials.providerName
+    builder.withHeaders(headers);
 
     // 	if (this.httpOptions) {
     // 		req.connectTimeout = this.httpOptions.connectTimeout;
@@ -221,17 +227,27 @@ export default class RAMRoleARNCredentialsProvider implements CredentialsProvide
 
     const request = builder.build();
 
-    const resonse = await this.doRequest(request);
+    const response = await this.doRequest(request);
 
-    if (resonse.statusCode != 200) {
-      throw new Error(`refresh session token failed: ${resonse.body.toString('utf8')}`)
+    if (response.statusCode != 200) {
+      if (response.headers['content-type'] && response.headers['content-type'].startsWith('application/json')) {
+        const body = JSON.parse(response.body.toString('utf8'));
+        const serverStringToSign = (body.Message as string).slice('Specified signature is not matched with our calculation. server string to sign is:'.length);
+        log('stringToSign[Server]:')
+        log(stringToSign)
+        if (body.Code === 'SignatureDoesNotMatch' && serverStringToSign === stringToSign) {
+          throw new Error(`the access key secret is invalid`);
+        }
+      }
+
+      throw new Error(`refresh session token failed: ${response.body.toString('utf8')}`)
     }
 
     let data;
     try {
-      data = JSON.parse(resonse.body.toString('utf8'));
+      data = JSON.parse(response.body.toString('utf8'));
     } catch (ex) {
-      throw new Error(`refresh RoleArn sts token err, unmarshal fail: ${resonse.body.toString('utf8')}`);
+      throw new Error(`refresh RoleArn sts token err, unmarshal fail: ${response.body.toString('utf8')}`);
     }
 
     if (!data || !data.Credentials) {
