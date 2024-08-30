@@ -81,7 +81,7 @@ export default class StaticSTSCredentialsProvider implements CredentialsProvider
       .withAccessKeyId(this.accessKeyId)
       .withAccessKeySecret(this.accessKeySecret)
       .withSecurityToken(this.securityToken)
-      .withProviderName('static_sts')
+      .withProviderName(this.getProviderName())
       .build();
   }
 }

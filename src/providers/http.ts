@@ -116,7 +116,7 @@ class ResponseBuilder{
   }
 
   constructor() {
-
+    this.headers = {};
   }
 
   build(): Response {
@@ -127,7 +127,7 @@ class ResponseBuilder{
 function querystringify(queries: {[key: string]: string}) {
   const fields = [];
   for (const [key, value] of Object.entries(queries)) {
-    fields.push(key + '=' + value);
+    fields.push(key + '=' + encodeURIComponent(value));
   }
   return fields.join('&');
 }
@@ -138,8 +138,15 @@ export async function doRequest(req: Request): Promise<Response> {
     url += `?` + querystringify(req.queries)
   }
 
+  let body;
+  if (req.bodyForm && Object.keys(req.bodyForm).length > 0) {
+    body = querystringify(req.bodyForm);
+  }
+
   const response = await httpx.request(url, {
     method: req.method,
+    data: body,
+    headers: req.headers
   });
 
   const responseBody = await httpx.read(response, '');

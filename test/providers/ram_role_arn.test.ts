@@ -105,7 +105,11 @@ describe('RAMRoleARNCredentialsProvider', function () {
 
     // case 2: 4xx error
     (p as any).doRequest = async function () {
-      return Response.builder().withStatusCode(400).withBody(Buffer.from('4xx error')).build();
+      return Response.builder()
+        .withStatusCode(400)
+        .withBody(Buffer.from('4xx error'))
+        .withHeaders({})
+        .build();
     };
 
     try {
