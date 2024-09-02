@@ -1,6 +1,5 @@
 import ICredential from './icredential';
 
-import EcsRamRoleCredential from './ecs_ram_role_credential';
 import RsaKeyPairCredential from './rsa_key_pair_credential';
 import BearerTokenCredential from './bearer_token_credential';
 import * as DefaultProvider from './provider/provider_chain';
@@ -14,6 +13,7 @@ import StaticAKCredentialsProvider from './providers/static_ak';
 import StaticSTSCredentialsProvider from './providers/static_sts';
 import RAMRoleARNCredentialsProvider from './providers/ram_role_arn';
 import OIDCRoleArnCredentialsProvider from './providers/oidc_role_arn';
+import ECSRAMRoleCredentialsProvider from './providers/ecs_ram_role';
 
 export { Config };
 
@@ -137,7 +137,10 @@ export default class Credential implements ICredential {
         .build());
       break;
     case 'ecs_ram_role':
-      this.credential = new EcsRamRoleCredential(config.roleName, runtime, config.enableIMDSv2, config.metadataTokenDuration);
+      this.credential = new InnerCredentialsClient('ecs_ram_role', ECSRAMRoleCredentialsProvider.builder()
+        .withRoleName(config.roleName)
+        .withEnableIMDSv2(config.enableIMDSv2)
+        .build());
       break;
     case 'ram_role_arn': {
       let credentialsProvider: CredentialsProvider;

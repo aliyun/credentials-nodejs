@@ -24,6 +24,14 @@ export class Request {
     this.bodyForm = builder.bodyForm;
     this.bodyBytes = builder.bodyBytes;
   }
+
+  toRequestURL(): string {
+    let url = `${this.protocol}://${this.host}${this.path}`;
+    if (this.queries && Object.keys(this.queries).length > 0) {
+      url += `?` + querystringify(this.queries)
+    }
+    return url;
+  }
 }
 
 export class RequestBuilder {
@@ -147,10 +155,7 @@ function querystringify(queries: { [key: string]: string }) {
 }
 
 export async function doRequest(req: Request): Promise<Response> {
-  let url = `${req.protocol}://${req.host}${req.path}`;
-  if (req.queries && Object.keys(req.queries).length > 0) {
-    url += `?` + querystringify(req.queries)
-  }
+  const url = req.toRequestURL();
 
   let body;
   if (req.bodyForm && Object.keys(req.bodyForm).length > 0) {
