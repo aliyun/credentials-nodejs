@@ -19,6 +19,25 @@ describe('credentials', () => {
     assert.ok(credentials.securityToken);
   });
 
+  it('RAM Role ARN should not ok when secret is invalid', async function () {
+    const config = new Config({
+      type: 'ram_role_arn',
+      roleArn: process.env.ROLE_ARN,
+      accessKeyId: process.env.SUB_ACCESS_KEY_ID,
+      accessKeySecret: 'invalidsecret'
+    });
+
+    const client = new CredentialsClient(config, {});
+    assert.strictEqual(client.getType(), 'ram_role_arn')
+
+    try {
+      await client.getCredential();
+      assert.fail('should not to be here');
+    } catch (ex) {
+      assert.strictEqual(ex.message, 'the access key secret is invalid');
+    }
+  });
+
   it('RAM Role ARN should ok with sts', async function () {
     const client = new CredentialsClient(new Config({
       type: 'ram_role_arn',
