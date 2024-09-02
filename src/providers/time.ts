@@ -1,4 +1,9 @@
-// 2015-04-09T11:52:19Z
+/**
+ * Parses a UTC format date time string and returns the number of milliseconds between midnight,
+ * January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the specified date.
+ * @param value A UTC format date time string. For example: 2015-04-09T11:52:19Z
+ * @returns The number of milliseconds between 1970.01.01 to the specified date.
+ */
 export function parseUTC(value: string): number {
   if (!value) {
     throw new Error('invalid UTC format time string');

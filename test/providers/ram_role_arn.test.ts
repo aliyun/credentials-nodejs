@@ -157,7 +157,10 @@ describe('RAMRoleARNCredentialsProvider', function () {
 
     // case 6: mock ok value
     (p as any).doRequest = async function () {
-      return Response.builder().withStatusCode(200).withBody(Buffer.from(`{"Credentials": {"AccessKeyId":"saki","AccessKeySecret":"saks","Expiration":"2021-10-20T04:27:09Z","SecurityToken":"token"}}`)).build();
+      return Response.builder()
+        .withStatusCode(200)
+        .withBody(Buffer.from(`{"Credentials": {"AccessKeyId":"saki","AccessKeySecret":"saks","Expiration":"2021-10-20T04:27:09Z","SecurityToken":"token"}}`))
+        .build();
     };
 
     const creds = await (p as any).getCredentialsInternal(cc);
