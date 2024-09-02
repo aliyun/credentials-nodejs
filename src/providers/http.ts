@@ -1,9 +1,9 @@
 import httpx from 'httpx';
 
 export class Request {
-  readonly queries: {[key: string]: string};
-  readonly headers: {[key: string]: string};
-  readonly method : string;
+  readonly queries: { [key: string]: string };
+  readonly headers: { [key: string]: string };
+  readonly method: string;
   readonly protocol: any;
   readonly host: any;
   readonly path: any;
@@ -36,15 +36,24 @@ export class RequestBuilder {
   bodyForm: { [key: string]: string; };
   bodyBytes: Buffer;
 
-  constructor() {
-    // set default values
-    this.protocol = 'https';
-    this.path = '/';
-    this.headers = {};
-    this.queries = {};
-  }
-
   build(): Request {
+    // set default values
+    if (!this.protocol) {
+      this.protocol = 'https';
+    }
+
+    if (!this.path) {
+      this.path = '/';
+    }
+
+    if (!this.headers) {
+      this.headers = {};
+    }
+
+    if (!this.queries) {
+      this.queries = {};
+    }
+
     return new Request(this);
   }
 
@@ -63,17 +72,22 @@ export class RequestBuilder {
     return this;
   }
 
-  withQueries(queries: {[key: string]: string }) {
+  withPath(path: string) {
+    this.path = path;
+    return this;
+  }
+
+  withQueries(queries: { [key: string]: string }) {
     this.queries = queries;
     return this;
   }
 
-  withHeaders(headers: {[key: string]: string }) {
+  withHeaders(headers: { [key: string]: string }) {
     this.headers = headers;
     return this;
   }
 
-  withBodyForm(bodyForm: {[key: string]: string}) {
+  withBodyForm(bodyForm: { [key: string]: string }) {
     this.bodyForm = bodyForm;
     return this;
   }
@@ -95,7 +109,7 @@ export class Response {
   }
 }
 
-class ResponseBuilder{
+class ResponseBuilder {
   statusCode: number;
   headers: { [key: string]: string };
   body: Buffer;
@@ -105,7 +119,7 @@ class ResponseBuilder{
     return this;
   }
 
-  withHeaders(headers: {[key: string]: string}) {
+  withHeaders(headers: { [key: string]: string }) {
     this.headers = headers;
     return this;
   }
@@ -124,7 +138,7 @@ class ResponseBuilder{
   }
 }
 
-function querystringify(queries: {[key: string]: string}) {
+function querystringify(queries: { [key: string]: string }) {
   const fields = [];
   for (const [key, value] of Object.entries(queries)) {
     fields.push(key + '=' + encodeURIComponent(value));
@@ -141,6 +155,9 @@ export async function doRequest(req: Request): Promise<Response> {
   let body;
   if (req.bodyForm && Object.keys(req.bodyForm).length > 0) {
     body = querystringify(req.bodyForm);
+    if (!req.headers['Content-Type']) {
+      req.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    }
   }
 
   const response = await httpx.request(url, {
@@ -152,7 +169,7 @@ export async function doRequest(req: Request): Promise<Response> {
   const responseBody = await httpx.read(response, '');
   return Response.builder()
     .withStatusCode(response.statusCode)
-    .withHeaders(response.headers as {[key: string]: string})
+    .withHeaders(response.headers as { [key: string]: string })
     .withBody(responseBody as Buffer)
     .build();
 }
