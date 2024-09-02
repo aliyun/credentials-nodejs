@@ -13,7 +13,7 @@ English | [简体中文](README-CN.md)
 npm install @alicloud/credentials
 ```
 
-**Node.js >= 8.5.0** required.
+**Node.js >= 12** required.
 
 ## Quick Examples
 
