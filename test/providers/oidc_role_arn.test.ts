@@ -134,8 +134,6 @@ describe('OIDCCredentialsProvider', function () {
       assert.strictEqual(ex.message, 'mock server error');
     }
 
-    
-
     // case 2: 4xx error
     (p as any).doRequest = async function () {
       return Response.builder()
