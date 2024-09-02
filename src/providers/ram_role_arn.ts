@@ -1,28 +1,15 @@
 import * as kitx from 'kitx';
+import debug from 'debug';
+
 import * as utils from '../util/utils';
 
 import Credentials from '../credentials';
 import CredentialsProvider from '../credentials_provider'
 import { doRequest, Request } from './http';
 import { parseUTC } from './time';
-
-import debug from 'debug';
+import Session from './session';
 
 const log = debug('sign');
-
-class Session {
-  accessKeyId: string;
-  accessKeySecret: string;
-  securityToken: string;
-  expiration: string;
-
-  constructor(accessKeyId: string, accessKeySecret: string, securityToken: string, expiration: string) {
-    this.accessKeyId = accessKeyId;
-    this.accessKeySecret = accessKeySecret;
-    this.securityToken = securityToken;
-    this.expiration = expiration;
-  }
-}
 
 // type HttpOptions struct {
 // 	Proxy         : string

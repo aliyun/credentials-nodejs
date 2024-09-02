@@ -1,10 +1,10 @@
 import ICredential from './icredential';
 
 import EcsRamRoleCredential from './ecs_ram_role_credential';
-import OidcRoleArnCredential from './oidc_role_arn_credential'
 import RsaKeyPairCredential from './rsa_key_pair_credential';
 import BearerTokenCredential from './bearer_token_credential';
 import * as DefaultProvider from './provider/provider_chain';
+
 import Config from './config';
 import URICredential from './uri_credential';
 import CredentialModel from './credential_model';
@@ -13,6 +13,7 @@ import CredentialsProvider from './credentials_provider';
 import StaticAKCredentialsProvider from './providers/static_ak';
 import StaticSTSCredentialsProvider from './providers/static_sts';
 import RAMRoleARNCredentialsProvider from './providers/ram_role_arn';
+import OIDCRoleArnCredentialsProvider from './providers/oidc_role_arn';
 
 export { Config };
 
@@ -163,7 +164,14 @@ export default class Credential implements ICredential {
     }
       break;
     case 'oidc_role_arn':
-      this.credential = new OidcRoleArnCredential(config, runtime);
+      this.credential = new InnerCredentialsClient('oidc_role_arn', OIDCRoleArnCredentialsProvider.builder()
+        .withRoleArn(config.roleArn)
+        .withOIDCProviderArn(config.oidcProviderArn)
+        .withOIDCTokenFilePath(config.oidcTokenFilePath)
+        .withRoleSessionName(config.roleSessionName)
+        .withPolicy(config.policy)
+        .withDurationSeconds(config.roleSessionExpiration)
+        .build());
       break;
     case 'rsa_key_pair':
       this.credential = new RsaKeyPairCredential(config.publicKeyId, config.privateKeyFile);
