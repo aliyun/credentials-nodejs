@@ -3,7 +3,7 @@ export default class Session {
   accessKeySecret: string;
   securityToken: string;
   expiration: string;
-  
+
   constructor(accessKeyId: string, accessKeySecret: string, securityToken: string, expiration: string) {
     this.accessKeyId = accessKeyId;
     this.accessKeySecret = accessKeySecret;

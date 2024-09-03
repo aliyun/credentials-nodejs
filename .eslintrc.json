@@ -17,7 +17,8 @@
             2
         ],
         "quotes": [2, "single", {"avoidEscape": true, "allowTemplateLiterals": true}],
-        "no-unused-vars": [2, {"args": "none"}]
+        "no-unused-vars": [2, {"args": "none"}],
+        "no-trailing-spaces": [2]
     },
     "globals": {
         "describe": true,

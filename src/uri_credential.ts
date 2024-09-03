@@ -42,7 +42,7 @@ export default class URICredential extends SessionCredential implements ICredent
     if (json.Code !== 'Success') {
       throw new Error(`Get credentials from ${url} failed, Code is ${json.Code}`);
     }
-  
+
     this.sessionCredential = {
       AccessKeyId: json.AccessKeyId,
       AccessKeySecret: json.AccessKeySecret,
