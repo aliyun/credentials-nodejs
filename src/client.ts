@@ -2,7 +2,6 @@ import ICredential from './icredential';
 
 import RsaKeyPairCredential from './rsa_key_pair_credential';
 import BearerTokenCredential from './bearer_token_credential';
-import * as DefaultProvider from './provider/provider_chain';
 
 import Config from './config';
 import URICredential from './uri_credential';
@@ -14,6 +13,7 @@ import StaticSTSCredentialsProvider from './providers/static_sts';
 import RAMRoleARNCredentialsProvider from './providers/ram_role_arn';
 import OIDCRoleArnCredentialsProvider from './providers/oidc_role_arn';
 import ECSRAMRoleCredentialsProvider from './providers/ecs_ram_role';
+import DefaultCredentialsProvider from './providers/default';
 
 export { Config };
 
@@ -114,7 +114,7 @@ export default class Credential implements ICredential {
 
   private load(config: Config, runtime: { [key: string]: any }): void {
     if (!config) {
-      this.credential = DefaultProvider.getCredentials();
+      this.credential = new InnerCredentialsClient('default', DefaultCredentialsProvider.builder().build());
       return;
     }
 

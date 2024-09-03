@@ -65,7 +65,7 @@ class OIDCRoleArnCredentialsProviderBuilder {
     if (!this.oidcProviderArn) {
       this.oidcProviderArn = process.env.ALIBABA_CLOUD_OIDC_PROVIDER_ARN;
     }
-    
+
     if (!this.oidcTokenFilePath) {
       this.oidcTokenFilePath = process.env.ALIBABA_CLOUD_OIDC_TOKEN_FILE;
     }
