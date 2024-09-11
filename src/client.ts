@@ -139,7 +139,7 @@ export default class Credential implements ICredential {
     case 'ecs_ram_role':
       this.credential = new InnerCredentialsClient('ecs_ram_role', ECSRAMRoleCredentialsProvider.builder()
         .withRoleName(config.roleName)
-        .withEnableIMDSv2(config.enableIMDSv2)
+        .withDisableIMDSv1(config.disableIMDSv1)
         .build());
       break;
     case 'ram_role_arn': {

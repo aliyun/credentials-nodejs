@@ -8,31 +8,43 @@ describe('ECSRAMRoleCredentialsProvider', function () {
   it('ECSRAMRoleCredentialsProvider', async function () {
     let p = ECSRAMRoleCredentialsProvider.builder().build()
     assert.ok(!(p as any).roleName)
-    assert.strictEqual((p as any).enableIMDSv2, true);
+    assert.strictEqual((p as any).disableIMDSv1, false);
 
     p = ECSRAMRoleCredentialsProvider.builder()
       .withRoleName('role')
-      .withEnableIMDSv2(false)
+      .withDisableIMDSv1(false)
       .build()
     assert.strictEqual((p as any).roleName, 'role');
-    assert.strictEqual((p as any).enableIMDSv2, false);
+    assert.strictEqual((p as any).disableIMDSv1, false);
+
+    p = ECSRAMRoleCredentialsProvider.builder()
+      .withRoleName('role')
+      .withDisableIMDSv1(true)
+      .build()
+    assert.strictEqual((p as any).roleName, 'role');
+    assert.strictEqual((p as any).disableIMDSv1, true);
 
     assert.ok((p as any).needUpdateCredential());
   });
 
-  it('env ALIBABA_CLOUD_IMDSV2_DISABLED should ok', async function () {
-    process.env.ALIBABA_CLOUD_IMDSV2_DISABLED = 'true';
+  it('env ALIBABA_CLOUD_IMDSV1_DISABLE should ok', async function () {
+    process.env.ALIBABA_CLOUD_IMDSV1_DISABLE = 'true';
     let p = ECSRAMRoleCredentialsProvider.builder().build()
-    assert.strictEqual((p as any).enableIMDSv2, false);
-    p = ECSRAMRoleCredentialsProvider.builder().withEnableIMDSv2(true).build()
-    assert.strictEqual((p as any).enableIMDSv2, false);
-    p = ECSRAMRoleCredentialsProvider.builder().withEnableIMDSv2(false).build()
-    assert.strictEqual((p as any).enableIMDSv2, false);
-    delete process.env.ALIBABA_CLOUD_IMDSV2_DISABLED;
+    assert.strictEqual((p as any).disableIMDSv1, true);
+    p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(true).build()
+    assert.strictEqual((p as any).disableIMDSv1, true);
+    p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(false).build()
+    assert.strictEqual((p as any).disableIMDSv1, true);
+    process.env.ALIBABA_CLOUD_IMDSV1_DISABLE = 'false';
+    p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(false).build()
+    assert.strictEqual((p as any).disableIMDSv1, false);
+    p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(true).build()
+    assert.strictEqual((p as any).disableIMDSv1, true);
+    delete process.env.ALIBABA_CLOUD_IMDSV1_DISABLE;
   });
 
   it('getRoleName should ok', async function () {
-    let p = ECSRAMRoleCredentialsProvider.builder().withEnableIMDSv2(false).build();
+    let p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(false).build();
     // case 1: server error
     (p as any).doRequest = async function () {
       throw new Error('mock server error')
@@ -69,7 +81,7 @@ describe('ECSRAMRoleCredentialsProvider', function () {
   });
 
   it('getRoleName with metadata v2 should ok', async function () {
-    let p = ECSRAMRoleCredentialsProvider.builder().withEnableIMDSv2(true).build();
+    let p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(true).build();
 
     // case 1: get metadata token failed
     (p as any).doRequest = async function () {
@@ -98,7 +110,7 @@ describe('ECSRAMRoleCredentialsProvider', function () {
   });
 
   it('getCredentialsInternal should ok', async function () {
-    let p = ECSRAMRoleCredentialsProvider.builder().withEnableIMDSv2(false).build();
+    let p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(false).build();
 
     // case 1: server error
     (p as any).doRequest = async function () {
@@ -204,7 +216,7 @@ describe('ECSRAMRoleCredentialsProvider', function () {
     };
 
     try {
-      await  (p as any).getCredentialsInternal();
+      await (p as any).getCredentialsInternal();
       assert.fail('should not run to here');
     } catch (ex) {
       assert.strictEqual(ex.message, 'get sts token failed');
@@ -221,7 +233,7 @@ describe('ECSRAMRoleCredentialsProvider', function () {
         withStatusCode(200)
         .withBody(Buffer.from(`{"AccessKeyId":"saki","AccessKeySecret":"saks","Expiration":"2021-10-20T04:27:09Z","SecurityToken":"token","Code":"Failed"}`)).build();
     };
-    
+
     try {
       await (p as any).getCredentialsInternal();
       assert.fail('should not run to here');
@@ -260,14 +272,14 @@ describe('ECSRAMRoleCredentialsProvider', function () {
   });
 
   it('getCredentials() with metadata V2 should ok', async function () {
-    let p = ECSRAMRoleCredentialsProvider.builder().withRoleName('rolename').withEnableIMDSv2(true).build();
+    let p = ECSRAMRoleCredentialsProvider.builder().withRoleName('rolename').withDisableIMDSv1(true).build();
     // case 1: get metadata token failed
     (p as any).doRequest = async function () {
       throw new Error('mock server error')
     };
 
     try {
-      await  (p as any).getCredentialsInternal();
+      await (p as any).getCredentialsInternal();
       assert.fail('should not run to here');
     } catch (ex) {
       assert.strictEqual(ex.message, 'mock server error');
@@ -359,7 +371,7 @@ describe('ECSRAMRoleCredentialsProvider', function () {
   });
 
   it('getMetadataToken() should ok', async function () {
-    let p = ECSRAMRoleCredentialsProvider.builder().build();
+    let p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(true).build();
 
     // case 1: server error
     (p as any).doRequest = async function () {
@@ -380,7 +392,7 @@ describe('ECSRAMRoleCredentialsProvider', function () {
         .withBody(Buffer.from('xxx'))
         .build();
     };
-  
+
     try {
       await (p as any).getMetadataToken();
       assert.fail('should not run to here');
@@ -394,7 +406,36 @@ describe('ECSRAMRoleCredentialsProvider', function () {
         withStatusCode(200)
         .withBody(Buffer.from('tokenxxxxx')).build();
     };
-    const metadataToken = await (p as any).getMetadataToken()
-    assert.strictEqual('tokenxxxxx', metadataToken)
+    let metadataToken = await (p as any).getMetadataToken();
+    assert.strictEqual('tokenxxxxx', metadataToken);
+
+    p = ECSRAMRoleCredentialsProvider.builder().build();
+
+    // case 1: server error
+    (p as any).doRequest = async function () {
+      throw new Error('mock server error')
+    };
+    metadataToken = await (p as any).getMetadataToken();
+    assert.ok(metadataToken === null);
+
+    // case 2: 4xx
+    (p as any).doRequest = async function () {
+      return Response.builder()
+        .withStatusCode(400)
+        .withBody(Buffer.from('xxx'))
+        .build();
+    };
+
+    metadataToken = await (p as any).getMetadataToken();
+    assert.ok(metadataToken === null);
+
+    // case 3: return token
+    (p as any).doRequest = async function () {
+      return Response.builder().
+        withStatusCode(200)
+        .withBody(Buffer.from('tokenxxxxx')).build();
+    };
+    metadataToken = await (p as any).getMetadataToken();
+    assert.strictEqual('tokenxxxxx', metadataToken);
   });
 });
