@@ -14,7 +14,7 @@ const mock = () => {
         return {body: 'tem_role_name'};
       }
 
-      if (url === SECURITY_CRED_TOKEN_URL) {
+      if (url === SECURITY_CRED_TOKEN_URL && opts.method === 'PUT') {
         return {body: 'token', statusCode: 200};
       }
 

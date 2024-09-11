@@ -39,7 +39,8 @@ export default class EcsRamRoleCredential extends SessionCredential implements I
       const response = await httpx.request(SECURITY_CRED_TOKEN_URL, {
         headers: {
           'X-aliyun-ecs-metadata-token-ttl-seconds': `${this.metadataTokenDuration}`
-        }
+        },
+        method: "PUT"
       });
       if (response.statusCode !== 200) {
         throw new Error(`Failed to get token from ECS Metadata Service. HttpCode=${response.statusCode}`);
