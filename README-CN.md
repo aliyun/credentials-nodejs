@@ -126,7 +126,7 @@ import Credential, { Config } from '@alicloud/credentials';
 const config: Config = {
   type: 'ecs_ram_role',    // 凭证类型
   roleName: 'roleName',    // 账户RoleName，非必填，不填则自动获取，建议设置，可以减少请求
-  disableIMDSv1: true,      // 禁用 V1 兜底，获取安全令牌失败则报错，可以设置环境变量来开启：ALIBABA_CLOUD_IMDSV1_DISABLE=true
+  disableIMDSv1: true,      // 禁用 V1 兜底，获取安全令牌失败则报错，可以设置环境变量来开启：ALIBABA_CLOUD_IMDSV1_DISABLED=true
 }
 const cred = new Credential(config);
 const {
