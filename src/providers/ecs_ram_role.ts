@@ -182,7 +182,7 @@ class ECSRAMRoleCredentialsProviderBuilder {
     }
 
     // 允许通过环境变量强制关闭 V1
-    if (process.env.ALIBABA_CLOUD_IMDSV1_DISABLE === 'true') {
+    if (process.env.ALIBABA_CLOUD_IMDSV1_DISABLED === 'true') {
       this.disableIMDSv1 = true;
     }
 

@@ -27,20 +27,20 @@ describe('ECSRAMRoleCredentialsProvider', function () {
     assert.ok((p as any).needUpdateCredential());
   });
 
-  it('env ALIBABA_CLOUD_IMDSV1_DISABLE should ok', async function () {
-    process.env.ALIBABA_CLOUD_IMDSV1_DISABLE = 'true';
+  it('env ALIBABA_CLOUD_IMDSV1_DISABLED should ok', async function () {
+    process.env.ALIBABA_CLOUD_IMDSV1_DISABLED = 'true';
     let p = ECSRAMRoleCredentialsProvider.builder().build()
     assert.strictEqual((p as any).disableIMDSv1, true);
     p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(true).build()
     assert.strictEqual((p as any).disableIMDSv1, true);
     p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(false).build()
     assert.strictEqual((p as any).disableIMDSv1, true);
-    process.env.ALIBABA_CLOUD_IMDSV1_DISABLE = 'false';
+    process.env.ALIBABA_CLOUD_IMDSV1_DISABLED = 'false';
     p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(false).build()
     assert.strictEqual((p as any).disableIMDSv1, false);
     p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(true).build()
     assert.strictEqual((p as any).disableIMDSv1, true);
-    delete process.env.ALIBABA_CLOUD_IMDSV1_DISABLE;
+    delete process.env.ALIBABA_CLOUD_IMDSV1_DISABLED;
   });
 
   it('getRoleName should ok', async function () {
