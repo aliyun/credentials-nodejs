@@ -1,6 +1,10 @@
 import * as ini from 'ini';
 import * as kitx from 'kitx';
 import fs from 'fs';
+import { promisify } from 'util';
+
+const readFileAsync = promisify(fs.readFile);
+const accessAsync = promisify(fs.access);
 
 export function timestamp(dateStr?: Date, timeChange?: number): string {
   let date = new Date(dateStr);
@@ -32,4 +36,10 @@ export function parseFile(file: string, ignoreErr: boolean = false): any {
   }
 
   return ini.parse(fs.readFileSync(file, 'utf-8'));
+}
+
+export async function loadIni(filePath: string): Promise<any> {
+  await accessAsync(filePath, fs.constants.R_OK);
+  const content = await readFileAsync(filePath, 'utf-8');
+  return ini.parse(content);
 }
