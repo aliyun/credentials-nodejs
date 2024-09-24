@@ -4,6 +4,7 @@ import CLIProfileCredentialsProvider from './cli_profile';
 import ECSRAMRoleCredentialsProvider from './ecs_ram_role';
 import EnvironmentVariableCredentialsProvider from './env';
 import OIDCRoleArnCredentialsProvider from './oidc_role_arn';
+import ProfileCredentialsProvider from './profile';
 
 export default class DefaultCredentialsProvider implements CredentialsProvider {
   private readonly providers: CredentialsProvider[];
@@ -38,11 +39,13 @@ export default class DefaultCredentialsProvider implements CredentialsProvider {
       // ignore
     }
 
-    // // profile credentials provider
-    // profileProvider, err := NewProfileCredentialsProvider.builder().build();
-    // if err == nil {
-    //     providers = append(providers, profileProvider)
-    // }
+    // profile credentials provider
+    try {
+      const profileProvider = ProfileCredentialsProvider.builder().build();
+      this.providers.push(profileProvider);
+    } catch (ex) {
+      // ignore
+    }
 
     // Add IMDS
     if (process.env.ALIBABA_CLOUD_ECS_METADATA) {
