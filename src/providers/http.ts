@@ -9,6 +9,9 @@ export class Request {
   readonly path: any;
   readonly bodyForm: { [key: string]: string; };
   readonly bodyBytes: Buffer;
+  readonly url: string;
+  readonly readTimeout: number;
+  readonly connectTimeout: number;
 
   static builder() {
     return new RequestBuilder();
@@ -23,9 +26,15 @@ export class Request {
     this.headers = builder.headers;
     this.bodyForm = builder.bodyForm;
     this.bodyBytes = builder.bodyBytes;
+    this.url = builder.url;
+    this.readTimeout = builder.readTimeout;
+    this.connectTimeout = builder.connectTimeout;
   }
 
   toRequestURL(): string {
+    if(this.url){
+      return this.url;
+    }
     let url = `${this.protocol}://${this.host}${this.path}`;
     if (this.queries && Object.keys(this.queries).length > 0) {
       url += `?` + querystringify(this.queries)
@@ -43,6 +52,9 @@ export class RequestBuilder {
   headers: { [key: string]: string; };
   bodyForm: { [key: string]: string; };
   bodyBytes: Buffer;
+  readTimeout: number;
+  connectTimeout: number;
+  url: string;
 
   build(): Request {
     // set default values
@@ -97,6 +109,21 @@ export class RequestBuilder {
 
   withBodyForm(bodyForm: { [key: string]: string }) {
     this.bodyForm = bodyForm;
+    return this;
+  }
+
+  withURL(url: string){
+    this.url = url;
+    return this;
+  }
+
+  withReadTimeout(readTimeout: number) {
+    this.readTimeout = readTimeout;
+    return this;
+  }
+
+  withConnectTimeout(connectTimeout: number) {
+    this.connectTimeout = connectTimeout;
     return this;
   }
 }
@@ -168,7 +195,9 @@ export async function doRequest(req: Request): Promise<Response> {
   const response = await httpx.request(url, {
     method: req.method,
     data: body,
-    headers: req.headers
+    headers: req.headers,
+    readTimeout: req.readTimeout,
+    connectTimeout: req.connectTimeout
   });
 
   const responseBody = await httpx.read(response, '');

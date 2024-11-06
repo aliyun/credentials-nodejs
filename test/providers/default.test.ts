@@ -12,7 +12,7 @@ describe('DefaultCredentialsProvider', function () {
   it('DefaultCredentialsProvider', async function () {
     let provider = DefaultCredentialsProvider.builder().build();
 
-    assert.ok((provider as any).providers.length === 3);
+    assert.ok((provider as any).providers.length === 5);
     assert.ok((provider as any).providers[0] instanceof EnvironmentVariableCredentialsProvider);
     assert.ok((provider as any).providers[1] instanceof CLIProfileCredentialsProvider);
     assert.ok((provider as any).providers[2] instanceof ProfileCredentialsProvider);
@@ -24,7 +24,7 @@ describe('DefaultCredentialsProvider', function () {
 
     provider = DefaultCredentialsProvider.builder().build();
 
-    assert.ok((provider as any).providers.length === 4);
+    assert.ok((provider as any).providers.length === 6);
     assert.ok((provider as any).providers[0] instanceof EnvironmentVariableCredentialsProvider)
     assert.ok((provider as any).providers[1] instanceof OIDCRoleArnCredentialsProvider)
     assert.ok((provider as any).providers[2] instanceof CLIProfileCredentialsProvider)
@@ -33,8 +33,7 @@ describe('DefaultCredentialsProvider', function () {
     // Add ecs ram role
     process.env.ALIBABA_CLOUD_ECS_METADATA = 'rolename';
     provider = DefaultCredentialsProvider.builder().build();
-
-    assert.ok((provider as any).providers.length === 5);
+    assert.ok((provider as any).providers.length === 6);
     assert.ok((provider as any).providers[0] instanceof EnvironmentVariableCredentialsProvider);
     assert.ok((provider as any).providers[1] instanceof OIDCRoleArnCredentialsProvider);
     assert.ok((provider as any).providers[2] instanceof CLIProfileCredentialsProvider);
@@ -51,7 +50,7 @@ describe('DefaultCredentialsProvider', function () {
     process.env.ALIBABA_CLOUD_CLI_PROFILE_DISABLED = 'true';
 
     let provider = DefaultCredentialsProvider.builder().build();
-    assert.ok((provider as any).providers.length === 2);
+    assert.ok((provider as any).providers.length === 4);
     try {
       await provider.getCredentials();
       assert.fail();
@@ -62,7 +61,7 @@ describe('DefaultCredentialsProvider', function () {
     process.env.ALIBABA_CLOUD_ACCESS_KEY_ID = 'akid';
     process.env.ALIBABA_CLOUD_ACCESS_KEY_SECRET = 'aksecret';
     provider = DefaultCredentialsProvider.builder().build();
-    assert.ok((provider as any).providers.length === 2);
+    assert.ok((provider as any).providers.length === 4);
     let cc = await provider.getCredentials();
     assert.deepStrictEqual(cc, Credentials.builder()
       .withAccessKeyId('akid')

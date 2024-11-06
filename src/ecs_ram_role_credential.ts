@@ -13,6 +13,8 @@ export default class EcsRamRoleCredential extends SessionCredential implements I
   runtime: { [key: string]: any };
   metadataToken?: string;
   staleTime?: number
+  readTimeout?: number;
+  connectTimeout?: number;
 
   constructor(roleName: string = '', runtime: { [key: string]: any } = {}, enableIMDSv2: boolean = false, metadataTokenDuration: number = 21600) {
     const conf = new Config({
@@ -58,7 +60,9 @@ export default class EcsRamRoleCredential extends SessionCredential implements I
       options = {
         headers: {
           'X-aliyun-ecs-metadata-token': this.metadataToken
-        }
+        },
+        readTimeout: this.readTimeout,
+        connectTimeout: this.connectTimeout
       }
     }
     const roleName = await this.getRoleName();

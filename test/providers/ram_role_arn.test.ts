@@ -276,4 +276,66 @@ describe('RAMRoleARNCredentialsProvider', function () {
     }
   });
 
+  it('env ALIBABA_CLOUD_ROLE_ARN should ok', async function () {
+    const akProvider = StaticAKCredentialsProvider
+    .builder()
+    .withAccessKeyId('akid')
+    .withAccessKeySecret('aksecret')
+    .build();
+    try {
+      RAMRoleARNCredentialsProvider.builder().withCredentialsProvider(akProvider).build();
+    } catch (ex) {
+      assert.strictEqual(ex.message, 'the RoleArn is empty');
+    }
+    process.env.ALIBABA_CLOUD_ROLE_ARN = "roleArn";
+    let p = RAMRoleARNCredentialsProvider.builder()
+    .withCredentialsProvider(akProvider)
+    .build();
+    assert.strictEqual((p as any).roleArn, "roleArn");
+    delete process.env.ALIBABA_CLOUD_ROLE_ARN;
+  });
+
+  it('env ALIBABA_CLOUD_ROLE_SESSION_NAME should ok', async function () {
+    const akProvider = StaticAKCredentialsProvider
+    .builder()
+    .withAccessKeyId('akid')
+    .withAccessKeySecret('aksecret')
+    .build();
+    
+    let p = RAMRoleARNCredentialsProvider.builder().withRoleArn("roleArn").withCredentialsProvider(akProvider).build();
+    assert.ok((p as any).roleSessionName);
+
+    process.env.ALIBABA_CLOUD_ROLE_SESSION_NAME = "sessionName";
+    p = RAMRoleARNCredentialsProvider.builder().withRoleArn("roleArn").withCredentialsProvider(akProvider).build();
+    assert.strictEqual((p as any).roleSessionName, 'sessionName');
+    delete process.env.ALIBABA_CLOUD_ROLE_SESSION_NAME;
+  });
+
+  it('env ALIBABA_CLOUD_STS_REGION should ok', async function () {
+    const akProvider = StaticAKCredentialsProvider
+    .builder()
+    .withAccessKeyId('akid')
+    .withAccessKeySecret('aksecret')
+    .build();
+    process.env.ALIBABA_CLOUD_STS_REGION = 'cn-hangzhou';
+    let p = RAMRoleARNCredentialsProvider.builder().withRoleArn("roleArn").withCredentialsProvider(akProvider).build();
+    assert.strictEqual((p as any).stsEndpoint, 'sts.cn-hangzhou.aliyuncs.com');
+
+    delete process.env.ALIBABA_CLOUD_STS_REGION;
+  });
+
+  it('env ALIBABA_CLOUD_VPC_ENDPOINT_ENABLED should ok', async function () {
+    const akProvider = StaticAKCredentialsProvider
+    .builder()
+    .withAccessKeyId('akid')
+    .withAccessKeySecret('aksecret')
+    .build();
+    process.env.ALIBABA_CLOUD_VPC_ENDPOINT_ENABLED = "true";
+    let p = RAMRoleARNCredentialsProvider.builder().withRoleArn("roleArn").withCredentialsProvider(akProvider).build();
+    assert.strictEqual((p as any).stsEndpoint, 'sts.aliyuncs.com');
+
+    p = RAMRoleARNCredentialsProvider.builder().withRoleArn("roleArn").withCredentialsProvider(akProvider).withStsRegionId("cn-beijing").build();
+    assert.strictEqual((p as any).stsEndpoint, 'sts-vpc.cn-beijing.aliyuncs.com');
+    delete process.env.ALIBABA_CLOUD_VPC_ENDPOINT_ENABLED;
+  });
 });

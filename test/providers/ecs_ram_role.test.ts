@@ -438,4 +438,14 @@ describe('ECSRAMRoleCredentialsProvider', function () {
     metadataToken = await (p as any).getMetadataToken();
     assert.strictEqual('tokenxxxxx', metadataToken);
   });
+
+  it('env ALIBABA_CLOUD_ECS_METADATA_DISABLED should ok', async function () {
+    try {
+      process.env.ALIBABA_CLOUD_ECS_METADATA_DISABLED = "true";
+      let p = ECSRAMRoleCredentialsProvider.builder().build();
+    } catch (ex) {
+      assert.strictEqual(ex.message, 'IMDS credentials is disabled');
+    }
+    delete process.env.ALIBABA_CLOUD_ECS_METADATA_DISABLED;
+  });
 });

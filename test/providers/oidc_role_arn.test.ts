@@ -65,6 +65,15 @@ describe('OIDCCredentialsProvider', function () {
       .build();
     assert.strictEqual((p as any)['stsEndpoint'], 'sts.cn-hangzhou.aliyuncs.com')
 
+    p = OIDCCredentialsProvider.builder()
+      .withRoleArn('roleArn')
+      .withOIDCProviderArn('oidcProviderArn')
+      .withOIDCTokenFilePath('/tmp/inexist')
+      .withStsRegionId('cn-hangzhou')
+      .withEnableVpc(true)
+      .build();
+    assert.strictEqual((p as any)['stsEndpoint'], 'sts-vpc.cn-hangzhou.aliyuncs.com')
+
     // test for roleSesssionName
     p = OIDCCredentialsProvider.builder()
       .withRoleArn('roleArn')
@@ -120,6 +129,8 @@ describe('OIDCCredentialsProvider', function () {
       .withOIDCProviderArn('oidcProviderArn')
       .withOIDCTokenFilePath(path.join(__dirname, '../fixtures/OIDCToken.txt'))
       .withDurationSeconds(1000)
+      .withReadTimeout(1000)
+      .withConnectTimeout(1000)
       .build();
 
     // case 1: server error
@@ -196,12 +207,12 @@ describe('OIDCCredentialsProvider', function () {
     assert.strictEqual(creds.accessKeySecret, 'saks');
     assert.strictEqual(creds.securityToken, 'token');
     assert.strictEqual(creds.expiration, '2021-10-20T04:27:09Z');
-  
+
     // needUpdateCredential
     assert.ok(p.needUpdateCredential() === true);
     (p as any).expirationTimestamp = Date.now() / 1000;
     assert.ok(p.needUpdateCredential() === true);
-  
+
     (p as any).expirationTimestamp = Date.now() / 1000 + 300
     assert.ok(p.needUpdateCredential() === false);
   });
@@ -218,10 +229,10 @@ describe('OIDCCredentialsProvider', function () {
 
     (p as any).doRequest = async function (req: Request) {
       assert.strictEqual(req.host, 'sts.cn-beijing.aliyuncs.com');
-      assert.strictEqual(req.bodyForm['Policy'] , 'policy');
-      assert.strictEqual(req.bodyForm['RoleArn'] , 'roleArn');
-      assert.strictEqual(req.bodyForm['RoleSessionName'] , 'rsn');
-      assert.strictEqual(req.bodyForm['DurationSeconds'] , '3600');
+      assert.strictEqual(req.bodyForm['Policy'], 'policy');
+      assert.strictEqual(req.bodyForm['RoleArn'], 'roleArn');
+      assert.strictEqual(req.bodyForm['RoleSessionName'], 'rsn');
+      assert.strictEqual(req.bodyForm['DurationSeconds'], '3600');
 
       throw new Error('mock server error');
     };
@@ -279,6 +290,37 @@ describe('OIDCCredentialsProvider', function () {
     } catch (ex) {
       assert.ok(ex.message.includes(`AuthenticationFail.NoPermission`));
     }
+  });
+
+  it('env ALIBABA_CLOUD_STS_REGION should ok', async function () {
+    process.env.ALIBABA_CLOUD_STS_REGION = 'cn-hangzhou';
+    const p = OIDCCredentialsProvider.builder()
+      .withRoleArn('roleArn')
+      .withOIDCProviderArn('oidcProviderArn')
+      .withOIDCTokenFilePath(path.join(__dirname, '../fixtures/OIDCToken.txt'))
+      .build();
+    assert.strictEqual((p as any).stsEndpoint, 'sts.cn-hangzhou.aliyuncs.com');
+
+    delete process.env.ALIBABA_CLOUD_STS_REGION;
+  });
+
+  it('env ALIBABA_CLOUD_VPC_ENDPOINT_ENABLED should ok', async function () {
+    process.env.ALIBABA_CLOUD_VPC_ENDPOINT_ENABLED = "true";
+    let p = OIDCCredentialsProvider.builder()
+      .withRoleArn('roleArn')
+      .withOIDCProviderArn('oidcProviderArn')
+      .withOIDCTokenFilePath(path.join(__dirname, '../fixtures/OIDCToken.txt'))
+      .build();
+    assert.strictEqual((p as any).stsEndpoint, 'sts.aliyuncs.com');
+
+    p = OIDCCredentialsProvider.builder()
+      .withRoleArn('roleArn')
+      .withOIDCProviderArn('oidcProviderArn')
+      .withOIDCTokenFilePath(path.join(__dirname, '../fixtures/OIDCToken.txt'))
+      .withStsRegionId('cn-beijing')
+      .build();
+    assert.strictEqual((p as any).stsEndpoint, 'sts-vpc.cn-beijing.aliyuncs.com');
+    delete process.env.ALIBABA_CLOUD_VPC_ENDPOINT_ENABLED;
   });
 
 });

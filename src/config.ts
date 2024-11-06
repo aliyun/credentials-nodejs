@@ -20,6 +20,10 @@ export default class Config extends $tea.Model {
   oidcProviderArn: string;
   oidcTokenFilePath: string;
   type?: string;
+  externalId?: string;
+  stsEndpoint?: string;
+  timeout?: number;
+  connectTimeout?: number;
 
   static names(): { [key: string]: string } {
     return {
@@ -32,6 +36,12 @@ export default class Config extends $tea.Model {
       policy: 'policy',
       roleSessionExpiration: 'roleSessionExpiration',
       roleSessionName: 'roleSessionName',
+      externalId: 'externalId',
+      stsEndpoint: 'stsEndpoint',
+      stsRegionId: 'stsRegionId',
+      enableVpc: 'enableVpc',
+      timeout: 'readTimeout',
+      connectTimeout: 'connectTimeout',
       publicKeyId: 'publicKeyId',
       privateKeyFile: 'privateKeyFile',
       roleName: 'roleName',
@@ -56,6 +66,12 @@ export default class Config extends $tea.Model {
       policy: 'string',
       roleSessionExpiration: 'number',
       roleSessionName: 'string',
+      externalId: 'string',
+      stsEndpoint: 'string',
+      stsRegionId: 'string',
+      enableVpc: 'string',
+      timeout: 'number',
+      connectTimeout: 'number',
       publicKeyId: 'string',
       privateKeyFile: 'string',
       roleName: 'string',

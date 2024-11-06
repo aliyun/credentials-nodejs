@@ -19,6 +19,9 @@ class OIDCRoleArnCredentialsProviderBuilder {
   stsRegionId: string;
   policy: string;
   durationSeconds: number;
+  enableVpc?: boolean;
+  readTimeout?: number;
+  connectTimeout?: number;
 
   withOIDCProviderArn(oidcProviderArn: string) {
     this.oidcProviderArn = oidcProviderArn;
@@ -57,6 +60,21 @@ class OIDCRoleArnCredentialsProviderBuilder {
 
   withPolicy(policy: string) {
     this.policy = policy;
+    return this;
+  }
+
+  withEnableVpc(enableVpc: boolean): OIDCRoleArnCredentialsProviderBuilder {
+    this.enableVpc = enableVpc
+    return this;
+  }
+
+  withReadTimeout(readTimeout: number): OIDCRoleArnCredentialsProviderBuilder {
+    this.readTimeout = readTimeout
+    return this;
+  }
+
+  withConnectTimeout(connectTimeout: number): OIDCRoleArnCredentialsProviderBuilder {
+    this.connectTimeout = connectTimeout
     return this;
   }
 
@@ -102,13 +120,23 @@ class OIDCRoleArnCredentialsProviderBuilder {
       throw new Error('session duration should be in the range of 900s - max session duration');
     }
 
+    if (!this.stsRegionId) {
+      this.stsRegionId = process.env.ALIBABA_CLOUD_STS_REGION;
+    }
+
+    if (!this.enableVpc) {
+      this.enableVpc = process.env.ALIBABA_CLOUD_VPC_ENDPOINT_ENABLED && process.env.ALIBABA_CLOUD_VPC_ENDPOINT_ENABLED.toLowerCase() === 'true' || false;
+    }
+
     // sts endpoint
     if (!this.stsEndpoint) {
       if (this.stsRegionId) {
-        this.stsEndpoint = `sts.${this.stsRegionId}.aliyuncs.com`
-      } else {
-        this.stsEndpoint = 'sts.aliyuncs.com'
-      }
+        if (this.enableVpc) {
+          this.stsEndpoint = `sts-vpc.${this.stsRegionId}.aliyuncs.com`
+        } else {
+          this.stsEndpoint = `sts.${this.stsRegionId}.aliyuncs.com`
+        }
+      } else { this.stsEndpoint = 'sts.aliyuncs.com' }
     }
 
     return new OIDCRoleArnCredentialsProvider(this);
@@ -125,6 +153,8 @@ export default class OIDCRoleArnCredentialsProvider implements CredentialsProvid
   runtime: { [key: string]: any };
   private readonly stsEndpoint: string;
   private doRequest = doRequest;
+  private readonly readTimeout: number;
+  private readonly connectTimeout: number;
 
   private session: Session;
   expirationTimestamp: number;
@@ -142,6 +172,8 @@ export default class OIDCRoleArnCredentialsProvider implements CredentialsProvid
     this.durationSeconds = builder.durationSeconds;
     this.roleSessionName = builder.roleSessionName;
     this.stsEndpoint = builder.stsEndpoint;
+    this.readTimeout = builder.readTimeout;
+    this.connectTimeout = builder.connectTimeout;
     // used for mock
     this.doRequest = doRequest;
   }
@@ -171,7 +203,7 @@ export default class OIDCRoleArnCredentialsProvider implements CredentialsProvid
 
   async getCredentialsInternal(): Promise<Session> {
     const oidcToken = await readFileAsync(this.oidcTokenFilePath, 'utf8');
-    const builder = Request.builder().withMethod('POST').withProtocol('https').withHost(this.stsEndpoint);
+    const builder = Request.builder().withMethod('POST').withProtocol('https').withHost(this.stsEndpoint).withReadTimeout(this.readTimeout || 10000).withConnectTimeout(this.connectTimeout || 5000);
 
     const queries = Object.create(null);
     queries['Version'] = '2015-04-01';

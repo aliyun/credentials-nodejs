@@ -8,6 +8,7 @@ import { loadIni } from '../util/utils';
 import StaticAKCredentialsProvider from './static_ak';
 import ECSRAMRoleCredentialsProvider from './ecs_ram_role';
 import RAMRoleARNCredentialsProvider from './ram_role_arn';
+import OIDCRoleArnCredentialsProvider from './oidc_role_arn'
 
 export default class ProfileCredentialsProvider implements CredentialsProvider {
   private readonly profileName: string;
@@ -46,27 +47,34 @@ export default class ProfileCredentialsProvider implements CredentialsProvider {
     }
 
     switch (config.type) {
-    case 'access_key':
-      return StaticAKCredentialsProvider.builder()
-        .withAccessKeyId(config.access_key_id)
-        .withAccessKeySecret(config.access_key_secret)
-        .build();
-    case 'ecs_ram_role':
-      return ECSRAMRoleCredentialsProvider.builder()
-        .withRoleName(config.role_name)
-        .build();
-    case 'ram_role_arn': {
-      const previous = StaticAKCredentialsProvider.builder()
-        .withAccessKeyId(config.access_key_id)
-        .withAccessKeySecret(config.access_key_secret)
-        .build();
-      return RAMRoleARNCredentialsProvider.builder()
-        .withCredentialsProvider(previous)
-        .withRoleArn(config.role_arn)
-        .build();
-    }
-    default:
-      throw new Error('Invalid type option, support: access_key, ecs_ram_role, ram_role_arn');
+      case 'access_key':
+        return StaticAKCredentialsProvider.builder()
+          .withAccessKeyId(config.access_key_id)
+          .withAccessKeySecret(config.access_key_secret)
+          .build();
+      case 'ecs_ram_role':
+        return ECSRAMRoleCredentialsProvider.builder()
+          .withRoleName(config.role_name)
+          .build();
+      case 'ram_role_arn':
+        {
+          const previous = StaticAKCredentialsProvider.builder()
+            .withAccessKeyId(config.access_key_id)
+            .withAccessKeySecret(config.access_key_secret)
+            .build();
+          return RAMRoleARNCredentialsProvider.builder()
+            .withCredentialsProvider(previous)
+            .withRoleArn(config.role_arn)
+            .withRoleSessionName(config.role_session_name)
+            .withPolicy(config.policy)
+            // .withStsEndpoint(config.stsEndpoint)
+            // .withStsRegionId(config.stsRegionId)
+            // .withEnableVpc(config.enableVpc)
+            // .withExternalId(config.enableVpc)
+            .build();
+        }
+      default:
+        throw new Error('Invalid type option, support: access_key, ecs_ram_role, ram_role_arn');
     }
   }
 

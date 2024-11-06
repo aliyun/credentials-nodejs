@@ -23,7 +23,7 @@ class CLIProfileCredentialsProviderBuilder {
       this.profileName = process.env.ALIBABA_CLOUD_PROFILE;
     }
 
-    if (process.env.ALIBABA_CLOUD_CLI_PROFILE_DISABLED === 'true') {
+    if (process.env.ALIBABA_CLOUD_CLI_PROFILE_DISABLED && process.env.ALIBABA_CLOUD_CLI_PROFILE_DISABLED.toLowerCase() === 'true') {
       throw new Error('the CLI profile is disabled');
     }
 
@@ -50,6 +50,9 @@ interface Profile {
   ram_role_name: string;
   oidc_token_file: string;
   oidc_provider_arn: string;
+  sts_endpoint: string,
+  enable_vpc: boolean,
+  duration_seconds: number
 }
 
 class Configuration {
@@ -121,6 +124,8 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
         .withRoleSessionName(p.ram_session_name)
         .withDurationSeconds(p.expired_seconds)
         .withStsRegionId(p.sts_region)
+        .withStsEndpoint(p.sts_endpoint)
+        .withEnableVpc(p.enable_vpc)
         .build();
     }
     case 'EcsRamRole':
@@ -133,6 +138,8 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
         .withStsRegionId(p.sts_region)
         .withDurationSeconds(p.expired_seconds)
         .withRoleSessionName(p.ram_session_name)
+        .withDurationSeconds(p.duration_seconds)
+        .withEnableVpc(p.enable_vpc)
         .build();
     case 'ChainableRamRoleArn': {
       const previousProvider = this.getCredentialsProvider(conf, p.source_profile);

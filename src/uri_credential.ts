@@ -6,6 +6,8 @@ import SessionCredential from './session_credential';
 
 export default class URICredential extends SessionCredential implements ICredential {
   credentialsURI: string;
+  readTimeout?: number;
+  connectTimeout?: number;
 
   constructor(uri: string) {
     const conf = new Config({
@@ -27,7 +29,7 @@ export default class URICredential extends SessionCredential implements ICredent
 
   async updateCredential(): Promise<void> {
     const url = this.credentialsURI;
-    const response = await httpx.request(url, {});
+    const response = await httpx.request(url, { readTimeout: this.readTimeout, connectTimeout: this.connectTimeout });
     if (response.statusCode !== 200) {
       throw new Error(`Get credentials from ${url} failed, status code is ${response.statusCode}`);
     }
