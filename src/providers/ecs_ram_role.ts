@@ -14,6 +14,8 @@ export default class ECSRAMRoleCredentialsProvider implements CredentialsProvide
   private expirationTimestamp: number
   // for mock
   private doRequest = doRequest;
+  private readonly readTimeout: number;
+  private readonly connectTimeout: number;
 
   static builder(): ECSRAMRoleCredentialsProviderBuilder {
     return new ECSRAMRoleCredentialsProviderBuilder();
@@ -22,6 +24,8 @@ export default class ECSRAMRoleCredentialsProvider implements CredentialsProvide
   constructor(builder: ECSRAMRoleCredentialsProviderBuilder) {
     this.roleName = builder.roleName;
     this.disableIMDSv1 = builder.disableIMDSv1;
+    this.readTimeout = builder.readTimeout;
+    this.connectTimeout = builder.connectTimeout;
   }
 
   async getCredentials(): Promise<Credentials> {
@@ -58,6 +62,8 @@ export default class ECSRAMRoleCredentialsProvider implements CredentialsProvide
       .withHeaders({
         'x-aliyun-ecs-metadata-token-ttl-seconds': `${defaultMetadataTokenDuration}`
       })
+      .withReadTimeout(this.readTimeout || 1000)
+      .withConnectTimeout(this.connectTimeout || 1000)
       .build();
 
     // ConnectTimeout: 5 * time.Second,
@@ -82,7 +88,9 @@ export default class ECSRAMRoleCredentialsProvider implements CredentialsProvide
       .withMethod('GET')
       .withProtocol('http')
       .withHost('100.100.100.200')
-      .withPath('/latest/meta-data/ram/security-credentials/');
+      .withPath('/latest/meta-data/ram/security-credentials/')
+      .withReadTimeout(this.readTimeout || 1000)
+      .withConnectTimeout(this.connectTimeout || 1000);
 
     const metadataToken = await this.getMetadataToken();
     if (metadataToken !== null) {
@@ -114,7 +122,9 @@ export default class ECSRAMRoleCredentialsProvider implements CredentialsProvide
       .withMethod('GET')
       .withProtocol('http')
       .withHost('100.100.100.200')
-      .withPath(`/latest/meta-data/ram/security-credentials/${roleName}`);
+      .withPath(`/latest/meta-data/ram/security-credentials/${roleName}`)
+      .withReadTimeout(this.readTimeout || 1000)
+      .withConnectTimeout(this.connectTimeout || 1000);
 
     // ConnectTimeout: 5 * time.Second,
     //   ReadTimeout: 5 * time.Second,
@@ -160,6 +170,8 @@ export default class ECSRAMRoleCredentialsProvider implements CredentialsProvide
 class ECSRAMRoleCredentialsProviderBuilder {
   roleName: string
   disableIMDSv1: boolean
+  readTimeout?: number;
+  connectTimeout?: number;
 
   constructor() {
     this.disableIMDSv1 = false;
@@ -175,14 +187,29 @@ class ECSRAMRoleCredentialsProviderBuilder {
     return this;
   }
 
+  withReadTimeout(readTimeout: number): ECSRAMRoleCredentialsProviderBuilder{
+    this.readTimeout = readTimeout
+    return this;
+  }
+
+  withConnectTimeout(connectTimeout: number): ECSRAMRoleCredentialsProviderBuilder{
+    this.connectTimeout = connectTimeout
+    return this;
+  }
+
   build(): ECSRAMRoleCredentialsProvider {
+    // 允许通过环境变量强制关闭 IMDS
+    if (process.env.ALIBABA_CLOUD_ECS_METADATA_DISABLED && process.env.ALIBABA_CLOUD_ECS_METADATA_DISABLED.toLowerCase() === 'true') {
+      throw new Error('IMDS credentials is disabled');
+    }
+
     // 设置 roleName 默认值
     if (!this.roleName) {
       this.roleName = process.env.ALIBABA_CLOUD_ECS_METADATA;
     }
 
     // 允许通过环境变量强制关闭 V1
-    if (process.env.ALIBABA_CLOUD_IMDSV1_DISABLED === 'true') {
+    if (process.env.ALIBABA_CLOUD_IMDSV1_DISABLED && process.env.ALIBABA_CLOUD_IMDSV1_DISABLED.toLowerCase() === 'true') {
       this.disableIMDSv1 = true;
     }
 

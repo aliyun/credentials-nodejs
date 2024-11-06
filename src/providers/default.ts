@@ -4,11 +4,12 @@ import CLIProfileCredentialsProvider from './cli_profile';
 import ECSRAMRoleCredentialsProvider from './ecs_ram_role';
 import EnvironmentVariableCredentialsProvider from './env';
 import OIDCRoleArnCredentialsProvider from './oidc_role_arn';
+import URICredentialsProvider from './uri';
 import ProfileCredentialsProvider from './profile';
 
 export default class DefaultCredentialsProvider implements CredentialsProvider {
   private readonly providers: CredentialsProvider[];
-  private lastUsedProvider : CredentialsProvider;
+  private lastUsedProvider: CredentialsProvider;
   static builder() {
     return new DefaultCredentialsProviderBuilder();
   }
@@ -48,17 +49,21 @@ export default class DefaultCredentialsProvider implements CredentialsProvider {
     }
 
     // Add IMDS
-    if (process.env.ALIBABA_CLOUD_ECS_METADATA) {
-      try {
-        const ecsRamRoleProvider = ECSRAMRoleCredentialsProvider.builder().withRoleName(process.env.ALIBABA_CLOUD_ECS_METADATA).build();
-        this.providers.push(ecsRamRoleProvider);
-      }
-      catch (ex) {
-        // ignore
-      }
+    try {
+      const ecsRamRoleProvider = ECSRAMRoleCredentialsProvider.builder().withRoleName(process.env.ALIBABA_CLOUD_ECS_METADATA).build();
+      this.providers.push(ecsRamRoleProvider);
+    } catch (ex) {
+      // ignore
     }
 
-    // TODO: ALIBABA_CLOUD_CREDENTIALS_URI check
+    // credentials uri
+    try {
+      const uriProvider = URICredentialsProvider.builder().withCredentialsURI(process.env.ALIBABA_CLOUD_CREDENTIALS_URI).build();
+      this.providers.push(uriProvider);
+    }
+    catch (ex) {
+      // ignore
+    }
   }
 
   async getCredentials(): Promise<Credentials> {
@@ -78,7 +83,7 @@ export default class DefaultCredentialsProvider implements CredentialsProvider {
       let inner;
       try {
         inner = await provider.getCredentials();
-      } catch(ex) {
+      } catch (ex) {
         errors.push(ex);
         continue;
       }

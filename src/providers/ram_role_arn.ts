@@ -26,18 +26,27 @@ class RAMRoleARNCredentialsProviderBuilder {
   stsRegionId: string;
   policy: string;
   externalId: string;
+  enableVpc?: boolean;
+  readTimeout?: number;
+  connectTimeout?: number;
 
   build(): RAMRoleARNCredentialsProvider {
     if (!this.credentialsProvider) {
       throw new Error('must specify a previous credentials provider to asssume role');
     }
 
-    if (!this.roleArn) {
-      throw new Error('the RoleArn is empty')
-    }
+    if (!(this.roleArn = this.roleArn || process.env.ALIBABA_CLOUD_ROLE_ARN)) throw new Error('the RoleArn is empty');
 
     if (!this.roleSessionName) {
-      this.roleSessionName = 'credentials-nodejs-' + Date.now()
+      this.roleSessionName = process.env.ALIBABA_CLOUD_ROLE_SESSION_NAME || 'credentials-nodejs-' + Date.now();
+    }
+
+    if (!this.stsRegionId) {
+      this.stsRegionId = process.env.ALIBABA_CLOUD_STS_REGION;
+    }
+
+    if (!this.enableVpc) {
+      this.enableVpc = process.env.ALIBABA_CLOUD_VPC_ENDPOINT_ENABLED && process.env.ALIBABA_CLOUD_VPC_ENDPOINT_ENABLED.toLowerCase() === 'true' || false;
     }
 
     // duration seconds
@@ -53,10 +62,12 @@ class RAMRoleARNCredentialsProviderBuilder {
     // sts endpoint
     if (!this.stsEndpoint) {
       if (this.stsRegionId) {
-        this.stsEndpoint = `sts.${this.stsRegionId}.aliyuncs.com`
-      } else {
-        this.stsEndpoint = 'sts.aliyuncs.com'
-      }
+        if (this.enableVpc) {
+          this.stsEndpoint = `sts-vpc.${this.stsRegionId}.aliyuncs.com`
+        } else {
+          this.stsEndpoint = `sts.${this.stsRegionId}.aliyuncs.com`
+        }
+      } else { this.stsEndpoint = 'sts.aliyuncs.com' }
     }
 
     return new RAMRoleARNCredentialsProvider(this);
@@ -102,10 +113,20 @@ class RAMRoleARNCredentialsProviderBuilder {
     return this;
   }
 
-  // withHttpOptions(httpOptions *HttpOptions) RAMRoleARNCredentialsProviderBuilder {
-  //   this.httpOptions = httpOptions
-  //   return this;
-  // }
+  withEnableVpc(enableVpc: boolean): RAMRoleARNCredentialsProviderBuilder {
+    this.enableVpc = enableVpc
+    return this;
+  }
+
+  withReadTimeout(readTimeout: number): RAMRoleARNCredentialsProviderBuilder {
+    this.readTimeout = readTimeout
+    return this;
+  }
+
+  withConnectTimeout(connectTimeout: number): RAMRoleARNCredentialsProviderBuilder {
+    this.connectTimeout = connectTimeout
+    return this;
+  }
 }
 
 function encode(str: string): string {
@@ -126,6 +147,8 @@ export default class RAMRoleARNCredentialsProvider implements CredentialsProvide
   private readonly durationSeconds: number;
   private readonly externalId: string;
   private readonly roleArn: string;
+  private readonly readTimeout: number;
+  private readonly connectTimeout: number;
 
   // used for mock
   private doRequest = doRequest;
@@ -146,11 +169,13 @@ export default class RAMRoleARNCredentialsProvider implements CredentialsProvide
     this.durationSeconds = builder.durationSeconds;
     this.roleArn = builder.roleArn;
     this.externalId = builder.externalId;
+    this.readTimeout = builder.readTimeout;
+    this.connectTimeout = builder.connectTimeout;
   }
 
   private async getCredentialsInternal(credentials: Credentials): Promise<Session> {
     const method = 'POST';
-    const builder = Request.builder().withMethod(method).withProtocol('https').withHost(this.stsEndpoint);
+    const builder = Request.builder().withMethod(method).withProtocol('https').withHost(this.stsEndpoint).withReadTimeout(this.readTimeout || 10000).withConnectTimeout(this.connectTimeout || 5000);
 
     const queries = Object.create(null);
     queries['Version'] = '2015-04-01';

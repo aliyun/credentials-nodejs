@@ -14,6 +14,7 @@ import RAMRoleARNCredentialsProvider from './providers/ram_role_arn';
 import OIDCRoleArnCredentialsProvider from './providers/oidc_role_arn';
 import ECSRAMRoleCredentialsProvider from './providers/ecs_ram_role';
 import DefaultCredentialsProvider from './providers/default';
+import URICredentialsProvider from './providers/uri';
 
 export { Config };
 
@@ -140,6 +141,8 @@ export default class Credential implements ICredential {
       this.credential = new InnerCredentialsClient('ecs_ram_role', ECSRAMRoleCredentialsProvider.builder()
         .withRoleName(config.roleName)
         .withDisableIMDSv1(config.disableIMDSv1)
+        .withReadTimeout(config.timeout)
+        .withConnectTimeout(config.connectTimeout)
         .build());
       break;
     case 'ram_role_arn': {
@@ -162,6 +165,12 @@ export default class Credential implements ICredential {
         .withPolicy(config.policy)
         .withDurationSeconds(config.roleSessionExpiration)
         .withRoleSessionName(config.roleSessionName)
+        .withReadTimeout(config.timeout)
+        .withConnectTimeout(config.connectTimeout)
+        .withEnableVpc(config.enableVpc)
+        .withStsEndpoint(config.stsEndpoint)
+        .withStsRegionId(config.stsRegionId)
+        .withExternalId(config.externalId)
         // .withHttpOptions(runtime)
         .build());
     }
@@ -174,6 +183,9 @@ export default class Credential implements ICredential {
         .withRoleSessionName(config.roleSessionName)
         .withPolicy(config.policy)
         .withDurationSeconds(config.roleSessionExpiration)
+        .withStsEndpoint(config.stsEndpoint)
+        .withReadTimeout(config.timeout)
+        .withConnectTimeout(config.connectTimeout)
         .build());
       break;
     case 'rsa_key_pair':
@@ -183,7 +195,11 @@ export default class Credential implements ICredential {
       this.credential = new BearerTokenCredential(config.bearerToken);
       break;
     case 'credentials_uri':
-      this.credential = new URICredential(config.credentialsURI);
+      this.credential = new InnerCredentialsClient('credentials_uri', URICredentialsProvider.builder()
+        .withCredentialsURI(config.credentialsURI)
+        .withReadTimeout(config.timeout)
+        .withConnectTimeout(config.connectTimeout)
+        .build());
       break;
     default:
       throw new Error('Invalid type option, support: access_key, sts, ecs_ram_role, ram_role_arn, rsa_key_pair, credentials_uri');
