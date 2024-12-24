@@ -2,6 +2,7 @@ import 'mocha';
 import assert from 'assert'
 import path from 'path';
 
+import { Session }from '../../src/providers/session';
 import OIDCCredentialsProvider from '../../src/providers/oidc_role_arn';
 import { Request, Response } from '../../src/providers/http';
 
@@ -211,9 +212,12 @@ describe('OIDCCredentialsProvider', function () {
     // needUpdateCredential
     assert.ok(p.needUpdateCredential() === true);
     (p as any).expirationTimestamp = Date.now() / 1000;
+    (p as any).refreshTimestamp();
     assert.ok(p.needUpdateCredential() === true);
 
-    (p as any).expirationTimestamp = Date.now() / 1000 + 300
+    (p as any).expirationTimestamp = Date.now() / 1000 + 1000;
+    (p as any).refreshTimestamp();
+    (p as any).session = new Session(creds.accessKeyId, creds.accessKeySecret, creds.securityToken, creds.expiration);
     assert.ok(p.needUpdateCredential() === false);
   });
 
@@ -265,11 +269,14 @@ describe('OIDCCredentialsProvider', function () {
     assert.strictEqual(cc.accessKeySecret, 'aksecret');
     assert.strictEqual(cc.securityToken, 'ststoken')
     assert.strictEqual(cc.providerName, 'oidc_role_arn');
+    (p as any).expirationTimestamp = Date.now() / 1000;
+    (p as any).refreshTimestamp();
     assert.ok(p.needUpdateCredential() === true);
 
     // get credentials again
-    (p as any).expirationTimestamp = Date.now() / 1000 + 300;
-    cc = await p.getCredentials()
+    (p as any).expirationTimestamp = Date.now() / 1000 + 1000;
+    (p as any).refreshTimestamp();
+    cc = await p.getCredentials();
     assert.strictEqual(cc.accessKeyId, 'akid');
     assert.strictEqual(cc.accessKeySecret, 'aksecret');
     assert.strictEqual(cc.securityToken, 'ststoken')

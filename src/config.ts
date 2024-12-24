@@ -15,6 +15,7 @@ export default class Config extends $tea.Model {
   roleName?: string;
   enableIMDSv2?: boolean;
   disableIMDSv1: boolean;
+  asyncCredentialUpdateEnabled: boolean;
   metadataTokenDuration?: number;
   credentialsURI?: string;
   oidcProviderArn: string;
@@ -47,6 +48,7 @@ export default class Config extends $tea.Model {
       roleName: 'roleName',
       enableIMDSv2: 'enableIMDSv2',
       disableIMDSv1: 'disableIMDSv1',
+      asyncCredentialUpdateEnabled: 'asyncCredentialUpdateEnabled',
       metadataTokenDuration: 'metadataTokenDuration',
       credentialsURI: 'credentialsURI',
       oidcProviderArn: 'oidcProviderArn',
@@ -77,6 +79,7 @@ export default class Config extends $tea.Model {
       roleName: 'string',
       enableIMDSv2: 'boolean',
       disableIMDSv1: 'boolean',
+      asyncCredentialUpdateEnabled: 'boolean',
       metadataTokenDuration: 'number',
       credentialsURI: 'string',
       oidcProviderArn: 'string',

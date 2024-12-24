@@ -107,11 +107,14 @@ describe('Credentials with valid config', function () {
   it('should return EcsRamRoleCredential when type is ecs_ram_role', async function () {
     const conf = new Config({
       type: 'ecs_ram_role',
-      roleName: 'roleName'
+      roleName: 'roleName',
+      asyncCredentialUpdateEnabled: true,
     });
     let cred = new Credentials(conf);
     let type = cred.getType();
     expect(type).to.be('ecs_ram_role');
+    expect((cred.credential as any).provider.checker).not.be(null);
+    (cred.credential as any).provider.close();
     // let credentialModel = await cred.getCredential();
     // expect(credentialModel.type).to.be('ecs_ram_role');
   });

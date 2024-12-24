@@ -166,7 +166,7 @@ describe('ProfileCredentialsProvider', function () {
     provider = ProfileCredentialsProvider.builder().withProfileName('noecs').build();
     cp = provider.getCredentialsProvider(file);
     assert.ok(cp instanceof ECSRAMRoleCredentialsProvider);
-
+    
     // ecs_ram_role with rolename
     provider = ProfileCredentialsProvider.builder().withProfileName('ecs').build()
     cp = provider.getCredentialsProvider(file)
