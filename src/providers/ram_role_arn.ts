@@ -6,8 +6,7 @@ import * as utils from '../util/utils';
 import Credentials from '../credentials';
 import CredentialsProvider from '../credentials_provider'
 import { doRequest, Request } from './http';
-import { parseUTC } from './time';
-import Session from './session';
+import { Session, SessionCredentialProvider, STALE_TIME } from './session';
 
 const log = debug('sign');
 
@@ -139,7 +138,7 @@ function encode(str: string): string {
     .replace(/\*/g, '%2A');
 }
 
-export default class RAMRoleARNCredentialsProvider implements CredentialsProvider {
+export default class RAMRoleARNCredentialsProvider extends SessionCredentialProvider implements CredentialsProvider {
   private readonly credentialsProvider: CredentialsProvider;
   private readonly stsEndpoint: string;
   private readonly roleSessionName: string;
@@ -153,15 +152,15 @@ export default class RAMRoleARNCredentialsProvider implements CredentialsProvide
   // used for mock
   private doRequest = doRequest;
 
-  private session: Session;
   private lastUpdateTimestamp: number;
-  private expirationTimestamp: any;
 
   static builder(): RAMRoleARNCredentialsProviderBuilder {
     return new RAMRoleARNCredentialsProviderBuilder();
   }
 
   constructor(builder: RAMRoleARNCredentialsProviderBuilder) {
+    super(STALE_TIME);
+    this.refresher = this.getCredentialsInternal;
     this.credentialsProvider = builder.credentialsProvider;
     this.stsEndpoint = builder.stsEndpoint;
     this.roleSessionName = builder.roleSessionName;
@@ -173,7 +172,8 @@ export default class RAMRoleARNCredentialsProvider implements CredentialsProvide
     this.connectTimeout = builder.connectTimeout;
   }
 
-  private async getCredentialsInternal(credentials: Credentials): Promise<Session> {
+  private async getCredentialsInternal(): Promise<Session> {
+    const credentials = await this.credentialsProvider.getCredentials();
     const method = 'POST';
     const builder = Request.builder().withMethod(method).withProtocol('https').withHost(this.stsEndpoint).withReadTimeout(this.readTimeout || 10000).withConnectTimeout(this.connectTimeout || 5000);
 
@@ -274,36 +274,7 @@ export default class RAMRoleARNCredentialsProvider implements CredentialsProvide
     return new Session(AccessKeyId, AccessKeySecret, SecurityToken, Expiration);
   }
 
-  async getCredentials(): Promise<Credentials> {
-    if (!this.session || this.needUpdateCredential()) {
-      // 获取前置凭证
-      const previousCredentials = await this.credentialsProvider.getCredentials();
-      const session = await this.getCredentialsInternal(previousCredentials);
-      // UTC time: 2015-04-09T11:52:19Z
-      const expirationTime = parseUTC(session.expiration)
-
-      this.expirationTimestamp = Math.floor(expirationTime / 1000);
-      this.lastUpdateTimestamp = Date.now();
-      this.session = session
-    }
-
-    return Credentials.builder()
-      .withAccessKeyId(this.session.accessKeyId)
-      .withAccessKeySecret(this.session.accessKeySecret)
-      .withSecurityToken(this.session.securityToken)
-      .withProviderName(`${this.getProviderName()}/${this.credentialsProvider.getProviderName()}`)
-      .build();
-  }
-
-  needUpdateCredential(): boolean {
-    if (!this.expirationTimestamp) {
-      return true
-    }
-
-    return this.expirationTimestamp - Date.now() / 1000 <= 180
-  }
-
   getProviderName(): string {
-    return 'ram_role_arn';
+    return `ram_role_arn/${this.credentialsProvider.getProviderName()}`;
   }
 }

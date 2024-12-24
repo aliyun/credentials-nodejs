@@ -1,55 +1,59 @@
-import Credentials from '../credentials'
 import CredentialsProvider from '../credentials_provider'
 import { Request, doRequest } from './http'
-import Session from './session'
-import { parseUTC } from './time'
+import { Session, SessionCredentialProvider, STALE_TIME } from './session'
 
+const PREFETCH_TIME = 60 * 60;
 const defaultMetadataTokenDuration = 21600; // 6 hours
 
-export default class ECSRAMRoleCredentialsProvider implements CredentialsProvider {
+export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProvider implements CredentialsProvider {
   private readonly roleName: string
   private readonly disableIMDSv1: boolean
-  // for sts
-  private session: Session
-  private expirationTimestamp: number
+  // for refresher
+  private checker: NodeJS.Timeout
   // for mock
   private doRequest = doRequest;
   private readonly readTimeout: number;
   private readonly connectTimeout: number;
+  private shouldRefreshCred: boolean;
 
   static builder(): ECSRAMRoleCredentialsProviderBuilder {
     return new ECSRAMRoleCredentialsProviderBuilder();
   }
 
   constructor(builder: ECSRAMRoleCredentialsProviderBuilder) {
+    super(STALE_TIME, PREFETCH_TIME);
+    this.refresher = this.getCredentialsInternal;
     this.roleName = builder.roleName;
     this.disableIMDSv1 = builder.disableIMDSv1;
     this.readTimeout = builder.readTimeout;
     this.connectTimeout = builder.connectTimeout;
+    this.checker = null;
+    this.shouldRefreshCred = false;
+    if(builder.asyncCredentialUpdateEnabled) {
+      this.checker = this.checkCredentialsUpdateAsynchronously();
+    }
   }
 
-  async getCredentials(): Promise<Credentials> {
-    if (!this.session || this.needUpdateCredential()) {
-      const session = await this.getCredentialsInternal();
-      const expirationTime = parseUTC(session.expiration);
-      this.session = session;
-      this.expirationTimestamp = expirationTime / 1000;
-    }
 
-    return Credentials.builder()
-      .withAccessKeyId(this.session.accessKeyId)
-      .withAccessKeySecret(this.session.accessKeySecret)
-      .withSecurityToken(this.session.securityToken)
-      .withProviderName(this.getProviderName())
-      .build();
+  checkCredentialsUpdateAsynchronously(): NodeJS.Timeout {
+    return setTimeout(async () => {
+      try {
+        if(this.shouldRefreshCred) {
+          await this.getCredentials();
+        }
+      } catch(err) {
+        console.error('CheckCredentialsUpdateAsynchronously Error:', err);
+      } finally {
+        this.checker = this.checkCredentialsUpdateAsynchronously();
+      }
+    }, 1000 * 60);
   }
 
-  private needUpdateCredential(): boolean {
-    if (!this.expirationTimestamp) {
-      return true
+  close(): void {
+    if (this.checker != null) {
+      clearTimeout(this.checker);
+      this.checker = null;
     }
-
-    return this.expirationTimestamp - (Date.now() / 1000) <= 180;
   }
 
   private async getMetadataToken(): Promise<string> {
@@ -139,7 +143,6 @@ export default class ECSRAMRoleCredentialsProvider implements CredentialsProvide
 
     const request = builder.build();
     const response = await this.doRequest(request);
-
     if (response.statusCode !== 200) {
       throw new Error(`get sts token failed, httpStatus: ${response.statusCode}, message = ${response.body.toString()}`);
     }
@@ -158,7 +161,7 @@ export default class ECSRAMRoleCredentialsProvider implements CredentialsProvide
     if (data.Code !== 'Success') {
       throw new Error('refresh Ecs sts token err, Code is not Success')
     }
-
+    this.shouldRefreshCred = true;
     return new Session(data.AccessKeyId, data.AccessKeySecret, data.SecurityToken, data.Expiration);
   }
 
@@ -172,9 +175,11 @@ class ECSRAMRoleCredentialsProviderBuilder {
   disableIMDSv1: boolean
   readTimeout?: number;
   connectTimeout?: number;
+  asyncCredentialUpdateEnabled?: boolean;
 
   constructor() {
     this.disableIMDSv1 = false;
+    this.asyncCredentialUpdateEnabled = false;
   }
 
   withRoleName(roleName: string): ECSRAMRoleCredentialsProviderBuilder {
@@ -194,6 +199,11 @@ class ECSRAMRoleCredentialsProviderBuilder {
 
   withConnectTimeout(connectTimeout: number): ECSRAMRoleCredentialsProviderBuilder{
     this.connectTimeout = connectTimeout
+    return this;
+  }
+
+  withAsyncCredentialUpdateEnabled(asyncCredentialUpdateEnabled: boolean): ECSRAMRoleCredentialsProviderBuilder {
+    this.asyncCredentialUpdateEnabled = asyncCredentialUpdateEnabled
     return this;
   }
 

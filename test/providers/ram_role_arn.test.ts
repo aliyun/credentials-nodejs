@@ -1,6 +1,7 @@
 import 'mocha';
 import assert from 'assert'
 
+import { Session }from '../../src/providers/session';
 import RAMRoleARNCredentialsProvider from '../../src/providers/ram_role_arn';
 import StaticAKCredentialsProvider from '../../src/providers/static_ak';
 import StaticSTSCredentialsProvider from '../../src/providers/static_sts';
@@ -173,9 +174,12 @@ describe('RAMRoleARNCredentialsProvider', function () {
     // needUpdateCredential
     assert.ok(p.needUpdateCredential() === true);
     (p as any).expirationTimestamp = Date.now() / 1000;
+    (p as any).refreshTimestamp();
     assert.ok(p.needUpdateCredential() === true);
-  
-    (p as any).expirationTimestamp = Date.now() / 1000 + 300
+
+    (p as any).expirationTimestamp = Date.now() / 1000 + 1000;
+    (p as any).refreshTimestamp();
+    (p as any).session = new Session(creds.accessKeyId, creds.accessKeySecret, creds.securityToken, creds.expiration);
     assert.ok(p.needUpdateCredential() === false);
   });
 
@@ -242,10 +246,13 @@ describe('RAMRoleARNCredentialsProvider', function () {
     assert.strictEqual(cc.accessKeySecret, 'aksecret');
     assert.strictEqual(cc.securityToken, 'ststoken')
     assert.strictEqual(cc.providerName, 'ram_role_arn/static_ak');
+    (p as any).expirationTimestamp = Date.now() / 1000;
+    (p as any).refreshTimestamp();
     assert.ok(p.needUpdateCredential() === true);
 
     // get credentials again
-    (p as any).expirationTimestamp = Date.now() / 1000 + 300;
+    (p as any).expirationTimestamp = Date.now() / 1000 + 1000;
+    (p as any).refreshTimestamp();
     cc = await p.getCredentials()
     assert.strictEqual(cc.accessKeyId, 'akid');
     assert.strictEqual(cc.accessKeySecret, 'aksecret');

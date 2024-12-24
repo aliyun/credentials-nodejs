@@ -43,3 +43,7 @@ export async function loadIni(filePath: string): Promise<any> {
   const content = await readFileAsync(filePath, 'utf-8');
   return ini.parse(content);
 }
+
+export function getRandomInt(max: number): number {
+  return Math.floor(Math.random() * (max + 1));
+}

@@ -16,6 +16,7 @@ describe('DefaultCredentialsProvider', function () {
     assert.ok((provider as any).providers[0] instanceof EnvironmentVariableCredentialsProvider);
     assert.ok((provider as any).providers[1] instanceof CLIProfileCredentialsProvider);
     assert.ok((provider as any).providers[2] instanceof ProfileCredentialsProvider);
+    assert.ok((provider as any).providers[3] instanceof ECSRAMRoleCredentialsProvider);
 
     // Add oidc provider
     process.env.ALIBABA_CLOUD_OIDC_TOKEN_FILE = '/path/to/oidc.token';
@@ -25,10 +26,11 @@ describe('DefaultCredentialsProvider', function () {
     provider = DefaultCredentialsProvider.builder().build();
 
     assert.ok((provider as any).providers.length === 6);
-    assert.ok((provider as any).providers[0] instanceof EnvironmentVariableCredentialsProvider)
-    assert.ok((provider as any).providers[1] instanceof OIDCRoleArnCredentialsProvider)
-    assert.ok((provider as any).providers[2] instanceof CLIProfileCredentialsProvider)
-    assert.ok((provider as any).providers[3] instanceof ProfileCredentialsProvider)
+    assert.ok((provider as any).providers[0] instanceof EnvironmentVariableCredentialsProvider);
+    assert.ok((provider as any).providers[1] instanceof OIDCRoleArnCredentialsProvider);
+    assert.ok((provider as any).providers[2] instanceof CLIProfileCredentialsProvider);
+    assert.ok((provider as any).providers[3] instanceof ProfileCredentialsProvider);
+    assert.ok((provider as any).providers[4] instanceof ECSRAMRoleCredentialsProvider);
 
     // Add ecs ram role
     process.env.ALIBABA_CLOUD_ECS_METADATA = 'rolename';
@@ -57,11 +59,12 @@ describe('DefaultCredentialsProvider', function () {
     } catch (ex) {
       assert.ok(ex.message.startsWith('unable to get credentials from any of the providers in the chain: unable to get credentials from enviroment variables, Access key ID must be specified via environment variable (ALIBABA_CLOUD_ACCESS_KEY_ID)'));
     }
-
+    assert.ok((provider as any).providers[2] instanceof ECSRAMRoleCredentialsProvider);
     process.env.ALIBABA_CLOUD_ACCESS_KEY_ID = 'akid';
     process.env.ALIBABA_CLOUD_ACCESS_KEY_SECRET = 'aksecret';
     provider = DefaultCredentialsProvider.builder().build();
     assert.ok((provider as any).providers.length === 4);
+    assert.ok((provider as any).providers[2] instanceof ECSRAMRoleCredentialsProvider);
     let cc = await provider.getCredentials();
     assert.deepStrictEqual(cc, Credentials.builder()
       .withAccessKeyId('akid')

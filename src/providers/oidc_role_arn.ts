@@ -3,10 +3,9 @@ import { promisify } from 'util';
 
 import Credentials from '../credentials';
 import CredentialsProvider from '../credentials_provider';
-import Session from './session';
+import { Session, SessionCredentialProvider, STALE_TIME } from './session';
 import * as utils from '../util/utils';
 import { doRequest, Request } from './http';
-import { parseUTC } from './time';
 
 const readFileAsync = promisify(readFile);
 
@@ -143,7 +142,7 @@ class OIDCRoleArnCredentialsProviderBuilder {
   }
 }
 
-export default class OIDCRoleArnCredentialsProvider implements CredentialsProvider {
+export default class OIDCRoleArnCredentialsProvider extends SessionCredentialProvider implements CredentialsProvider {
   private readonly roleArn: string;
   private readonly oidcProviderArn: string;
   private readonly oidcTokenFilePath: string;
@@ -156,8 +155,6 @@ export default class OIDCRoleArnCredentialsProvider implements CredentialsProvid
   private readonly readTimeout: number;
   private readonly connectTimeout: number;
 
-  private session: Session;
-  expirationTimestamp: number;
   lastUpdateTimestamp: number;
 
   static builder() {
@@ -165,6 +162,8 @@ export default class OIDCRoleArnCredentialsProvider implements CredentialsProvid
   }
 
   constructor(builder: OIDCRoleArnCredentialsProviderBuilder) {
+    super(STALE_TIME);
+    this.refresher = this.getCredentialsInternal;
     this.roleArn = builder.roleArn;
     this.oidcProviderArn = builder.oidcProviderArn;
     this.oidcTokenFilePath = builder.oidcTokenFilePath;
@@ -176,25 +175,6 @@ export default class OIDCRoleArnCredentialsProvider implements CredentialsProvid
     this.connectTimeout = builder.connectTimeout;
     // used for mock
     this.doRequest = doRequest;
-  }
-
-  async getCredentials(): Promise<Credentials> {
-    if (!this.session || this.needUpdateCredential()) {
-      const session = await this.getCredentialsInternal();
-      // UTC time: 2015-04-09T11:52:19Z
-      const expirationTime = parseUTC(session.expiration)
-
-      this.expirationTimestamp = Math.floor(expirationTime / 1000);
-      this.lastUpdateTimestamp = Date.now();
-      this.session = session
-    }
-
-    return Credentials.builder()
-      .withAccessKeyId(this.session.accessKeyId)
-      .withAccessKeySecret(this.session.accessKeySecret)
-      .withSecurityToken(this.session.securityToken)
-      .withProviderName(this.getProviderName())
-      .build();
   }
 
   getProviderName(): string {
@@ -254,13 +234,5 @@ export default class OIDCRoleArnCredentialsProvider implements CredentialsProvid
     }
 
     return new Session(AccessKeyId, AccessKeySecret, SecurityToken, Expiration);
-  }
-
-  needUpdateCredential(): boolean {
-    if (!this.expirationTimestamp) {
-      return true
-    }
-
-    return this.expirationTimestamp - Date.now() / 1000 <= 180
   }
 }

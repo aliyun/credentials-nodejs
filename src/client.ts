@@ -16,7 +16,11 @@ import ECSRAMRoleCredentialsProvider from './providers/ecs_ram_role';
 import DefaultCredentialsProvider from './providers/default';
 import URICredentialsProvider from './providers/uri';
 
-export { Config };
+export { 
+  Config, DefaultCredentialsProvider, CredentialsProvider, 
+  StaticAKCredentialsProvider, RAMRoleARNCredentialsProvider,
+  OIDCRoleArnCredentialsProvider, ECSRAMRoleCredentialsProvider, URICredentialsProvider
+};;
 
 class InnerCredentialsClient implements ICredential {
   type: string;
@@ -141,6 +145,7 @@ export default class Credential implements ICredential {
       this.credential = new InnerCredentialsClient('ecs_ram_role', ECSRAMRoleCredentialsProvider.builder()
         .withRoleName(config.roleName)
         .withDisableIMDSv1(config.disableIMDSv1)
+        .withAsyncCredentialUpdateEnabled(config.asyncCredentialUpdateEnabled)
         .withReadTimeout(config.timeout)
         .withConnectTimeout(config.connectTimeout)
         .build());

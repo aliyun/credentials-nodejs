@@ -35,10 +35,13 @@ describe('URICredentialsProvider', function () {
     assert.strictEqual(cc.accessKeySecret, 'aksecret');
     assert.strictEqual(cc.securityToken, 'ststoken')
     assert.strictEqual(cc.providerName, 'credential_uri');
+    (p as any).expirationTimestamp = Date.now() / 1000;
+    (p as any).refreshTimestamp();
     assert.ok((p as any).needUpdateCredential() === true);
 
     // get credentials again
-    (p as any).expirationTimestamp = Date.now() / 1000 + 300;
+    (p as any).expirationTimestamp = Date.now() / 1000 + 1000;
+    (p as any).refreshTimestamp();
     cc = await p.getCredentials()
     assert.strictEqual(cc.accessKeyId, 'akid');
     assert.strictEqual(cc.accessKeySecret, 'aksecret');
@@ -100,7 +103,12 @@ describe('URICredentialsProvider', function () {
       await p.getCredentials();
       assert.fail('should not to be here');
     } catch (ex) {
-      assert.strictEqual(ex.message, 'get sts token failed, json parse failed: Unexpected token e in JSON at position 0, result: error json.');
+      let message = ex.message;
+      if (/Unexpected token '?e'?,/.test(message)) {
+        // 处理 Node.js 20 的情况
+        message = message.replace(/Unexpected token '?e'?,/, "Unexpected token e in JSON at position 0,").replace(/".*" is not valid JSON, /, '');;
+      }
+      assert.strictEqual(message, 'get sts token failed, json parse failed: Unexpected token e in JSON at position 0, result: error json.');
     }
   });
 
