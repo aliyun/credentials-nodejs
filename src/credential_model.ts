@@ -6,6 +6,7 @@ export default class CredentialModel extends $tea.Model {
   securityToken?: string;
   bearerToken?: string;
   type?: string;
+  providerName?: string;
   static names(): { [key: string]: string } {
     return {
       accessKeyId: 'accessKeyId',
@@ -13,6 +14,7 @@ export default class CredentialModel extends $tea.Model {
       securityToken: 'securityToken',
       bearerToken: 'bearerToken',
       type: 'type',
+      providerName: 'providerName',
     };
   }
 
@@ -23,6 +25,7 @@ export default class CredentialModel extends $tea.Model {
       securityToken: 'string',
       bearerToken: 'string',
       type: 'string',
+      providerName: 'string',
     };
   }
 
