@@ -4,7 +4,6 @@ import RsaKeyPairCredential from './rsa_key_pair_credential';
 import BearerTokenCredential from './bearer_token_credential';
 
 import Config from './config';
-import URICredential from './uri_credential';
 import CredentialModel from './credential_model';
 
 import CredentialsProvider from './credentials_provider';
@@ -15,12 +14,16 @@ import OIDCRoleArnCredentialsProvider from './providers/oidc_role_arn';
 import ECSRAMRoleCredentialsProvider from './providers/ecs_ram_role';
 import DefaultCredentialsProvider from './providers/default';
 import URICredentialsProvider from './providers/uri';
+import CLIProfileCredentialsProvider from './providers/cli_profile';
+import ProfileCredentialsProvider from './providers/profile';
+import EnvironmentVariableCredentialsProvider from './providers/env';
 
 export {
   Config, DefaultCredentialsProvider, CredentialsProvider,
-  StaticAKCredentialsProvider, RAMRoleARNCredentialsProvider,
-  OIDCRoleArnCredentialsProvider, ECSRAMRoleCredentialsProvider, URICredentialsProvider
-};;
+  StaticAKCredentialsProvider, StaticSTSCredentialsProvider, RAMRoleARNCredentialsProvider,
+  OIDCRoleArnCredentialsProvider, ECSRAMRoleCredentialsProvider, URICredentialsProvider,
+  EnvironmentVariableCredentialsProvider, ProfileCredentialsProvider, CLIProfileCredentialsProvider
+};
 
 class InnerCredentialsClient implements ICredential {
   type: string;
