@@ -4,6 +4,7 @@ import expect from 'expect.js';
 import Credentials from '../src/client';
 import DefaultCredential from '../src/default_credential';
 import * as DefaultProvider from '../src/provider/provider_chain';
+import StaticAKCredentialsProvider from '../src/providers/static_ak';
 import mm from 'mm';
 import * as utils from '../src/util/utils';
 import Config from '../src/config';
@@ -60,6 +61,7 @@ describe('Credentials with valid config', function () {
     expect(credentialModel.accessKeySecret).to.be('accessKeySecret');
     assert.strictEqual(credentialModel.securityToken, undefined);
     assert.strictEqual(credentialModel.bearerToken, undefined);
+    expect(credentialModel.providerName).to.be('static_ak');
   });
 
   it('should return BearerTokenCredential when type is bearer', async function () {
@@ -80,6 +82,7 @@ describe('Credentials with valid config', function () {
     expect(credentialModel.accessKeySecret).to.be('');
     expect(credentialModel.securityToken).to.be('');
     expect(credentialModel.bearerToken).to.be('bearerToken');
+    assert.strictEqual(credentialModel.providerName, undefined);
   });
 
   it('should return StsTokenCredential when type is sts', async function () {
@@ -102,6 +105,7 @@ describe('Credentials with valid config', function () {
     expect(credentialModel.accessKeySecret).to.be('accessKeySecret');
     expect(credentialModel.securityToken).to.be('securityToken');
     assert.strictEqual(credentialModel.bearerToken, undefined);
+    expect(credentialModel.providerName).to.be('static_sts');
   });
 
   it('should return EcsRamRoleCredential when type is ecs_ram_role', async function () {
@@ -177,6 +181,22 @@ describe('Credentials with invalid config ', function () {
   });
 });
 
+describe('Credentials with provider ', function () {
+  it('should ok', async function () {
+    const provider = StaticAKCredentialsProvider.builder()
+    .withAccessKeyId('akid')
+    .withAccessKeySecret('aksecret')
+    .build();
+    let cred = new Credentials(null, provider);
+    let credentialModel = await cred.getCredential();
+    expect(credentialModel.accessKeyId).to.be('akid');
+    expect(credentialModel.accessKeySecret).to.be('aksecret');
+    assert.strictEqual(credentialModel.securityToken, undefined);
+    assert.strictEqual(credentialModel.bearerToken, undefined);
+    expect(credentialModel.providerName).to.be('static_ak');
+  });
+});
+
 describe('Credentials', function () {
   it('should ok', async function () {
     const conf = new Config({
@@ -184,7 +204,7 @@ describe('Credentials', function () {
       accessKeyId: 'akid',
       accessKeySecret: 'aksecret'
     });
-    const cred = new Credentials(conf);
+    let cred = new Credentials(conf);
     assert.strictEqual(await cred.getAccessKeyId(), 'akid');
     assert.strictEqual(await cred.getAccessKeySecret(), 'aksecret');
     assert.strictEqual(await cred.getSecurityToken(), undefined);
@@ -194,5 +214,10 @@ describe('Credentials', function () {
     assert.strictEqual(credentialModel.accessKeySecret, 'aksecret');
     assert.strictEqual(credentialModel.securityToken, undefined);
     assert.strictEqual(credentialModel.bearerToken, undefined);
+
+    cred = new Credentials(null);
+    assert.strictEqual(await cred.getType(), 'default');
+    cred = new Credentials(undefined);
+    assert.strictEqual(await cred.getType(), 'default');
   });
 });

@@ -16,8 +16,8 @@ import ECSRAMRoleCredentialsProvider from './providers/ecs_ram_role';
 import DefaultCredentialsProvider from './providers/default';
 import URICredentialsProvider from './providers/uri';
 
-export { 
-  Config, DefaultCredentialsProvider, CredentialsProvider, 
+export {
+  Config, DefaultCredentialsProvider, CredentialsProvider,
   StaticAKCredentialsProvider, RAMRoleARNCredentialsProvider,
   OIDCRoleArnCredentialsProvider, ECSRAMRoleCredentialsProvider, URICredentialsProvider
 };;
@@ -74,14 +74,26 @@ class InnerCredentialsClient implements ICredential {
       securityToken: credentials.securityToken,
       bearerToken: undefined,
       type: this.getType(),
+      providerName: credentials.providerName,
     });
   }
 }
 
+function isCredentialsProviderClass(t: any): boolean {
+  if (!t) {
+      return false;
+  }
+  return typeof t.getCredentials === 'function' && typeof t.getProviderName === 'function';
+}
+
 export default class Credential implements ICredential {
   credential: ICredential;
-  constructor(config: Config = null, runtime: { [key: string]: any } = {}) {
-    this.load(config, runtime);
+  constructor(config: Config | null = null, provider: CredentialsProvider | { [key: string]: any } | null = null) {
+    if (isCredentialsProviderClass(provider)) {
+      this.load(null, provider as CredentialsProvider);
+    } else {
+      this.load(config, null);
+    }
   }
 
   /**
@@ -105,10 +117,16 @@ export default class Credential implements ICredential {
     return this.credential.getSecurityToken();
   }
 
+  /**
+   * @deprecated Use getCredential() instead of
+   */
   getBearerToken(): string {
     return this.credential.getBearerToken();
   }
 
+  /**
+   * @deprecated Use getCredential() instead of
+   */
   getType(): string {
     return this.credential.getType();
   }
@@ -117,7 +135,11 @@ export default class Credential implements ICredential {
     return this.credential.getCredential();
   }
 
-  private load(config: Config, runtime: { [key: string]: any }): void {
+  private load(config: Config, provider: CredentialsProvider): void {
+    if (provider) {
+      this.credential = new InnerCredentialsClient(provider.getProviderName(), provider);
+      return;
+    }
     if (!config) {
       this.credential = new InnerCredentialsClient('default', DefaultCredentialsProvider.builder().build());
       return;
@@ -189,6 +211,8 @@ export default class Credential implements ICredential {
         .withPolicy(config.policy)
         .withDurationSeconds(config.roleSessionExpiration)
         .withStsEndpoint(config.stsEndpoint)
+        .withStsRegionId(config.stsRegionId)
+        .withEnableVpc(config.enableVpc)
         .withReadTimeout(config.timeout)
         .withConnectTimeout(config.connectTimeout)
         .build());
