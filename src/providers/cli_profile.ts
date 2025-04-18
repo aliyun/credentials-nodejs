@@ -6,6 +6,7 @@ import os from 'os';
 import Credentials from '../credentials';
 import CredentialsProvider from '../credentials_provider'
 import StaticAKCredentialsProvider from './static_ak';
+import StaticSTSCredentialsProvider from './static_sts';
 import RAMRoleARNCredentialsProvider from './ram_role_arn';
 import OIDCRoleArnCredentialsProvider from './oidc_role_arn';
 import ECSRAMRoleCredentialsProvider from './ecs_ram_role';
@@ -41,6 +42,7 @@ interface Profile {
   mode: string;
   access_key_id: string;
   access_key_secret: string;
+  sts_token: string;
   region_id: string;
   ram_role_arn: string;
   ram_session_name: string;
@@ -111,6 +113,12 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
       return StaticAKCredentialsProvider.builder()
         .withAccessKeyId(p.access_key_id)
         .withAccessKeySecret(p.access_key_secret)
+        .build();
+    case 'StsToken':
+      return StaticSTSCredentialsProvider.builder()
+        .withAccessKeyId(p.access_key_id)
+        .withAccessKeySecret(p.access_key_secret)
+        .withSecurityToken(p.sts_token)
         .build();
     case 'RamRoleArn': {
       const previousProvider = StaticAKCredentialsProvider.builder()
