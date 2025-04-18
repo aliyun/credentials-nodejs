@@ -102,6 +102,13 @@ describe('CLIProfileCredentialsProvider', function () {
           access_key_secret: 'secret',
         },
         {
+          mode: 'StsToken',
+          name: 'StsToken',
+          access_key_id: 'access_key_id',
+          access_key_secret: 'access_key_secret',
+          sts_token: 'sts_token',
+        },
+        {
           mode: 'RamRoleArn',
           name: 'RamRoleArn',
           access_key_id: 'akid',
@@ -160,6 +167,19 @@ describe('CLIProfileCredentialsProvider', function () {
       .withAccessKeySecret('secret')
       .withProviderName('static_ak')
       .build());
+
+    // STS
+    cp = await (provider as any).getCredentialsProvider(conf, 'StsToken') as CredentialsProvider;
+    assert.strictEqual(cp.getProviderName(), 'static_sts');
+    cc = await cp.getCredentials();
+
+    assert.deepStrictEqual(cc, Credentials.builder()
+      .withAccessKeyId('access_key_id')
+      .withAccessKeySecret('access_key_secret')
+      .withSecurityToken('sts_token')
+      .withProviderName('static_sts')
+      .build());
+
     // RamRoleArn
     cp = await (provider as any).getCredentialsProvider(conf, 'RamRoleArn')
 
