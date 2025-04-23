@@ -32,7 +32,7 @@
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.10",
     "@types/rewire": "^2.5.28",
-    "@typescript-eslint/eslint-plugin": "^6.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^6.18.1",
     "eslint": "^8.56.0",
     "expect.js": "^0.3.1",
