@@ -19,7 +19,7 @@ import ProfileCredentialsProvider from './providers/profile';
 import EnvironmentVariableCredentialsProvider from './providers/env';
 
 export {
-  Config, DefaultCredentialsProvider, CredentialsProvider,
+  CredentialModel, Config, DefaultCredentialsProvider, CredentialsProvider,
   StaticAKCredentialsProvider, StaticSTSCredentialsProvider, RAMRoleARNCredentialsProvider,
   OIDCRoleArnCredentialsProvider, ECSRAMRoleCredentialsProvider, URICredentialsProvider,
   EnvironmentVariableCredentialsProvider, ProfileCredentialsProvider, CLIProfileCredentialsProvider
