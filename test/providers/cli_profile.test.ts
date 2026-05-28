@@ -6,6 +6,8 @@ import CredentialsProvider from '../../src/credentials_provider';
 import ECSRAMRoleCredentialsProvider from '../../src/providers/ecs_ram_role';
 import RAMRoleARNCredentialsProvider from '../../src/providers/ram_role_arn';
 import OIDCRoleArnCredentialsProvider from '../../src/providers/oidc_role_arn';
+import CloudSSOCredentialsProvider from '../../src/providers/cloud_sso';
+import OAuthCredentialsProvider from '../../src/providers/oauth';
 import Credentials from '../../src/credentials';
 
 describe('CLIProfileCredentialsProvider', function () {
@@ -143,6 +145,45 @@ describe('CLIProfileCredentialsProvider', function () {
           source_profile: 'InvalidSource',
         },
         {
+          mode: 'CloudSSO',
+          name: 'CloudSSO',
+          cloud_sso_sign_in_url: 'https://signin.aliyun.com',
+          cloud_sso_account_id: '123456',
+          cloud_sso_access_config: 'config',
+          access_token: 'sso_token',
+          cloud_sso_access_token_expire: Math.floor(Date.now() / 1000) + 3600,
+        },
+        {
+          mode: 'CloudSSO',
+          name: 'CloudSSO_Expired',
+          cloud_sso_sign_in_url: 'https://signin.aliyun.com',
+          cloud_sso_account_id: '123456',
+          cloud_sso_access_config: 'config',
+          access_token: 'expired_token',
+          cloud_sso_access_token_expire: 0,
+        },
+        {
+          mode: 'OAuth',
+          name: 'OAuth_CN',
+          oauth_site_type: 'CN',
+          oauth_refresh_token: 'refreshToken',
+          oauth_access_token: 'accessToken',
+          oauth_access_token_expire: Math.floor(Date.now() / 1000) + 3600,
+        },
+        {
+          mode: 'OAuth',
+          name: 'OAuth_INTL',
+          oauth_site_type: 'INTL',
+          oauth_refresh_token: 'refreshToken',
+          oauth_access_token: 'accessToken',
+          oauth_access_token_expire: Math.floor(Date.now() / 1000) + 3600,
+        },
+        {
+          mode: 'OAuth',
+          name: 'OAuth_Invalid',
+          oauth_site_type: 'INVALID',
+        },
+        {
           mode: 'Unsupported',
           name: 'Unsupported',
         },
@@ -214,6 +255,36 @@ describe('CLIProfileCredentialsProvider', function () {
     } catch (ex) {
       assert.strictEqual(ex.message, "unable to get profile with 'InvalidSource'")
     }
+    // CloudSSO
+    cp = await (provider as any).getCredentialsProvider(conf, 'CloudSSO')
+    assert.ok(cp instanceof CloudSSOCredentialsProvider)
+    assert.strictEqual(cp.getProviderName(), 'cloud_sso');
+
+    // CloudSSO with expired token
+    try {
+      await (provider as any).getCredentialsProvider(conf, 'CloudSSO_Expired')
+      assert.fail();
+    } catch (ex) {
+      assert.strictEqual(ex.message, 'CloudSSO access token is empty or expired, please re-login with cli.');
+    }
+
+    // OAuth CN
+    cp = await (provider as any).getCredentialsProvider(conf, 'OAuth_CN')
+    assert.ok(cp instanceof OAuthCredentialsProvider)
+    assert.strictEqual(cp.getProviderName(), 'oauth');
+
+    // OAuth INTL
+    cp = await (provider as any).getCredentialsProvider(conf, 'OAuth_INTL')
+    assert.ok(cp instanceof OAuthCredentialsProvider)
+
+    // OAuth with invalid site type
+    try {
+      await (provider as any).getCredentialsProvider(conf, 'OAuth_Invalid')
+      assert.fail();
+    } catch (ex) {
+      assert.strictEqual(ex.message, 'invalid OAuth site type, support CN or INTL');
+    }
+
     // Unsupported
     try {
       await (provider as any).getCredentialsProvider(conf, 'Unsupported')

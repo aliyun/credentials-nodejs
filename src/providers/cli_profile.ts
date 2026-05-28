@@ -1,4 +1,4 @@
-import { readFile } from 'fs';
+import { readFile, writeFile } from 'fs';
 import { promisify } from 'util';
 
 import path from 'path';
@@ -10,8 +10,21 @@ import StaticSTSCredentialsProvider from './static_sts';
 import RAMRoleARNCredentialsProvider from './ram_role_arn';
 import OIDCRoleArnCredentialsProvider from './oidc_role_arn';
 import ECSRAMRoleCredentialsProvider from './ecs_ram_role';
+import CloudSSOCredentialsProvider from './cloud_sso';
+import OAuthCredentialsProvider from './oauth';
 
 const readFileAsync = promisify(readFile);
+const writeFileAsync = promisify(writeFile);
+
+const OAUTH_BASE_URL_MAP: { [key: string]: string } = {
+  'CN': 'https://oauth.aliyun.com',
+  'INTL': 'https://oauth.alibabacloud.com',
+};
+
+const OAUTH_CLIENT_MAP: { [key: string]: string } = {
+  'CN': '4038181954557748008',
+  'INTL': '4103531455503354461',
+};
 
 class CLIProfileCredentialsProviderBuilder {
   profileName: string;
@@ -52,9 +65,19 @@ interface Profile {
   ram_role_name: string;
   oidc_token_file: string;
   oidc_provider_arn: string;
-  sts_endpoint: string,
-  enable_vpc: boolean,
-  duration_seconds: number
+  sts_endpoint: string;
+  enable_vpc: boolean;
+  duration_seconds: number;
+  cloud_sso_sign_in_url: string;
+  cloud_sso_account_id: string;
+  cloud_sso_access_config: string;
+  access_token: string;
+  cloud_sso_access_token_expire: number;
+  oauth_site_type: string;
+  oauth_refresh_token: string;
+  oauth_access_token: string;
+  oauth_access_token_expire: number;
+  sts_expiration: number;
 }
 
 class Configuration {
@@ -104,6 +127,45 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
 
   constructor(builder: CLIProfileCredentialsProviderBuilder) {
     this.profileName = builder.profileName;
+  }
+
+  private createOAuthTokenUpdateCallback(conf: Configuration, profileName: string) {
+    return async (refreshToken: string, accessToken: string, accessKeyId: string,
+                  accessKeySecret: string, securityToken: string,
+                  accessTokenExpire: number, stsExpire: number): Promise<void> => {
+      try {
+        const cfgPath = path.join(this.homedir, '.aliyun/config.json');
+        const content = await readFileAsync(cfgPath, 'utf8');
+        const config = JSON.parse(content) as Configuration;
+        if (!config || !config.profiles) return;
+
+        const oauthProfile = this.findOAuthProfile(config, profileName);
+        if (!oauthProfile) return;
+
+        oauthProfile.oauth_refresh_token = refreshToken;
+        oauthProfile.oauth_access_token = accessToken;
+        oauthProfile.oauth_access_token_expire = accessTokenExpire;
+        oauthProfile.access_key_id = accessKeyId;
+        oauthProfile.access_key_secret = accessKeySecret;
+        oauthProfile.sts_token = securityToken;
+        oauthProfile.sts_expiration = stsExpire;
+
+        await writeFileAsync(cfgPath, JSON.stringify(config, null, 4), 'utf8');
+      } catch (e) {
+        // Warning only
+      }
+    };
+  }
+
+  private findOAuthProfile(conf: Configuration, profileName: string): Profile | null {
+    for (const p of conf.profiles) {
+      if (p.name === profileName) {
+        if (p.mode === 'OAuth') return p;
+        if (p.source_profile) return this.findOAuthProfile(conf, p.source_profile);
+        return null;
+      }
+    }
+    return null;
   }
 
   private getCredentialsProvider(conf: Configuration, profileName: string): CredentialsProvider {
@@ -157,6 +219,30 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
         .withRoleSessionName(p.ram_session_name)
         .withDurationSeconds(p.expired_seconds)
         .withStsRegionId(p.sts_region)
+        .build();
+    }
+    case 'CloudSSO':
+      return CloudSSOCredentialsProvider.builder()
+        .withSignInUrl(p.cloud_sso_sign_in_url)
+        .withAccountId(p.cloud_sso_account_id)
+        .withAccessConfig(p.cloud_sso_access_config)
+        .withAccessToken(p.access_token)
+        .withAccessTokenExpire(p.cloud_sso_access_token_expire)
+        .build();
+    case 'OAuth': {
+      const siteType = (p.oauth_site_type || '').toUpperCase();
+      const oauthSignInUrl = OAUTH_BASE_URL_MAP[siteType];
+      if (!oauthSignInUrl) {
+        throw new Error('invalid OAuth site type, support CN or INTL');
+      }
+      const oauthClientId = OAUTH_CLIENT_MAP[siteType];
+      return OAuthCredentialsProvider.builder()
+        .withSignInUrl(oauthSignInUrl)
+        .withClientId(oauthClientId)
+        .withRefreshToken(p.oauth_refresh_token)
+        .withAccessToken(p.oauth_access_token)
+        .withAccessTokenExpire(p.oauth_access_token_expire)
+        .withTokenUpdateCallback(this.createOAuthTokenUpdateCallback(conf, profileName))
         .build();
     }
     default:
