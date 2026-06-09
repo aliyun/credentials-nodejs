@@ -12,6 +12,7 @@ import OIDCRoleArnCredentialsProvider from './oidc_role_arn';
 import ECSRAMRoleCredentialsProvider from './ecs_ram_role';
 import CloudSSOCredentialsProvider from './cloud_sso';
 import OAuthCredentialsProvider from './oauth';
+import ExternalCredentialsProvider from './external';
 
 const readFileAsync = promisify(readFile);
 const writeFileAsync = promisify(writeFile);
@@ -77,6 +78,7 @@ interface Profile {
   oauth_refresh_token: string;
   oauth_access_token: string;
   oauth_access_token_expire: number;
+  process_command: string;
   sts_expiration: number;
 }
 
@@ -168,6 +170,40 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
     return null;
   }
 
+  private createExternalCredentialUpdateCallback(conf: Configuration, profileName: string) {
+    return async (accessKeyId: string, accessKeySecret: string, securityToken: string, expiration: number): Promise<void> => {
+      try {
+        const cfgPath = path.join(this.homedir, '.aliyun/config.json');
+        const content = await readFileAsync(cfgPath, 'utf8');
+        const config = JSON.parse(content) as Configuration;
+        if (!config || !config.profiles) return;
+
+        const externalProfile = this.findExternalProfile(config, profileName);
+        if (!externalProfile) return;
+
+        externalProfile.access_key_id = accessKeyId;
+        externalProfile.access_key_secret = accessKeySecret;
+        externalProfile.sts_token = securityToken;
+        externalProfile.sts_expiration = expiration;
+
+        await writeFileAsync(cfgPath, JSON.stringify(config, null, 4), 'utf8');
+      } catch (e) {
+        // Warning only
+      }
+    };
+  }
+
+  private findExternalProfile(conf: Configuration, profileName: string): Profile | null {
+    for (const p of conf.profiles) {
+      if (p.name === profileName) {
+        if (p.mode === 'External') return p;
+        if (p.source_profile) return this.findExternalProfile(conf, p.source_profile);
+        return null;
+      }
+    }
+    return null;
+  }
+
   private getCredentialsProvider(conf: Configuration, profileName: string): CredentialsProvider {
     const p = getProfile(conf, profileName);
     switch (p.mode) {
@@ -245,6 +281,11 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
         .withTokenUpdateCallback(this.createOAuthTokenUpdateCallback(conf, profileName))
         .build();
     }
+    case 'External':
+      return ExternalCredentialsProvider.builder()
+        .withProcessCommand(p.process_command)
+        .withCredentialUpdateCallback(this.createExternalCredentialUpdateCallback(conf, profileName))
+        .build();
     default:
       throw new Error(`unsupported profile mode '${p.mode}'`);
     }

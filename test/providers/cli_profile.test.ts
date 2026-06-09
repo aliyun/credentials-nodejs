@@ -8,6 +8,7 @@ import RAMRoleARNCredentialsProvider from '../../src/providers/ram_role_arn';
 import OIDCRoleArnCredentialsProvider from '../../src/providers/oidc_role_arn';
 import CloudSSOCredentialsProvider from '../../src/providers/cloud_sso';
 import OAuthCredentialsProvider from '../../src/providers/oauth';
+import ExternalCredentialsProvider from '../../src/providers/external';
 import Credentials from '../../src/credentials';
 
 describe('CLIProfileCredentialsProvider', function () {
@@ -184,6 +185,11 @@ describe('CLIProfileCredentialsProvider', function () {
           oauth_site_type: 'INVALID',
         },
         {
+          mode: 'External',
+          name: 'External',
+          process_command: '/bin/echo {"mode":"AK","access_key_id":"ak","access_key_secret":"sk"}',
+        },
+        {
           mode: 'Unsupported',
           name: 'Unsupported',
         },
@@ -284,6 +290,11 @@ describe('CLIProfileCredentialsProvider', function () {
     } catch (ex) {
       assert.strictEqual(ex.message, 'invalid OAuth site type, support CN or INTL');
     }
+
+    // External
+    cp = await (provider as any).getCredentialsProvider(conf, 'External')
+    assert.ok(cp instanceof ExternalCredentialsProvider)
+    assert.strictEqual(cp.getProviderName(), 'external');
 
     // Unsupported
     try {
