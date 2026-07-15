@@ -223,17 +223,19 @@ describe('ProfileCredentialsProvider', function () {
       await provider.getCredentials();
       assert.fail();
     } catch (ex) {
-      assert.strictEqual(ex.message, `ENOENT: no such file or directory, access '/path/invalid/home/dir/.alibabacloud/credentials'`);
+      const expected = path.join('/path/invalid/home/dir', '.alibabacloud/credentials');
+      assert.strictEqual(ex.message, `ENOENT: no such file or directory, access '${expected}'`);
     }
 
     // testcase: specify credentials file with env
-    process.env.ALIBABA_CLOUD_CREDENTIALS_FILE = '/path/to/credentials.invalid';
+    const invalidCredsFile = path.join('/path/to', 'credentials.invalid');
+    process.env.ALIBABA_CLOUD_CREDENTIALS_FILE = invalidCredsFile;
     provider = ProfileCredentialsProvider.builder().withProfileName('custom').build()
     try {
       await provider.getCredentials();
       assert.fail();
     } catch (ex) {
-      assert.strictEqual(ex.message, `ENOENT: no such file or directory, access '/path/to/credentials.invalid'`);
+      assert.strictEqual(ex.message, `ENOENT: no such file or directory, access '${invalidCredsFile}'`);
     }
     delete process.env.ALIBABA_CLOUD_CREDENTIALS_FILE;
 
