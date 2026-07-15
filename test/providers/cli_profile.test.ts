@@ -321,7 +321,8 @@ describe('CLIProfileCredentialsProvider', function () {
       await (provider as any).getCredentials();
       assert.fail();
     } catch (ex) {
-      assert.strictEqual(ex.message, "reading aliyun cli config from '/path/invalid/home/dir/.aliyun/config.json' failed.")
+      const expected = path.join('/path/invalid/home/dir', '.aliyun', 'config.json');
+      assert.strictEqual(ex.message, `reading aliyun cli config from '${expected}' failed.`)
     }
 
     // get credentials by current profile
