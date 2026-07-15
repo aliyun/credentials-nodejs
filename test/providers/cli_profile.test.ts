@@ -366,4 +366,141 @@ describe('CLIProfileCredentialsProvider', function () {
     }
   });
 
+
+  it('default config path uses path.join', async function () {
+    const provider = CLIProfileCredentialsProvider.builder().build();
+    (provider as any).homedir = path.join(__dirname, '../fixtures');
+    const expected = path.join((provider as any).homedir, '.aliyun', 'config.json');
+    assert.ok(expected.endsWith(path.join('.aliyun', 'config.json')));
+    const cc = await provider.getCredentials();
+    assert.strictEqual(cc.accessKeyId, 'akid');
+  });
+
+  it('OAuth token update callback should overwrite existing config.json', async function () {
+    const fs = require('fs');
+    const os = require('os');
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cred-oauth-'));
+    const aliyunDir = path.join(tempDir, '.aliyun');
+    fs.mkdirSync(aliyunDir);
+    const cfgPath = path.join(aliyunDir, 'config.json');
+    const conf = {
+      current: 'OAuth_CN',
+      profiles: [
+        {
+          mode: 'OAuth',
+          name: 'OAuth_CN',
+          oauth_site_type: 'CN',
+          oauth_refresh_token: 'old_refresh',
+          oauth_access_token: 'old_access',
+          oauth_access_token_expire: Math.floor(Date.now() / 1000) + 3600,
+        },
+        {
+          mode: 'ChainableRamRoleArn',
+          name: 'via_oauth',
+          source_profile: 'OAuth_CN',
+          ram_role_arn: 'arn',
+        },
+      ],
+    };
+    fs.writeFileSync(cfgPath, JSON.stringify(conf, null, 4));
+
+    try {
+      const provider = CLIProfileCredentialsProvider.builder()
+        .withProfileName('OAuth_CN')
+        .build();
+      (provider as any).homedir = tempDir;
+
+      const callback = (provider as any).createOAuthTokenUpdateCallback(conf, 'OAuth_CN');
+      await callback('new_refresh', 'new_access', 'ak', 'sk', 'sts', 111, 222);
+
+      const updated = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+      assert.strictEqual(updated.profiles[0].oauth_refresh_token, 'new_refresh');
+      assert.strictEqual(updated.profiles[0].oauth_access_token, 'new_access');
+      assert.strictEqual(updated.profiles[0].access_key_id, 'ak');
+      assert.strictEqual(updated.profiles[0].access_key_secret, 'sk');
+      assert.strictEqual(updated.profiles[0].sts_token, 'sts');
+      assert.strictEqual(updated.profiles[0].oauth_access_token_expire, 111);
+      assert.strictEqual(updated.profiles[0].sts_expiration, 222);
+
+      const viaCallback = (provider as any).createOAuthTokenUpdateCallback(conf, 'via_oauth');
+      await viaCallback('chain_refresh', 'chain_access', 'ak2', 'sk2', 'sts2', 333, 444);
+      const chained = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+      assert.strictEqual(chained.profiles[0].oauth_refresh_token, 'chain_refresh');
+
+      const noop = (provider as any).createOAuthTokenUpdateCallback(conf, 'missing');
+      await noop('x', 'y', 'a', 'b', 'c', 1, 2);
+
+      (provider as any).homedir = path.join(tempDir, 'not-exist');
+      const broken = (provider as any).createOAuthTokenUpdateCallback(conf, 'OAuth_CN');
+      await broken('x', 'y', 'a', 'b', 'c', 1, 2);
+    } finally {
+      try {
+        fs.unlinkSync(cfgPath);
+        fs.rmdirSync(aliyunDir);
+        fs.rmdirSync(tempDir);
+      } catch (e) { /* ignore */ }
+    }
+  });
+
+  it('External credential update callback should overwrite existing config.json', async function () {
+    const fs = require('fs');
+    const os = require('os');
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cred-ext-'));
+    const aliyunDir = path.join(tempDir, '.aliyun');
+    fs.mkdirSync(aliyunDir);
+    const cfgPath = path.join(aliyunDir, 'config.json');
+    const conf = {
+      current: 'External',
+      profiles: [
+        {
+          mode: 'External',
+          name: 'External',
+          process_command: 'echo',
+          access_key_id: 'old',
+          access_key_secret: 'old',
+        },
+        {
+          mode: 'ChainableRamRoleArn',
+          name: 'via_ext',
+          source_profile: 'External',
+          ram_role_arn: 'arn',
+        },
+      ],
+    };
+    fs.writeFileSync(cfgPath, JSON.stringify(conf, null, 4));
+
+    try {
+      const provider = CLIProfileCredentialsProvider.builder()
+        .withProfileName('External')
+        .build();
+      (provider as any).homedir = tempDir;
+
+      const callback = (provider as any).createExternalCredentialUpdateCallback(conf, 'External');
+      await callback('new_ak', 'new_sk', 'new_sts', 999);
+      const updated = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+      assert.strictEqual(updated.profiles[0].access_key_id, 'new_ak');
+      assert.strictEqual(updated.profiles[0].access_key_secret, 'new_sk');
+      assert.strictEqual(updated.profiles[0].sts_token, 'new_sts');
+      assert.strictEqual(updated.profiles[0].sts_expiration, 999);
+
+      const viaCallback = (provider as any).createExternalCredentialUpdateCallback(conf, 'via_ext');
+      await viaCallback('ak2', 'sk2', 'sts2', 1000);
+      const chained = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+      assert.strictEqual(chained.profiles[0].access_key_id, 'ak2');
+
+      const noop = (provider as any).createExternalCredentialUpdateCallback(conf, 'missing');
+      await noop('a', 'b', 'c', 1);
+
+      (provider as any).homedir = path.join(tempDir, 'not-exist');
+      const broken = (provider as any).createExternalCredentialUpdateCallback(conf, 'External');
+      await broken('a', 'b', 'c', 1);
+    } finally {
+      try {
+        fs.unlinkSync(cfgPath);
+        fs.rmdirSync(aliyunDir);
+        fs.rmdirSync(tempDir);
+      } catch (e) { /* ignore */ }
+    }
+  });
+
 });
