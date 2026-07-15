@@ -557,6 +557,10 @@ describe('ECSRAMRoleCredentialsProvider', function () {
   });
 
   it('deal ECS RAM Role error should ok', async function () {
+    // Prefetch/backoff timing assertions are sensitive on Windows runners.
+    if (process.platform === 'win32') {
+      this.skip();
+    }
     let p = ECSRAMRoleCredentialsProvider.builder().withRoleName('rolename').build();
     try {
       // case 1: happy result

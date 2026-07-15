@@ -79,6 +79,7 @@ private_key_file = ./pk_error.pem
 import 'mocha';
 import assert from 'assert'
 import path from 'path';
+import os from 'os';
 
 import ProfileCredentialsProvider from '../../src/providers/profile';
 import Credentials from '../../src/credentials';
@@ -218,17 +219,19 @@ describe('ProfileCredentialsProvider', function () {
 
     // testcase: invalid home
     provider = ProfileCredentialsProvider.builder().withProfileName('custom').build();
-    (provider as any).homedir = '/path/invalid/home/dir';
+    const invalidHome = path.join(os.tmpdir(), 'aone-84300068-missing-home');
+    (provider as any).homedir = invalidHome;
     try {
       await provider.getCredentials();
       assert.fail();
     } catch (ex) {
-      const expected = path.join('/path/invalid/home/dir', '.alibabacloud/credentials');
+      // Match production: path.join(homedir, '.alibabacloud/credentials')
+      const expected = path.join(invalidHome, '.alibabacloud/credentials');
       assert.strictEqual(ex.message, `ENOENT: no such file or directory, access '${expected}'`);
     }
 
     // testcase: specify credentials file with env
-    const invalidCredsFile = path.join('/path/to', 'credentials.invalid');
+    const invalidCredsFile = path.join(os.tmpdir(), 'aone-84300068-credentials.invalid');
     process.env.ALIBABA_CLOUD_CREDENTIALS_FILE = invalidCredsFile;
     provider = ProfileCredentialsProvider.builder().withProfileName('custom').build()
     try {
