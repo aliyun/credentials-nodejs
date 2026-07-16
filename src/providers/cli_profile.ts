@@ -136,7 +136,7 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
                   accessKeySecret: string, securityToken: string,
                   accessTokenExpire: number, stsExpire: number): Promise<void> => {
       try {
-        const cfgPath = path.join(this.homedir, '.aliyun/config.json');
+        const cfgPath = path.join(this.homedir, '.aliyun', 'config.json');
         const content = await readFileAsync(cfgPath, 'utf8');
         const config = JSON.parse(content) as Configuration;
         if (!config || !config.profiles) return;
@@ -173,7 +173,7 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
   private createExternalCredentialUpdateCallback(conf: Configuration, profileName: string) {
     return async (accessKeyId: string, accessKeySecret: string, securityToken: string, expiration: number): Promise<void> => {
       try {
-        const cfgPath = path.join(this.homedir, '.aliyun/config.json');
+        const cfgPath = path.join(this.homedir, '.aliyun', 'config.json');
         const content = await readFileAsync(cfgPath, 'utf8');
         const config = JSON.parse(content) as Configuration;
         if (!config || !config.profiles) return;
@@ -297,7 +297,7 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
         throw new Error('cannot found home dir');
       }
 
-      const cfgPath = path.join(this.homedir, '.aliyun/config.json');
+      const cfgPath = path.join(this.homedir, '.aliyun', 'config.json');
 
       const conf = await getConfiguration(cfgPath);
       const profileName = this.profileName || conf.current;
