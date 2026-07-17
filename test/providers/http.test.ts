@@ -1,5 +1,6 @@
 import 'mocha';
 import assert from 'assert'
+import http, { Server } from 'http';
 
 import {Request, doRequest} from '../../src/providers/http';
 
@@ -30,9 +31,31 @@ describe('Request', function () {
 });
 
 describe('doRequest', function () {
+  let server: Server;
+  let host: string;
+
+  before(function (done) {
+    server = http.createServer((_req, res) => {
+      res.writeHead(200, {'content-type': 'text/html'});
+      res.end('<html>ok</html>');
+    });
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address();
+      if (!address || typeof address === 'string') {
+        done(new Error('test server did not bind to a TCP port'));
+        return;
+      }
+      host = `127.0.0.1:${address.port}`;
+      done();
+    });
+  });
+
+  after(function (done) {
+    server.close(done);
+  });
 
   it('should ok', async function () {
-    const req = Request.builder().withHost('www.baidu.com').build();
+    const req = Request.builder().withProtocol('http').withHost(host).build();
     const res = await doRequest(req);
     assert.strictEqual(res.statusCode, 200);
     assert.strictEqual(res.headers['content-type'], 'text/html');
@@ -42,7 +65,8 @@ describe('doRequest', function () {
 
   it('should ok with queries', async function () {
     const req = Request.builder()
-      .withHost('www.baidu.com')
+      .withProtocol('http')
+      .withHost(host)
       .withQueries({'key': 'value'})
       .build();
     const res = await doRequest(req);
@@ -54,7 +78,8 @@ describe('doRequest', function () {
 
   it('should ok with headers', async function () {
     const req = Request.builder()
-      .withHost('www.baidu.com')
+      .withProtocol('http')
+      .withHost(host)
       .withQueries({'key': 'value'})
       .withHeaders({'key': 'value'})
       .build();
