@@ -34,6 +34,13 @@ describe('splitProcessCommand', function () {
     ]);
   });
 
+  it('should keep JSON double-quotes inside single-quoted arg', function () {
+    expect(splitProcessCommand('/bin/echo \'{"mode":"AK","access_key_id":"ak"}\'')).to.eql([
+      '/bin/echo',
+      '{"mode":"AK","access_key_id":"ak"}',
+    ]);
+  });
+
   it('should support escaped spaces outside quotes', function () {
     expect(splitProcessCommand('tool arg\\ with\\ space')).to.eql([
       'tool',
