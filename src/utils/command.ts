@@ -12,11 +12,15 @@ export function splitProcessCommand(command: string): string[] {
   let current = '';
   let inSingle = false;
   let inDouble = false;
+  // Tracks that a token has started even if it is empty, so quoted empty
+  // arguments like `tool "" arg` keep their empty argv element.
+  let hasToken = false;
 
   const flush = () => {
-    if (current.length > 0) {
+    if (hasToken) {
       args.push(current);
       current = '';
+      hasToken = false;
     }
   };
 
@@ -50,21 +54,25 @@ export function splitProcessCommand(command: string): string[] {
       if (i + 1 >= input.length) {
         throw new Error('invalid process_command: trailing backslash');
       }
+      hasToken = true;
       current += input[++i];
       continue;
     }
     if (c === "'") {
       inSingle = true;
+      hasToken = true;
       continue;
     }
     if (c === '"') {
       inDouble = true;
+      hasToken = true;
       continue;
     }
     if (/\s/.test(c)) {
       flush();
       continue;
     }
+    hasToken = true;
     current += c;
   }
 
@@ -72,7 +80,7 @@ export function splitProcessCommand(command: string): string[] {
     throw new Error('invalid process_command: unclosed quote');
   }
   flush();
-  if (args.length === 0) {
+  if (args.length === 0 || args[0] === '') {
     throw new Error('process_command is empty');
   }
   return args;

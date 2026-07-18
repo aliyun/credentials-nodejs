@@ -55,6 +55,18 @@ describe('splitProcessCommand', function () {
     ]);
   });
 
+  it('should keep empty double-quoted argument', function () {
+    expect(splitProcessCommand('tool "" arg')).to.eql(['tool', '', 'arg']);
+  });
+
+  it('should keep empty single-quoted argument', function () {
+    expect(splitProcessCommand("tool '' arg")).to.eql(['tool', '', 'arg']);
+  });
+
+  it('should merge adjacent quoted segments into one argument', function () {
+    expect(splitProcessCommand('tool "a b"\'c d\'')).to.eql(['tool', 'a bc d']);
+  });
+
   it('should reject empty command', function () {
     expect(() => splitProcessCommand('   ')).to.throwError(/process_command is empty/);
   });
