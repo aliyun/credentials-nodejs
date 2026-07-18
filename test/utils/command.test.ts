@@ -94,6 +94,14 @@ describe('splitProcessCommand', function () {
     expect(splitProcessCommand('tool "a b"\'c d\'')).to.eql(['tool', 'a bc d']);
   });
 
+  it('should treat backslash-newline outside quotes as line continuation on unix', function () {
+    expect(splitProcessCommand('tool arg1 \\\n arg2', false)).to.eql(['tool', 'arg1', 'arg2']);
+  });
+
+  it('should treat backslash-newline inside double quotes as line continuation on unix', function () {
+    expect(splitProcessCommand('tool "a\\\nb"', false)).to.eql(['tool', 'ab']);
+  });
+
   it('should reject empty command', function () {
     expect(() => splitProcessCommand('   ')).to.throwError(/process_command is empty/);
   });
