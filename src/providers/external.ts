@@ -2,6 +2,7 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import Credentials from '../credentials';
 import CredentialsProvider from '../credentials_provider';
+import { splitProcessCommand } from '../utils/command';
 
 const execFileAsync = promisify(execFile);
 const EXPIRATION_SLOT_SECONDS = 180;
@@ -78,10 +79,7 @@ export default class ExternalCredentialsProvider implements CredentialsProvider 
   }
 
   private async getCredentialsInternal(): Promise<ExternalCredentialResponse> {
-    const args = this.processCommand.trim().split(/\s+/).filter(Boolean);
-    if (args.length === 0) {
-      throw new Error('process_command is empty');
-    }
+    const args = splitProcessCommand(this.processCommand);
 
     let stdout: string;
     try {

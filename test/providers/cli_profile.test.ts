@@ -187,7 +187,7 @@ describe('CLIProfileCredentialsProvider', function () {
         {
           mode: 'External',
           name: 'External',
-          process_command: '/bin/echo {"mode":"AK","access_key_id":"ak","access_key_secret":"sk"}',
+          process_command: '/bin/echo \'{"mode":"AK","access_key_id":"ak","access_key_secret":"sk"}\'',
         },
         {
           mode: 'Unsupported',

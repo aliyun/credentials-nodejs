@@ -24,7 +24,8 @@ describe('ExternalCredentialsProvider', function () {
 
     it('should return AK credentials', async function () {
       const p = ExternalCredentialsProvider.builder()
-        .withProcessCommand('/bin/echo {"mode":"AK","access_key_id":"ak","access_key_secret":"sk"}')
+        // JSON must be single-quoted so shlex-like split keeps " inside the arg.
+        .withProcessCommand('/bin/echo \'{"mode":"AK","access_key_id":"ak","access_key_secret":"sk"}\'')
         .build();
 
       const creds = await p.getCredentials();
@@ -37,7 +38,7 @@ describe('ExternalCredentialsProvider', function () {
     it('should return STS credentials and invoke callback', async function () {
       let callbackArgs: any[] = [];
       const p = ExternalCredentialsProvider.builder()
-        .withProcessCommand('/bin/echo {"mode":"StsToken","access_key_id":"ak","access_key_secret":"sk","sts_token":"token","expiration":"2049-10-20T04:27:09Z"}')
+        .withProcessCommand('/bin/echo \'{"mode":"StsToken","access_key_id":"ak","access_key_secret":"sk","sts_token":"token","expiration":"2049-10-20T04:27:09Z"}\'')
         .withCredentialUpdateCallback((accessKeyId, accessKeySecret, securityToken, expiration) => {
           callbackArgs = [accessKeyId, accessKeySecret, securityToken, expiration];
         })
@@ -54,7 +55,7 @@ describe('ExternalCredentialsProvider', function () {
     it('should refresh on every call when expiration is absent', async function () {
       let callbackCount = 0;
       const p = ExternalCredentialsProvider.builder()
-        .withProcessCommand('/bin/echo {"mode":"AK","access_key_id":"ak","access_key_secret":"sk"}')
+        .withProcessCommand('/bin/echo \'{"mode":"AK","access_key_id":"ak","access_key_secret":"sk"}\'')
         .withCredentialUpdateCallback(() => {
           callbackCount++;
         })
@@ -67,7 +68,7 @@ describe('ExternalCredentialsProvider', function () {
 
     it('should ignore callback errors', async function () {
       const p = ExternalCredentialsProvider.builder()
-        .withProcessCommand('/bin/echo {"mode":"AK","access_key_id":"ak","access_key_secret":"sk"}')
+        .withProcessCommand('/bin/echo \'{"mode":"AK","access_key_id":"ak","access_key_secret":"sk"}\'')
         .withCredentialUpdateCallback(() => {
           throw new Error('callback error');
         })
@@ -79,7 +80,7 @@ describe('ExternalCredentialsProvider', function () {
 
     it('should validate response fields', async function () {
       const p = ExternalCredentialsProvider.builder()
-        .withProcessCommand('/bin/echo {"mode":"StsToken","access_key_id":"ak","access_key_secret":"sk"}')
+        .withProcessCommand('/bin/echo \'{"mode":"StsToken","access_key_id":"ak","access_key_secret":"sk"}\'')
         .build();
 
       try {

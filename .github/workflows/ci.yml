@@ -27,7 +27,24 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Build
-      run: npm install
+      run: |
+        npm config set fetch-retries 5
+        npm config set fetch-retry-mintimeout 20000
+        npm config set fetch-retry-maxtimeout 120000
+        # Mitigate intermittent registry socket timeouts (ERR_SOCKET_TIMEOUT).
+        # On failure, wipe node_modules so retry is a clean install — partial
+        # trees leave packages like diff missing files (MODULE_NOT_FOUND).
+        ok=0
+        for i in 1 2 3; do
+          if npm install; then
+            ok=1
+            break
+          fi
+          echo "npm install failed (attempt $i), cleaning and retrying..."
+          rm -rf node_modules
+          sleep 15
+        done
+        test "$ok" -eq 1
 
     - name: Unit Test
       run: npm run ci
@@ -82,7 +99,25 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Build
-      run: npm install
+      shell: bash
+      run: |
+        npm config set fetch-retries 5
+        npm config set fetch-retry-mintimeout 20000
+        npm config set fetch-retry-maxtimeout 120000
+        # Mitigate intermittent registry socket timeouts (ERR_SOCKET_TIMEOUT).
+        # On failure, wipe node_modules so retry is a clean install — partial
+        # trees leave packages like diff missing files (MODULE_NOT_FOUND).
+        ok=0
+        for i in 1 2 3; do
+          if npm install; then
+            ok=1
+            break
+          fi
+          echo "npm install failed (attempt $i), cleaning and retrying..."
+          rm -rf node_modules
+          sleep 15
+        done
+        test "$ok" -eq 1
 
     - name: Unit Test
       run: npm run ci
