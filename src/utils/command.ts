@@ -1,8 +1,16 @@
 /**
- * Split process_command into argv with quote support (POSIX shlex-like).
+ * Split process_command into argv with quote support.
  * Allows quoted Windows paths such as "C:\\Program Files\\tool.exe".
+ *
+ * On Unix, escape rules follow POSIX shlex: outside quotes, '\' escapes the
+ * next char; inside double quotes, '\' only escapes '"', '\', '$', '`' and
+ * newline; inside single quotes, all characters are literal.
+ *
+ * On Windows, '\' is a path separator and is treated as a literal (except
+ * '\"' inside double quotes), so unquoted paths like C:\tools\cred.exe keep
+ * their backslashes.
  */
-export function splitProcessCommand(command: string): string[] {
+export function splitProcessCommand(command: string, windows: boolean = process.platform === 'win32'): string[] {
   const input = (command || '').trim();
   if (!input) {
     throw new Error('process_command is empty');
@@ -41,7 +49,14 @@ export function splitProcessCommand(command: string): string[] {
       }
       if (c === '\\' && i + 1 < input.length) {
         const next = input[i + 1];
-        if (next === '"' || next === '\\' || next === '$' || next === '`' || next === '\n') {
+        if (windows) {
+          // On Windows only \" is an escape inside double quotes.
+          if (next === '"') {
+            current += next;
+            i++;
+            continue;
+          }
+        } else if (next === '"' || next === '\\' || next === '$' || next === '`' || next === '\n') {
           current += next;
           i++;
           continue;
@@ -51,6 +66,12 @@ export function splitProcessCommand(command: string): string[] {
       continue;
     }
     if (c === '\\') {
+      if (windows) {
+        // Path separator — keep literal.
+        hasToken = true;
+        current += c;
+        continue;
+      }
       if (i + 1 >= input.length) {
         throw new Error('invalid process_command: trailing backslash');
       }

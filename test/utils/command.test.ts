@@ -11,7 +11,7 @@ describe('splitProcessCommand', function () {
   });
 
   it('should keep windows path with spaces inside double quotes', function () {
-    expect(splitProcessCommand('"C:\\Program Files\\tool\\cred.exe" get --profile default')).to.eql([
+    expect(splitProcessCommand('"C:\\Program Files\\tool\\cred.exe" get --profile default', true)).to.eql([
       'C:\\Program Files\\tool\\cred.exe',
       'get',
       '--profile',
@@ -41,17 +41,44 @@ describe('splitProcessCommand', function () {
     ]);
   });
 
-  it('should support escaped spaces outside quotes', function () {
-    expect(splitProcessCommand('tool arg\\ with\\ space')).to.eql([
+  it('should keep backslashes inside single-quoted arg on unix', function () {
+    expect(splitProcessCommand('/usr/bin/printf \'\\173\\042mode\\042\\175\'', false)).to.eql([
+      '/usr/bin/printf',
+      '\\173\\042mode\\042\\175',
+    ]);
+  });
+
+  it('should support escaped spaces outside quotes on unix', function () {
+    expect(splitProcessCommand('tool arg\\ with\\ space', false)).to.eql([
       'tool',
       'arg with space',
     ]);
   });
 
-  it('should support escaped quote inside double quotes', function () {
-    expect(splitProcessCommand('tool "say \\"hi\\""')).to.eql([
+  it('should support escaped quote inside double quotes on unix', function () {
+    expect(splitProcessCommand('tool "say \\"hi\\""', false)).to.eql([
       'tool',
       'say "hi"',
+    ]);
+  });
+
+  it('should keep unquoted windows path backslashes on windows', function () {
+    expect(splitProcessCommand('C:\\tools\\cred.exe get', true)).to.eql([
+      'C:\\tools\\cred.exe',
+      'get',
+    ]);
+  });
+
+  it('should support escaped quote inside double quotes on windows', function () {
+    expect(splitProcessCommand('tool "say \\"hi\\""', true)).to.eql([
+      'tool',
+      'say "hi"',
+    ]);
+  });
+
+  it('should keep backslashes inside double quotes on windows', function () {
+    expect(splitProcessCommand('"C:\\Program Files\\tool.exe"', true)).to.eql([
+      'C:\\Program Files\\tool.exe',
     ]);
   });
 
@@ -79,7 +106,7 @@ describe('splitProcessCommand', function () {
     expect(() => splitProcessCommand('"C:\\Program Files\\tool.exe')).to.throwError(/unclosed quote/);
   });
 
-  it('should reject trailing backslash', function () {
-    expect(() => splitProcessCommand('tool\\')).to.throwError(/trailing backslash/);
+  it('should reject trailing backslash on unix', function () {
+    expect(() => splitProcessCommand('tool\\', false)).to.throwError(/trailing backslash/);
   });
 });
