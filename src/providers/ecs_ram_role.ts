@@ -8,6 +8,7 @@ const defaultMetadataTokenDuration = 21600; // 6 hours
 export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProvider implements CredentialsProvider {
   private readonly roleName: string
   private readonly disableIMDSv1: boolean
+  private readonly enableIMDSv2: boolean
   // for refresher
   private checker: NodeJS.Timeout
   // for mock
@@ -25,6 +26,7 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
     this.refresher = this.getCredentialsInternal;
     this.roleName = builder.roleName;
     this.disableIMDSv1 = builder.disableIMDSv1;
+    this.enableIMDSv2 = builder.enableIMDSv2;
     this.readTimeout = builder.readTimeout;
     this.connectTimeout = builder.connectTimeout;
     this.checker = null;
@@ -56,7 +58,14 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
     }
   }
 
+  private shouldFallbackToIMDSv1(metadataToken: string): boolean {
+    return metadataToken !== null && !this.disableIMDSv1;
+  }
+
   private async getMetadataToken(): Promise<string> {
+    if (!this.enableIMDSv2) {
+      return null;
+    }
     // PUT http://100.100.100.200/latest/api/token
     const request = Request.builder()
       .withMethod('PUT')
@@ -88,6 +97,18 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
   }
 
   private async getRoleName(): Promise<string> {
+    const metadataToken = await this.getMetadataToken();
+    try {
+      return await this.doGetRoleName(metadataToken);
+    } catch (error) {
+      if (this.shouldFallbackToIMDSv1(metadataToken)) {
+        return await this.doGetRoleName(null);
+      }
+      throw error;
+    }
+  }
+
+  private async doGetRoleName(metadataToken: string): Promise<string> {
     const builder = Request.builder()
       .withMethod('GET')
       .withProtocol('http')
@@ -96,7 +117,6 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
       .withReadTimeout(this.readTimeout || 1000)
       .withConnectTimeout(this.connectTimeout || 1000);
 
-    const metadataToken = await this.getMetadataToken();
     if (metadataToken !== null) {
       builder.withHeaders({
         'x-aliyun-ecs-metadata-token': metadataToken
@@ -122,6 +142,18 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
       roleName = await this.getRoleName();
     }
 
+    const metadataToken = await this.getMetadataToken();
+    try {
+      return await this.doGetCredentials(roleName, metadataToken);
+    } catch (error) {
+      if (this.shouldFallbackToIMDSv1(metadataToken)) {
+        return await this.doGetCredentials(roleName, null);
+      }
+      throw error;
+    }
+  }
+
+  private async doGetCredentials(roleName: string, metadataToken: string): Promise<Session> {
     const builder = Request.builder()
       .withMethod('GET')
       .withProtocol('http')
@@ -134,7 +166,6 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
     //   ReadTimeout: 5 * time.Second,
     //     Headers: map[string]string{ },
 
-    const metadataToken = await this.getMetadataToken();
     if (metadataToken !== null) {
       builder.withHeaders({
         'x-aliyun-ecs-metadata-token': metadataToken
@@ -173,12 +204,16 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
 class ECSRAMRoleCredentialsProviderBuilder {
   roleName: string
   disableIMDSv1: boolean
+  enableIMDSv2: boolean
+  private enableIMDSv2Set: boolean
   readTimeout?: number;
   connectTimeout?: number;
   asyncCredentialUpdateEnabled?: boolean;
 
   constructor() {
     this.disableIMDSv1 = false;
+    this.enableIMDSv2 = true;
+    this.enableIMDSv2Set = false;
     this.asyncCredentialUpdateEnabled = false;
   }
 
@@ -189,6 +224,12 @@ class ECSRAMRoleCredentialsProviderBuilder {
 
   withDisableIMDSv1(disableIMDSv1: boolean): ECSRAMRoleCredentialsProviderBuilder {
     this.disableIMDSv1 = disableIMDSv1
+    return this;
+  }
+
+  withEnableIMDSv2(enableIMDSv2: boolean): ECSRAMRoleCredentialsProviderBuilder {
+    this.enableIMDSv2 = enableIMDSv2
+    this.enableIMDSv2Set = true;
     return this;
   }
 
@@ -221,6 +262,12 @@ class ECSRAMRoleCredentialsProviderBuilder {
     // 允许通过环境变量强制关闭 V1
     if (process.env.ALIBABA_CLOUD_IMDSV1_DISABLED && process.env.ALIBABA_CLOUD_IMDSV1_DISABLED.toLowerCase() === 'true') {
       this.disableIMDSv1 = true;
+    }
+
+    // Default: try IMDSv2. Explicit builder value wins; otherwise env false skips the probe.
+    if (!this.enableIMDSv2Set) {
+      this.enableIMDSv2 = !(process.env.ALIBABA_CLOUD_ECS_IMDSV2_ENABLE
+        && process.env.ALIBABA_CLOUD_ECS_IMDSV2_ENABLE.toLowerCase() === 'false');
     }
 
     return new ECSRAMRoleCredentialsProvider(this);

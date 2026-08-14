@@ -166,15 +166,19 @@ export default class Credential implements ICredential {
         .withSecurityToken(config.securityToken)
         .build());
       break;
-    case 'ecs_ram_role':
-      this.credential = new InnerCredentialsClient('ecs_ram_role', ECSRAMRoleCredentialsProvider.builder()
+    case 'ecs_ram_role': {
+      let ecsBuilder = ECSRAMRoleCredentialsProvider.builder()
         .withRoleName(config.roleName)
         .withDisableIMDSv1(config.disableIMDSv1)
         .withAsyncCredentialUpdateEnabled(config.asyncCredentialUpdateEnabled)
         .withReadTimeout(config.timeout)
-        .withConnectTimeout(config.connectTimeout)
-        .build());
+        .withConnectTimeout(config.connectTimeout);
+      if (config.enableIMDSv2 !== undefined && config.enableIMDSv2 !== null) {
+        ecsBuilder = ecsBuilder.withEnableIMDSv2(config.enableIMDSv2);
+      }
+      this.credential = new InnerCredentialsClient('ecs_ram_role', ecsBuilder.build());
       break;
+    }
     case 'ram_role_arn': {
       let credentialsProvider: CredentialsProvider;
       if (config.securityToken) {
