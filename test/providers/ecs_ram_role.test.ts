@@ -13,7 +13,6 @@ describe('ECSRAMRoleCredentialsProvider', function () {
     let p = ECSRAMRoleCredentialsProvider.builder().build()
     assert.ok(!(p as any).roleName)
     assert.strictEqual((p as any).disableIMDSv1, false);
-    assert.strictEqual((p as any).enableIMDSv2, true);
     assert.strictEqual((p as any).checker, null);
     p.close();
 
@@ -23,27 +22,18 @@ describe('ECSRAMRoleCredentialsProvider', function () {
       .build()
     assert.strictEqual((p as any).roleName, 'role');
     assert.strictEqual((p as any).disableIMDSv1, false);
-    assert.strictEqual((p as any).enableIMDSv2, true);
     assert.strictEqual((p as any).checker, null);
     p.close();
 
     p = ECSRAMRoleCredentialsProvider.builder()
       .withRoleName('role')
       .withDisableIMDSv1(true)
-      .withEnableIMDSv2(false)
       .withAsyncCredentialUpdateEnabled(true)
       .build()
     assert.strictEqual((p as any).roleName, 'role');
     assert.strictEqual((p as any).disableIMDSv1, true);
-    assert.strictEqual((p as any).enableIMDSv2, false);
     assert.ok((p as any).checker);
     assert.ok((p as any).needUpdateCredential());
-    p.close();
-
-    p = ECSRAMRoleCredentialsProvider.builder()
-      .withEnableIMDSv2(true)
-      .build()
-    assert.strictEqual((p as any).enableIMDSv2, true);
     p.close();
   });
 
@@ -65,27 +55,6 @@ describe('ECSRAMRoleCredentialsProvider', function () {
     p = ECSRAMRoleCredentialsProvider.builder().withDisableIMDSv1(true).build()
     assert.strictEqual((p as any).disableIMDSv1, true);
     delete process.env.ALIBABA_CLOUD_IMDSV1_DISABLED;
-    p.close();
-  });
-
-  it('env ALIBABA_CLOUD_ECS_IMDSV2_ENABLE should ok', async function () {
-    process.env.ALIBABA_CLOUD_ECS_IMDSV2_ENABLE = 'false';
-    let p = ECSRAMRoleCredentialsProvider.builder().build()
-    assert.strictEqual((p as any).enableIMDSv2, false);
-    p.close();
-    p = ECSRAMRoleCredentialsProvider.builder().withEnableIMDSv2(true).build()
-    assert.strictEqual((p as any).enableIMDSv2, true);
-    p.close();
-    p = ECSRAMRoleCredentialsProvider.builder().withEnableIMDSv2(false).build()
-    assert.strictEqual((p as any).enableIMDSv2, false);
-    p.close();
-    process.env.ALIBABA_CLOUD_ECS_IMDSV2_ENABLE = 'FALSE';
-    p = ECSRAMRoleCredentialsProvider.builder().build()
-    assert.strictEqual((p as any).enableIMDSv2, false);
-    p.close();
-    delete process.env.ALIBABA_CLOUD_ECS_IMDSV2_ENABLE;
-    p = ECSRAMRoleCredentialsProvider.builder().build()
-    assert.strictEqual((p as any).enableIMDSv2, true);
     p.close();
   });
 
@@ -613,43 +582,6 @@ describe('ECSRAMRoleCredentialsProvider', function () {
         assert.strictEqual(ex.message, 'get sts token failed, httpStatus: 500, message = v2 failed');
         assert.strictEqual(credentialGetCount, 1);
       }
-    } finally {
-      p.close();
-    }
-  });
-
-  it('enableIMDSv2=false skips token PUT', async function () {
-    let p = ECSRAMRoleCredentialsProvider.builder()
-      .withRoleName('rolename')
-      .withEnableIMDSv2(false)
-      .build();
-    try {
-      assert.strictEqual((p as any).enableIMDSv2, false);
-      let putCalled = false;
-      (p as any).doRequest = async function (request: Request) {
-        if (request.path === '/latest/api/token') {
-          putCalled = true;
-          return Response.builder()
-            .withStatusCode(200)
-            .withBody(Buffer.from('tokenxxxxx'))
-            .build();
-        }
-        assert.ok(!request.headers || !request.headers['x-aliyun-ecs-metadata-token']);
-        return Response.builder()
-          .withStatusCode(200)
-          .withBody(Buffer.from(`{"AccessKeyId":"akid","AccessKeySecret":"aksecret","Expiration":"2021-10-20T04:27:09Z","SecurityToken":"token","Code":"Success"}`))
-          .build();
-      };
-
-      const metadataToken = await (p as any).getMetadataToken();
-      assert.ok(metadataToken === null);
-      assert.ok(!putCalled);
-
-      const creds = await (p as any).getCredentialsInternal() as Session;
-      assert.strictEqual(creds.accessKeyId, 'akid');
-      assert.ok(!putCalled);
-    } catch (err) {
-      assert.fail('should not run to here');
     } finally {
       p.close();
     }
