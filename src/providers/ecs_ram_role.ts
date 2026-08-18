@@ -56,6 +56,10 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
     }
   }
 
+  private shouldFallbackToIMDSv1(metadataToken: string): boolean {
+    return metadataToken !== null && !this.disableIMDSv1;
+  }
+
   private async getMetadataToken(): Promise<string> {
     // PUT http://100.100.100.200/latest/api/token
     const request = Request.builder()
@@ -88,6 +92,18 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
   }
 
   private async getRoleName(): Promise<string> {
+    const metadataToken = await this.getMetadataToken();
+    try {
+      return await this.doGetRoleName(metadataToken);
+    } catch (error) {
+      if (this.shouldFallbackToIMDSv1(metadataToken)) {
+        return await this.doGetRoleName(null);
+      }
+      throw error;
+    }
+  }
+
+  private async doGetRoleName(metadataToken: string): Promise<string> {
     const builder = Request.builder()
       .withMethod('GET')
       .withProtocol('http')
@@ -96,7 +112,6 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
       .withReadTimeout(this.readTimeout || 1000)
       .withConnectTimeout(this.connectTimeout || 1000);
 
-    const metadataToken = await this.getMetadataToken();
     if (metadataToken !== null) {
       builder.withHeaders({
         'x-aliyun-ecs-metadata-token': metadataToken
@@ -122,6 +137,18 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
       roleName = await this.getRoleName();
     }
 
+    const metadataToken = await this.getMetadataToken();
+    try {
+      return await this.doGetCredentials(roleName, metadataToken);
+    } catch (error) {
+      if (this.shouldFallbackToIMDSv1(metadataToken)) {
+        return await this.doGetCredentials(roleName, null);
+      }
+      throw error;
+    }
+  }
+
+  private async doGetCredentials(roleName: string, metadataToken: string): Promise<Session> {
     const builder = Request.builder()
       .withMethod('GET')
       .withProtocol('http')
@@ -134,7 +161,6 @@ export default class ECSRAMRoleCredentialsProvider extends SessionCredentialProv
     //   ReadTimeout: 5 * time.Second,
     //     Headers: map[string]string{ },
 
-    const metadataToken = await this.getMetadataToken();
     if (metadataToken !== null) {
       builder.withHeaders({
         'x-aliyun-ecs-metadata-token': metadataToken

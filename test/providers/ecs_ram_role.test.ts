@@ -513,6 +513,80 @@ describe('ECSRAMRoleCredentialsProvider', function () {
     delete process.env.ALIBABA_CLOUD_ECS_METADATA_DISABLED;
   });
 
+  it('fallback to IMDSv1 when credential GET fails after token', async function () {
+    let p = ECSRAMRoleCredentialsProvider.builder()
+      .withRoleName('rolename')
+      .withDisableIMDSv1(false)
+      .build();
+    try {
+      let credentialGetCount = 0;
+      (p as any).doRequest = async function (request: Request) {
+        if (request.path === '/latest/api/token') {
+          return Response.builder()
+            .withStatusCode(200)
+            .withBody(Buffer.from('tokenxxxxx'))
+            .build();
+        }
+        if (request.path === '/latest/meta-data/ram/security-credentials/rolename') {
+          credentialGetCount++;
+          if (request.headers && request.headers['x-aliyun-ecs-metadata-token']) {
+            return Response.builder()
+              .withStatusCode(404)
+              .withBody(Buffer.from('not found'))
+              .build();
+          }
+          return Response.builder()
+            .withStatusCode(200)
+            .withBody(Buffer.from(`{"AccessKeyId":"akid","AccessKeySecret":"aksecret","Expiration":"2021-10-20T04:27:09Z","SecurityToken":"token","Code":"Success"}`))
+            .build();
+        }
+      };
+
+      const creds = await (p as any).getCredentialsInternal() as Session;
+      assert.strictEqual(creds.accessKeyId, 'akid');
+      assert.strictEqual(creds.accessKeySecret, 'aksecret');
+      assert.strictEqual(creds.securityToken, 'token');
+      assert.strictEqual(credentialGetCount, 2);
+    } catch (err) {
+      assert.fail('should not run to here');
+    } finally {
+      p.close();
+    }
+  });
+
+  it('no fallback when disableIMDSv1=true', async function () {
+    let p = ECSRAMRoleCredentialsProvider.builder()
+      .withRoleName('rolename')
+      .withDisableIMDSv1(true)
+      .build();
+    try {
+      let credentialGetCount = 0;
+      (p as any).doRequest = async function (request: Request) {
+        if (request.path === '/latest/api/token') {
+          return Response.builder()
+            .withStatusCode(200)
+            .withBody(Buffer.from('tokenxxxxx'))
+            .build();
+        }
+        credentialGetCount++;
+        return Response.builder()
+          .withStatusCode(500)
+          .withBody(Buffer.from('v2 failed'))
+          .build();
+      };
+
+      try {
+        await (p as any).getCredentialsInternal();
+        assert.fail('should not run to here');
+      } catch (ex) {
+        assert.strictEqual(ex.message, 'get sts token failed, httpStatus: 500, message = v2 failed');
+        assert.strictEqual(credentialGetCount, 1);
+      }
+    } finally {
+      p.close();
+    }
+  });
+
   it('prefetch ECS RAM Role should ok', async function () {
     let p = ECSRAMRoleCredentialsProvider.builder().withRoleName('rolename').build();
     try {
