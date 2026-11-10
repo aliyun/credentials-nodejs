@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'fs';
+import { readFile, writeFile, realpath } from 'fs';
 import { promisify } from 'util';
 
 import path from 'path';
@@ -16,6 +16,7 @@ import ExternalCredentialsProvider from './external';
 
 const readFileAsync = promisify(readFile);
 const writeFileAsync = promisify(writeFile);
+const realpathAsync = promisify(realpath);
 
 const OAUTH_BASE_URL_MAP: { [key: string]: string } = {
   'CN': 'https://oauth.aliyun.com',
@@ -69,6 +70,7 @@ interface Profile {
   sts_endpoint: string;
   enable_vpc: boolean;
   duration_seconds: number;
+  sso_session?: string;
   cloud_sso_sign_in_url: string;
   cloud_sso_account_id: string;
   cloud_sso_access_config: string;
@@ -257,14 +259,39 @@ export default class CLIProfileCredentialsProvider implements CredentialsProvide
         .withStsRegionId(p.sts_region)
         .build();
     }
-    case 'CloudSSO':
-      return CloudSSOCredentialsProvider.builder()
+    case 'CloudSSO': {
+      const builder = CloudSSOCredentialsProvider.builder()
         .withSignInUrl(p.cloud_sso_sign_in_url)
         .withAccountId(p.cloud_sso_account_id)
         .withAccessConfig(p.cloud_sso_access_config)
         .withAccessToken(p.access_token)
-        .withAccessTokenExpire(p.cloud_sso_access_token_expire)
-        .build();
+        .withAccessTokenExpire(p.cloud_sso_access_token_expire);
+      if (p.sso_session != null && p.sso_session !== '') {
+        const name = p.sso_session;
+        if (typeof name !== 'string' || name.length < 1 || name.length > 64 || /[^a-z0-9_-]/.test(name)) {
+          throw new Error('invalid CloudSSO session name');
+        }
+        const configPath = path.join(this.homedir, '.aliyun/config.json');
+        builder.loadSession = async () => {
+          let session;
+          try {
+            const canonicalPath = await realpathAsync(configPath);
+            session = JSON.parse((await readFileAsync(path.join(path.dirname(canonicalPath), 'sso', name + '.json'))).toString('utf8'));
+          } catch (_) {
+            throw new Error(`unable to read CloudSSO session ${name}`);
+          }
+          if (!session || session.name !== name || typeof session.sign_in_url !== 'string' || !session.sign_in_url) {
+            throw new Error(`invalid CloudSSO session ${name}`);
+          }
+          if (typeof session.access_token !== 'string' || !session.access_token ||
+              !Number.isSafeInteger(session.expires_at) || session.expires_at <= Date.now() / 1000) {
+            throw new Error(`CloudSSO session ${name} access token is empty or expired, please re-login with CLI`);
+          }
+          return { signInUrl: session.sign_in_url, accessToken: session.access_token };
+        };
+      }
+      return builder.build();
+    }
     case 'OAuth': {
       const siteType = (p.oauth_site_type || '').toUpperCase();
       const oauthSignInUrl = OAUTH_BASE_URL_MAP[siteType];

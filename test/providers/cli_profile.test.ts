@@ -1,5 +1,8 @@
 import assert from 'assert';
 import path from 'path';
+import os from 'os';
+import { mkdtempSync, mkdirSync, writeFileSync, unlinkSync, rmdirSync } from 'fs';
+import { Request, Response } from '../../src/providers/http';
 
 import CLIProfileCredentialsProvider, { getConfiguration, getProfile } from '../../src/providers/cli_profile';
 import CredentialsProvider from '../../src/credentials_provider';
@@ -12,6 +15,47 @@ import ExternalCredentialsProvider from '../../src/providers/external';
 import Credentials from '../../src/credentials';
 
 describe('CLIProfileCredentialsProvider', function () {
+  it('reloads the shared CloudSSO access token when refreshing credentials', async function () {
+    const home = mkdtempSync(path.join(os.tmpdir(), 'cloud-sso-'));
+    const configPath = path.join(home, '.aliyun/config.json');
+    const sessionPath = path.join(home, '.aliyun/sso/company.json');
+    mkdirSync(path.dirname(configPath));
+    mkdirSync(path.dirname(sessionPath));
+    writeFileSync(configPath, JSON.stringify({ current: 'dev', profiles: [{
+      name: 'dev', mode: 'CloudSSO', sso_session: 'company',
+      cloud_sso_account_id: 'account', cloud_sso_access_config: 'role',
+    }] }));
+    try {
+      const cli = CLIProfileCredentialsProvider.builder().build();
+      (cli as any).homedir = home;
+      const conf = await getConfiguration(configPath);
+      const provider = (cli as any).getCredentialsProvider(conf, 'dev');
+      const authorization: string[] = [];
+      provider.doRequest = async (request: Request) => {
+        authorization.push(request.headers.Authorization);
+        assert.deepStrictEqual(JSON.parse(request.bodyBytes.toString()), { AccountId: 'account', AccessConfigurationId: 'role' });
+        return Response.builder().withStatusCode(200).withHeaders({}).withBody(Buffer.from(
+          '{"CloudCredential":{"AccessKeyId":"ak","AccessKeySecret":"sk","SecurityToken":"sts","Expiration":"2099-01-01T00:00:00Z"}}',
+        )).build();
+      };
+      await assert.rejects(() => provider.getCredentialsInternal(), /unable to read CloudSSO session/);
+      for (const token of ['first', 'second']) {
+        writeFileSync(sessionPath, JSON.stringify({
+          name: 'company', sign_in_url: 'https://example.test/login',
+          access_token: token, expires_at: 4102444800,
+        }));
+        await provider.getCredentialsInternal();
+      }
+      assert.deepStrictEqual(authorization, ['Bearer first', 'Bearer second']);
+    } finally {
+      try { unlinkSync(sessionPath); } catch (_) {}
+      unlinkSync(configPath);
+      rmdirSync(path.dirname(sessionPath));
+      rmdirSync(path.dirname(configPath));
+      rmdirSync(home);
+    }
+  });
+
   it('construct should ok', async function () {
     let b = CLIProfileCredentialsProvider.builder().build();
     assert.ok(!(b as any).profileName)
