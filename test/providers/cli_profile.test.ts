@@ -436,6 +436,7 @@ describe('CLIProfileCredentialsProvider', function () {
     const cfgPath = path.join(aliyunDir, 'config.json');
     const conf = {
       current: 'OAuth_CN',
+      future_config: { empty: {}, nullable: null as null },
       profiles: [
         {
           mode: 'OAuth',
@@ -451,6 +452,7 @@ describe('CLIProfileCredentialsProvider', function () {
           source_profile: 'OAuth_CN',
           ram_role_arn: 'arn',
         },
+        { mode: 'CloudSSO', name: 'shared', sso_session: 'company', future_profile: { empty: {} } },
       ],
     };
     fs.writeFileSync(cfgPath, JSON.stringify(conf, null, 4));
@@ -476,6 +478,8 @@ describe('CLIProfileCredentialsProvider', function () {
       const viaCallback = (provider as any).createOAuthTokenUpdateCallback(conf, 'via_oauth');
       await viaCallback('chain_refresh', 'chain_access', 'ak2', 'sk2', 'sts2', 333, 444);
       const chained = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+      assert.deepStrictEqual(chained.future_config, conf.future_config);
+      assert.deepStrictEqual(chained.profiles[2], conf.profiles[2]);
       assert.strictEqual(chained.profiles[0].oauth_refresh_token, 'chain_refresh');
 
       const noop = (provider as any).createOAuthTokenUpdateCallback(conf, 'missing');
@@ -502,6 +506,7 @@ describe('CLIProfileCredentialsProvider', function () {
     const cfgPath = path.join(aliyunDir, 'config.json');
     const conf = {
       current: 'External',
+      future_config: { empty: {}, nullable: null as null },
       profiles: [
         {
           mode: 'External',
@@ -516,6 +521,7 @@ describe('CLIProfileCredentialsProvider', function () {
           source_profile: 'External',
           ram_role_arn: 'arn',
         },
+        { mode: 'CloudSSO', name: 'shared', sso_session: 'company', future_profile: { empty: {} } },
       ],
     };
     fs.writeFileSync(cfgPath, JSON.stringify(conf, null, 4));
@@ -537,6 +543,8 @@ describe('CLIProfileCredentialsProvider', function () {
       const viaCallback = (provider as any).createExternalCredentialUpdateCallback(conf, 'via_ext');
       await viaCallback('ak2', 'sk2', 'sts2', 1000);
       const chained = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+      assert.deepStrictEqual(chained.future_config, conf.future_config);
+      assert.deepStrictEqual(chained.profiles[2], conf.profiles[2]);
       assert.strictEqual(chained.profiles[0].access_key_id, 'ak2');
 
       const noop = (provider as any).createExternalCredentialUpdateCallback(conf, 'missing');
