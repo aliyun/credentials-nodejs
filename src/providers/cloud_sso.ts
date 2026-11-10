@@ -3,6 +3,7 @@ import { Session, SessionCredentialProvider, STALE_TIME } from './session';
 import { doRequest, Request } from './http';
 
 class CloudSSOCredentialsProviderBuilder {
+  loadSession?: () => Promise<{ signInUrl: string; accessToken: string }>;
   signInUrl: string;
   accountId: string;
   accessConfig: string;
@@ -48,11 +49,11 @@ class CloudSSOCredentialsProviderBuilder {
 
   build(): CloudSSOCredentialsProvider {
     const now = Math.floor(Date.now() / 1000);
-    if (!this.accessToken || !this.accessTokenExpire || this.accessTokenExpire - now <= 0) {
+    if (!this.loadSession && (!this.accessToken || this.accessTokenExpire <= now || !this.accessTokenExpire)) {
       throw new Error('CloudSSO access token is empty or expired, please re-login with cli.');
     }
 
-    if (!this.signInUrl || !this.accountId || !this.accessConfig) {
+    if ((!this.loadSession && !this.signInUrl) || !this.accountId || !this.accessConfig) {
       throw new Error('CloudSSO sign in url, account id, and access config cannot be empty.');
     }
 
@@ -61,6 +62,7 @@ class CloudSSOCredentialsProviderBuilder {
 }
 
 export default class CloudSSOCredentialsProvider extends SessionCredentialProvider implements CredentialsProvider {
+  private readonly loadSession: CloudSSOCredentialsProviderBuilder['loadSession'];
   private readonly signInUrl: string;
   private readonly accountId: string;
   private readonly accessConfig: string;
@@ -77,6 +79,7 @@ export default class CloudSSOCredentialsProvider extends SessionCredentialProvid
   constructor(builder: CloudSSOCredentialsProviderBuilder) {
     super(STALE_TIME);
     this.refresher = this.getCredentialsInternal;
+    this.loadSession = builder.loadSession;
     this.signInUrl = builder.signInUrl;
     this.accountId = builder.accountId;
     this.accessConfig = builder.accessConfig;
@@ -92,7 +95,10 @@ export default class CloudSSOCredentialsProvider extends SessionCredentialProvid
   }
 
   async getCredentialsInternal(): Promise<Session> {
-    const url = new URL(this.signInUrl);
+    const session = this.loadSession ? await this.loadSession() : {
+      signInUrl: this.signInUrl, accessToken: this.accessToken,
+    };
+    const url = new URL(session.signInUrl);
 
     const body = JSON.stringify({
       AccountId: this.accountId,
@@ -102,7 +108,7 @@ export default class CloudSSOCredentialsProvider extends SessionCredentialProvid
     const headers: { [key: string]: string } = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.accessToken}`,
+      'Authorization': `Bearer ${session.accessToken}`,
     };
 
     const request = Request.builder()
@@ -111,6 +117,7 @@ export default class CloudSSOCredentialsProvider extends SessionCredentialProvid
       .withHost(url.host)
       .withPath('/cloud-credentials')
       .withHeaders(headers)
+      .withBodyBytes(Buffer.from(body))
       .withReadTimeout(this.readTimeout)
       .withConnectTimeout(this.connectTimeout)
       .build();
