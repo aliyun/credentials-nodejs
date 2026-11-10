@@ -39,6 +39,12 @@ describe('CLIProfileCredentialsProvider', function () {
         )).build();
       };
       await assert.rejects(() => provider.getCredentialsInternal(), /unable to read CloudSSO session/);
+      writeFileSync(sessionPath, '{"name":"wrong","sign_in_url":"https://example.test"}');
+      await assert.rejects(() => provider.getCredentialsInternal(), /invalid CloudSSO session/);
+      writeFileSync(sessionPath, '{"name":"company","sign_in_url":"https://example.test","access_token":"expired","expires_at":1}');
+      await assert.rejects(() => provider.getCredentialsInternal(), /expired/);
+      conf.profiles[0].sso_session = '../outside';
+      assert.throws(() => (cli as any).getCredentialsProvider(conf, 'dev'), /invalid CloudSSO session name/);
       for (const token of ['first', 'second']) {
         writeFileSync(sessionPath, JSON.stringify({
           name: 'company', sign_in_url: 'https://example.test/login',
