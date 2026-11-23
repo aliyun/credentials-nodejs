@@ -107,6 +107,11 @@ export class RequestBuilder {
     return this;
   }
 
+  withBodyBytes(bodyBytes: Buffer) {
+    this.bodyBytes = bodyBytes;
+    return this;
+  }
+
   withBodyForm(bodyForm: { [key: string]: string }) {
     this.bodyForm = bodyForm;
     return this;
@@ -184,8 +189,8 @@ function querystringify(queries: { [key: string]: string }) {
 export async function doRequest(req: Request): Promise<Response> {
   const url = req.toRequestURL();
 
-  let body;
-  if (req.bodyForm && Object.keys(req.bodyForm).length > 0) {
+  let body: Buffer | string = req.bodyBytes;
+  if (!body && req.bodyForm && Object.keys(req.bodyForm).length > 0) {
     body = querystringify(req.bodyForm);
     if (!req.headers['Content-Type']) {
       req.headers['Content-Type'] = 'application/x-www-form-urlencoded';
