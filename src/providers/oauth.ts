@@ -186,16 +186,22 @@ export default class OAuthCredentialsProvider extends SessionCredentialProvider 
       throw new Error(`get session token from OAuth failed, unmarshal fail: ${response.body.toString('utf8')}`);
     }
 
-    if (!data || !data.accessKeyId || !data.accessKeySecret || !data.securityToken) {
+    // Real OAuth /v1/exchange returns PascalCase; keep camelCase fallback for compatibility.
+    const accessKeyId = getExchangeField(data, 'AccessKeyId', 'accessKeyId');
+    const accessKeySecret = getExchangeField(data, 'AccessKeySecret', 'accessKeySecret');
+    const securityToken = getExchangeField(data, 'SecurityToken', 'securityToken');
+    const expiration = getExchangeField(data, 'Expiration', 'expiration');
+
+    if (!data || !accessKeyId || !accessKeySecret || !securityToken) {
       throw new Error(`refresh session token from OAuth failed, fail to get credentials: ${response.body.toString('utf8')}`);
     }
 
     if (this.tokenUpdateCallback) {
       try {
-        const stsExpire = data.expiration ? Math.floor(new Date(data.expiration).getTime() / 1000) : 0;
+        const stsExpire = expiration ? Math.floor(new Date(expiration).getTime() / 1000) : 0;
         await this.tokenUpdateCallback(
           this.refreshToken, this.accessToken,
-          data.accessKeyId, data.accessKeySecret, data.securityToken,
+          accessKeyId, accessKeySecret, securityToken,
           this.accessTokenExpire, stsExpire
         );
       } catch (e) {
@@ -203,6 +209,20 @@ export default class OAuthCredentialsProvider extends SessionCredentialProvider 
       }
     }
 
-    return new Session(data.accessKeyId, data.accessKeySecret, data.securityToken, data.expiration);
+    return new Session(accessKeyId, accessKeySecret, securityToken, expiration);
   }
+}
+
+/** Prefer real-service PascalCase key, then fall back to camelCase. */
+export function getExchangeField(data: any, primaryKey: string, fallbackKey: string): any {
+  if (!data) {
+    return undefined;
+  }
+  const value = data[primaryKey] != null && data[primaryKey] !== ''
+    ? data[primaryKey]
+    : data[fallbackKey];
+  if (value == null) {
+    return undefined;
+  }
+  return String(value);
 }

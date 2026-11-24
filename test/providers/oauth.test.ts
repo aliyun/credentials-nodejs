@@ -40,7 +40,7 @@ describe('OAuthCredentialsProvider', function () {
     (p as any).doRequest = async function () {
       return Response.builder()
         .withStatusCode(200)
-        .withBody(Buffer.from('{"accessKeyId":"ak","accessKeySecret":"sk","securityToken":"token","expiration":"2021-10-20T04:27:09Z"}'))
+        .withBody(Buffer.from('{"AccessKeyId":"ak","AccessKeySecret":"sk","SecurityToken":"token","Expiration":"2021-10-20T04:27:09Z"}'))
         .withHeaders({})
         .build();
     };
@@ -50,6 +50,34 @@ describe('OAuthCredentialsProvider', function () {
     assert.strictEqual(creds.accessKeySecret, 'sk');
     assert.strictEqual(creds.securityToken, 'token');
     assert.strictEqual(creds.expiration, '2021-10-20T04:27:09Z');
+  });
+
+  it('getCredentialsInternal() should accept camelCase fallback body', async function () {
+    const p = OAuthCredentialsProvider.builder()
+      .withClientId('clientId')
+      .withSignInUrl('https://oauth.aliyun.com')
+      .withAccessToken('token')
+      .withAccessTokenExpire(Math.floor(Date.now() / 1000) + 2000)
+      .build();
+
+    (p as any).doRequest = async function () {
+      return Response.builder()
+        .withStatusCode(200)
+        .withBody(Buffer.from('{"accessKeyId":"ak","accessKeySecret":"sk","securityToken":"token","expiration":"2021-10-20T04:27:09Z"}'))
+        .withHeaders({})
+        .build();
+    };
+
+    const creds = await (p as any).getCredentialsInternal();
+    assert.strictEqual(creds.accessKeyId, 'ak');
+    assert.strictEqual(creds.securityToken, 'token');
+  });
+
+  it('getExchangeField prefers PascalCase', function () {
+    const { getExchangeField } = require('../../src/providers/oauth');
+    assert.strictEqual(getExchangeField({ AccessKeyId: 'p', accessKeyId: 'c' }, 'AccessKeyId', 'accessKeyId'), 'p');
+    assert.strictEqual(getExchangeField({ accessKeyId: 'c' }, 'AccessKeyId', 'accessKeyId'), 'c');
+    assert.strictEqual(getExchangeField({}, 'AccessKeyId', 'accessKeyId'), undefined);
   });
 
   it('getCredentialsInternal() should throw on server error', async function () {
@@ -142,7 +170,7 @@ describe('OAuthCredentialsProvider', function () {
       if (req.path === '/v1/exchange') {
         return Response.builder()
           .withStatusCode(200)
-          .withBody(Buffer.from('{"accessKeyId":"ak","accessKeySecret":"sk","securityToken":"token","expiration":"2021-10-20T04:27:09Z"}'))
+          .withBody(Buffer.from('{"AccessKeyId":"ak","AccessKeySecret":"sk","SecurityToken":"token","Expiration":"2021-10-20T04:27:09Z"}'))
           .withHeaders({})
           .build();
       }
@@ -202,7 +230,7 @@ describe('OAuthCredentialsProvider', function () {
     (p as any).doRequest = async function () {
       return Response.builder()
         .withStatusCode(200)
-        .withBody(Buffer.from('{"accessKeyId":"ak","accessKeySecret":"sk","securityToken":"token","expiration":"2021-10-20T04:27:09Z"}'))
+        .withBody(Buffer.from('{"AccessKeyId":"ak","AccessKeySecret":"sk","SecurityToken":"token","Expiration":"2021-10-20T04:27:09Z"}'))
         .withHeaders({})
         .build();
     };
@@ -228,7 +256,7 @@ describe('OAuthCredentialsProvider', function () {
     (p as any).doRequest = async function () {
       return Response.builder()
         .withStatusCode(200)
-        .withBody(Buffer.from('{"accessKeyId":"ak","accessKeySecret":"sk","securityToken":"token","expiration":"2021-10-20T04:27:09Z"}'))
+        .withBody(Buffer.from('{"AccessKeyId":"ak","AccessKeySecret":"sk","SecurityToken":"token","Expiration":"2021-10-20T04:27:09Z"}'))
         .withHeaders({})
         .build();
     };
